@@ -4,7 +4,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -23,17 +22,8 @@ public class ParticleManager {
      */
     private void startParticleClock() {
         Bukkit.getScheduler().runTaskTimer(plugin, () -> {
-            // Iterate through all active effects
-            Iterator<ActiveParticleEffect> iterator = activeEffects.iterator();
-            while (iterator.hasNext()) {
-                ActiveParticleEffect effect = iterator.next();
-
-                // Update and play the effect
-                if (!effect.updateAndPlay()) {
-                    iterator.remove(); // Remove the effect if it has expired
-                }
-            }
-        }, 0L, 1L); // Runs every tick
+            activeEffects.removeIf(effect -> !effect.updateAndPlay());
+        }, 0L, 1L);
     }
 
     /**

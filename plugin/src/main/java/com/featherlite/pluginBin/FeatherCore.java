@@ -73,6 +73,10 @@ public class FeatherCore extends JavaPlugin {
     private UtilManager utilManager;
     private ParticleManager particleManager;
     private ChatManager chatManager;
+
+    private PlayerDataManager playerDataManager;
+    private TeleportationManager teleportationManager;
+    private HomeManager homeManager;
     // private AdminManager adminManager;
     // private MessagingManager messagingManager;
     // Command handler instances
@@ -99,9 +103,9 @@ public class FeatherCore extends JavaPlugin {
         new IndicatorListener(this);
         getLogger().info("FeatherCore Plugin Enabled!");
 
-        PlayerDataManager playerDataManager = new PlayerDataManager(this, "player_data");
-        TeleportationManager teleportationManager = new TeleportationManager(playerDataManager, this);
-        HomeManager homeManager = new HomeManager(playerDataManager);
+        playerDataManager = new PlayerDataManager(this, "player_data");
+        teleportationManager = new TeleportationManager(playerDataManager, this);
+        homeManager = new HomeManager(playerDataManager);
 
         adminManager = new AdminManager();
         messagingManager = new MessagingManager(playerDataManager);        
@@ -328,7 +332,11 @@ public class FeatherCore extends JavaPlugin {
         return lobbyLocations.get(name);
     }
 
-    // Getter methods for UIManager and ItemManager
+    /*
+     * 
+     * Below we are exposing managers for API calls. 
+     */
+    // ITEM UI MANAGER - SHOULD CHANGE THIS NAME
     public UIManager getUiManager() {
         return uiManager;
     }
@@ -340,6 +348,50 @@ public class FeatherCore extends JavaPlugin {
     public ParticleManager getParticleManager() {
         return particleManager;
     }
+
+    public EconomyManager getEconomyManager() {
+        return economyManager;
+    }
+
+    public ChatManager getChatManager() {
+        return chatManager;
+    }
+
+    public InstanceManager getInstanceManager() {
+        return instanceManager;
+    }
+
+    public PartyManager getPartyManager() {
+        return partyManager;
+    }
+
+    public WorldManager getWorldManager() {
+        return worldManager;
+    }
+
+    public ZoneManager getZoneManager() {
+        return zoneManager;
+    }
+
+    public PermissionManager getPermissionManager() {
+        return permissionManager;
+    }
+
+    public PlayerDataManager getPlayerDataManager() {
+        return playerDataManager;
+    }
+
+    public TeleportationManager getTeleportationManager() {
+        return teleportationManager;
+    }
+
+    public ScoreboardManager getScoreboardManager() {
+        return scoreboardManager;
+    }
+
+
+
+
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {

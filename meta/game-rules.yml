@@ -1,0 +1,64 @@
+gameCategories:
+  bedwars:
+    fourBed:
+      minPlayers: 2
+      maxPlayers: 16
+      minTeams: 2
+      maxTeams: 4
+      teams:
+        - "Red"
+        - "Blue"
+        - "Green"
+        - "Yellow"
+      maxTime: 60
+
+      worlds:
+        bedwars1:
+          spawns:
+            Red:
+              x: 100
+              y: 100
+              z: 100
+            Blue:
+              x: 200
+              y: 100
+              z: 100
+            Green:
+              x: 100
+              y: 100
+              z: 200
+            Yellow:
+              x: 150
+              y: 100
+              z: 150
+          generators:
+            RedHearth:
+              drops:
+                - "IRON_INGOT"
+                - "GOLD_INGOT"
+              x: 100
+              y: 100
+              z: 100
+            BlueHearth:
+              drops:
+                - "IRON_INGOT"
+                - "GOLD_INGOT"
+              x: 200
+              y: 100
+              z: 100
+            EmeraldOne:
+              drops:
+                - "EMERALD"
+              x: 150
+              y: 80
+              z: 150
+        bedwars2:
+          spawns:
+            Red:
+              x: 110
+              y: 100
+              z: 110
+            Blue:
+              x: 210
+              y: 100
+              z: 110
