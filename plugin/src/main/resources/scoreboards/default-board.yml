@@ -1,0 +1,11 @@
+scoreboard:
+  title: "&b&lFeatherlite Board"
+  permission: "core.board.default"
+  update-interval: 3
+  lines:
+    - "&dPing: <player_ping>"
+    - "&bPlayers: <online_player_count>"
+    - "&eCurrent World: <world_name>"
+    - "&aBalance: <player_balance>"
+    - ""
+    - "&7Toggle with /board toggle"

@@ -1,0 +1,458 @@
+
+package com.featherlite.pluginBin;
+
+import com.featherlite.pluginBin.commands.*;
+import com.featherlite.pluginBin.economy.EconomyManager;
+import com.featherlite.pluginBin.essentials.PlayerDataManager;
+import com.featherlite.pluginBin.essentials.commands.AdminCommands;
+import com.featherlite.pluginBin.essentials.commands.HomeCommands;
+import com.featherlite.pluginBin.essentials.commands.MessagingCommands;
+import com.featherlite.pluginBin.essentials.commands.TeleportationCommands;
+import com.featherlite.pluginBin.essentials.commands.UtilCommands;
+import com.featherlite.pluginBin.essentials.teleportation.HomeManager;
+import com.featherlite.pluginBin.essentials.teleportation.PlayerRespawnListener;
+import com.featherlite.pluginBin.essentials.teleportation.TeleportationManager;
+import com.featherlite.pluginBin.essentials.messaging.MessagingManager;
+import com.featherlite.pluginBin.essentials.admin.AdminManager;
+import com.featherlite.pluginBin.essentials.util.UtilManager;
+import com.featherlite.pluginBin.essentials.util.PlayerJoinListenerForUtils;
+
+import com.featherlite.pluginBin.items.AbilityRegistry;
+import com.featherlite.pluginBin.items.CooldownManager;
+import com.featherlite.pluginBin.items.ItemListeners;
+import com.featherlite.pluginBin.items.ItemManager;
+import com.featherlite.pluginBin.items.UIManager;
+import com.featherlite.pluginBin.lobbies.InstanceManager;
+import com.featherlite.pluginBin.lobbies.PartyManager;
+import com.featherlite.pluginBin.particles.ParticleManager;
+import com.featherlite.pluginBin.lobbies.GameConfiguration;
+import com.featherlite.pluginBin.permissions.PermissionManager;
+import com.featherlite.pluginBin.permissions.PlayerJoinListener;
+import com.featherlite.pluginBin.placeholders.PlaceholderEconomy;
+import com.featherlite.pluginBin.scoreboards.ScoreboardManager;
+import com.featherlite.pluginBin.utils.IndicatorListener;
+import com.featherlite.pluginBin.webapp.WebAppManager;
+import com.featherlite.pluginBin.worlds.WorldBorderListener;
+import com.featherlite.pluginBin.worlds.WorldManager;
+import com.featherlite.pluginBin.zones.ZoneManager;
+import com.featherlite.pluginBin.chat.ChatControlListener;
+import com.featherlite.pluginBin.chat.ChatManager;
+
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import org.bukkit.configuration.ConfigurationSection;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
+public class FeatherCore extends JavaPlugin {
+    private FileManager fileManager;
+    private WebAppManager webAppManager;
+    private PartyManager partyManager;
+    private GameConfiguration gameConfiguration;
+    private WorldManager worldManager;
+    private InstanceManager instanceManager;
+    private PermissionManager permissionManager;
+    private UIManager uiManager;
+    private ItemManager itemManager;
+    private Map<UUID, String> activeSessions = new HashMap<>();
+    private Map<String, Location> lobbyLocations = new HashMap<>();
+    private AbilityRegistry abilityRegistry; // Add the AbilityRegistry here
+    private CooldownManager cooldownManager;
+    private ZoneManager zoneManager;
+    private ScoreboardManager scoreboardManager;
+    private EconomyManager economyManager;
+    private MessagingManager messagingManager;
+    private AdminManager adminManager;
+    private UtilManager utilManager;
+    private ParticleManager particleManager;
+    private ChatManager chatManager;
+    // private AdminManager adminManager;
+    // private MessagingManager messagingManager;
+    // Command handler instances
+    private PartyCommands partyCommands;
+    private AppCommands appCommands;
+    private GameCommands gameCommands;
+    private WorldCommands worldCommands;
+    private PermissionsCommands permissionCommands;
+    private ItemCommands itemCommands;
+    private ZonesCommands zoneCommands;
+    private ScoreboardCommands scoreboardCommands;
+    private EconomyCommands economyCommands;
+    private MessagingCommands messagingCommands;
+    private AdminCommands adminCommands;
+    private UtilCommands utilCommands;
+
+    private TeleportationCommands teleportationCommands;
+    private HomeCommands homeCommands;
+
+    @Override
+    public void onEnable() {
+        saveDefaultConfig();
+        loadLobbyLocations();
+        new IndicatorListener(this);
+        getLogger().info("FeatherCore Plugin Enabled!");
+
+        PlayerDataManager playerDataManager = new PlayerDataManager(this, "player_data");
+        TeleportationManager teleportationManager = new TeleportationManager(playerDataManager, this);
+        HomeManager homeManager = new HomeManager(playerDataManager);
+
+        adminManager = new AdminManager();
+        messagingManager = new MessagingManager(playerDataManager);        
+
+        utilManager = new UtilManager();
+
+
+
+        // Initialize managers
+        abilityRegistry = new AbilityRegistry(this); // Initialize AbilityRegistry
+        cooldownManager = new CooldownManager();
+        fileManager = new FileManager(this);
+        fileManager.loadActiveItemCategories();
+        gameConfiguration = new GameConfiguration(this);
+        worldManager = new WorldManager(this);
+        worldManager.loadPersistedWorlds();
+
+        webAppManager = new WebAppManager(this, fileManager);
+        partyManager = new PartyManager();
+        itemManager = new ItemManager(this);  // Initialize ItemManager
+        uiManager = new UIManager(this, itemManager); // Initialize UIManager with ItemManager
+        instanceManager = new InstanceManager(gameConfiguration, partyManager, worldManager, this);
+        permissionManager = new PermissionManager(this, playerDataManager); // Initialize the permission manager
+        zoneManager = new ZoneManager(this);
+        scoreboardManager = new ScoreboardManager(this);
+
+        economyManager = new EconomyManager(this, playerDataManager);
+        particleManager = new ParticleManager(this);
+
+        chatManager = new ChatManager(this);
+        getServer().getPluginManager().registerEvents(new ChatControlListener(this, chatManager, permissionManager), this);
+
+        partyManager.setInstanceManager(instanceManager);
+        getServer().getPluginManager().registerEvents(new PlayerJoinListener(permissionManager), this);
+        getServer().getPluginManager().registerEvents(new ItemListeners(abilityRegistry, cooldownManager, this), this);
+
+        getServer().getPluginManager().registerEvents(new PlayerJoinListenerForUtils(playerDataManager), this);
+
+        getServer().getPluginManager().registerEvents(new WorldBorderListener(worldManager), this);
+
+        getServer().getPluginManager().registerEvents(new PlayerRespawnListener(teleportationManager, this), this);
+
+        // Initialize command handlers
+        partyCommands = new PartyCommands(partyManager);
+        appCommands = new AppCommands(webAppManager, activeSessions);
+        gameCommands = new GameCommands(instanceManager);
+        worldCommands = new WorldCommands(worldManager);
+        permissionCommands = new PermissionsCommands(permissionManager);
+        itemCommands = new ItemCommands(uiManager, itemManager, this); // Only pass the main plugin instance
+        zoneCommands = new ZonesCommands(zoneManager ,this);
+        scoreboardCommands = new ScoreboardCommands(scoreboardManager);
+        economyCommands = new EconomyCommands(economyManager, this);
+
+        teleportationCommands = new TeleportationCommands(teleportationManager, this);
+        homeCommands = new HomeCommands(homeManager, teleportationManager);
+
+        adminCommands = new AdminCommands(adminManager);
+        messagingCommands = new MessagingCommands(messagingManager);
+        utilCommands = new UtilCommands(utilManager, playerDataManager);
+
+
+        //Set Managers for Placeholders
+        PlaceholderEconomy.setEconomyManager(economyManager);
+
+
+
+        // Register commands
+        getCommand("app").setExecutor(this);
+        getCommand("party").setExecutor(this);
+        getCommand("party").setTabCompleter(partyCommands);
+        getCommand("game").setExecutor(this);
+        getCommand("world").setExecutor(this);
+        getCommand("world").setTabCompleter(worldCommands);
+        getCommand("perms").setExecutor(this);
+        getCommand("perms").setTabCompleter(permissionCommands);
+        getCommand("items").setExecutor(this);
+        getCommand("zone").setExecutor(this);
+        getCommand("zone").setTabCompleter(zoneCommands);
+        getCommand("board").setExecutor(this);
+        getCommand("board").setTabCompleter(scoreboardCommands);
+
+        getCommand("eco").setExecutor(this);
+        getCommand("eco").setTabCompleter(economyCommands);
+        getCommand("bal").setExecutor(this);
+        getCommand("baltop").setExecutor(this);
+        // Essentials command and completer registries.
+        getCommand("tppos").setExecutor(this);
+        getCommand("tppos").setTabCompleter(teleportationCommands);
+        getCommand("tp").setExecutor(this);
+        getCommand("tp").setTabCompleter(teleportationCommands);
+        getCommand("tphere").setExecutor(this);
+        getCommand("tphere").setTabCompleter(teleportationCommands);
+        getCommand("tpall").setExecutor(this);
+        getCommand("tpall").setTabCompleter(teleportationCommands);
+        getCommand("tpa").setExecutor(this);
+        getCommand("tpa").setTabCompleter(teleportationCommands);
+        getCommand("tpahere").setExecutor(this);
+        getCommand("tpahere").setTabCompleter(teleportationCommands);
+        getCommand("tpaccept").setExecutor(this);
+        getCommand("tpaccept").setTabCompleter(teleportationCommands);
+        getCommand("tpadeny").setExecutor(this);
+        getCommand("tpadeny").setTabCompleter(teleportationCommands);
+        getCommand("tpacancel").setExecutor(this);
+        getCommand("tpacancel").setTabCompleter(teleportationCommands);
+        getCommand("tpr").setExecutor(this);
+        getCommand("tpr").setTabCompleter(teleportationCommands);
+        getCommand("rtp").setExecutor(this);
+        getCommand("rtp").setTabCompleter(teleportationCommands);
+        getCommand("spawn").setExecutor(this);
+        getCommand("setspawn").setExecutor(this);
+        getCommand("back").setExecutor(this);
+
+        getCommand("sethome").setExecutor(this);
+        getCommand("sethome").setTabCompleter(homeCommands);
+        getCommand("home").setExecutor(this);
+        getCommand("home").setTabCompleter(homeCommands);
+        getCommand("delhome").setExecutor(this);
+        getCommand("delhome").setTabCompleter(homeCommands);
+        getCommand("homes").setExecutor(this);
+        getCommand("homes").setTabCompleter(homeCommands);
+
+        getCommand("msg").setExecutor(this);
+        getCommand("msg").setTabCompleter(messagingCommands);
+        getCommand("r").setExecutor(this);
+        getCommand("ignore").setExecutor(this);
+        getCommand("ignore").setTabCompleter(messagingCommands);
+        getCommand("msgtoggle").setExecutor(this);
+        getCommand("broadcast").setExecutor(this);
+
+        getCommand("repair").setExecutor(this);
+        getCommand("enchant").setExecutor(this);
+        getCommand("enchant").setTabCompleter(adminCommands);
+        getCommand("exp").setExecutor(this);
+        getCommand("exp").setTabCompleter(adminCommands);
+        getCommand("give").setExecutor(this);
+        getCommand("give").setTabCompleter(adminCommands);
+        getCommand("kill").setExecutor(this);
+        getCommand("kill").setTabCompleter(adminCommands);
+        getCommand("killall").setExecutor(this);
+        getCommand("remove").setExecutor(this);
+        getCommand("killall").setTabCompleter(adminCommands);
+        getCommand("remove").setTabCompleter(adminCommands);
+        getCommand("sudo").setExecutor(this);
+        getCommand("weather").setExecutor(this);
+        getCommand("weather").setTabCompleter(adminCommands);
+        getCommand("time").setExecutor(this);
+        getCommand("time").setTabCompleter(adminCommands);
+        getCommand("god").setExecutor(this);
+
+        getCommand("fly").setExecutor(this);
+        getCommand("speed").setExecutor(this);
+        getCommand("flyspeed").setExecutor(this);
+        getCommand("gamemode").setExecutor(this);
+        getCommand("gamemode").setTabCompleter(utilCommands);
+        getCommand("gm").setExecutor(this);
+        getCommand("gm").setTabCompleter(utilCommands);
+        getCommand("heal").setExecutor(this);
+        getCommand("feed").setExecutor(this);
+        getCommand("rest").setExecutor(this);
+        getCommand("afk").setExecutor(this);
+        getCommand("enderchest").setExecutor(this);
+        getCommand("ec").setExecutor(this);
+        getCommand("trash").setExecutor(this);
+        getCommand("top").setExecutor(this);
+        getCommand("hat").setExecutor(this);
+        getCommand("nick").setExecutor(this);
+        getCommand("nick").setTabCompleter(utilCommands);
+        getCommand("nickname").setExecutor(this);
+        getCommand("nickname").setTabCompleter(utilCommands);
+        getCommand("realname").setExecutor(this);
+        getCommand("list").setExecutor(this);
+        getCommand("near").setExecutor(this);
+        getCommand("getpos").setExecutor(this);
+        getCommand("ping").setExecutor(this);
+        getCommand("seen").setExecutor(this);
+        getCommand("workbench").setExecutor(this);
+        getCommand("wb").setExecutor(this);
+        getCommand("craft").setExecutor(this);
+        getCommand("anvil").setExecutor(this);
+        getCommand("cartographytable").setExecutor(this);
+        getCommand("grindstone").setExecutor(this);
+        getCommand("loom").setExecutor(this);
+        getCommand("smithingtable").setExecutor(this);
+        getCommand("smithing").setExecutor(this);
+        getCommand("stonecutter").setExecutor(this);
+        getCommand("ptime").setExecutor(this);
+        getCommand("pweather").setExecutor(this);
+
+
+
+    }
+
+    @Override
+    public void onDisable() {
+        getLogger().info("FeatherCore Plugin Disabled!");
+    }
+
+
+
+    private void loadLobbyLocations() {
+        if (getConfig().isConfigurationSection("lobbyLocations")) {
+            ConfigurationSection section = getConfig().getConfigurationSection("lobbyLocations");
+
+            for (String name : section.getKeys(false)) {
+                String worldName = section.getString(name + ".world");
+                double x = section.getDouble(name + ".x");
+                double y = section.getDouble(name + ".y");
+                double z = section.getDouble(name + ".z");
+
+                if (Bukkit.getWorld(worldName) == null) {
+                    getLogger().warning("World " + worldName + " for lobby " + name + " does not exist!");
+                    continue;
+                }
+
+                Location location = new Location(Bukkit.getWorld(worldName), x, y, z);
+                lobbyLocations.put(name, location);
+            }
+        } else {
+            getLogger().warning("No 'lobbyLocations' section found in config.yml!");
+        }
+    }
+
+    public Location getLobbyLocation(String name) {
+        return lobbyLocations.get(name);
+    }
+
+    // Getter methods for UIManager and ItemManager
+    public UIManager getUiManager() {
+        return uiManager;
+    }
+
+    public ItemManager getItemManager() {
+        return itemManager;
+    }
+
+    public ParticleManager getParticleManager() {
+        return particleManager;
+    }
+
+    @Override
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (sender instanceof Player) {
+            Player player = (Player) sender;
+            
+            switch (command.getName().toLowerCase()) {
+                case "party":
+                    return partyCommands.handlePartyCommands(player, args);
+                case "app":
+                    return appCommands.handleAppCommands(player, args);
+                case "game":
+                    return gameCommands.handleGameCommands(player, args);
+                case "world":
+                    return worldCommands.handleWorldCommands(player, args);
+                case "perms":
+                    return permissionCommands.handlePermissionsCommands(player, args);
+                case "items":
+                    return itemCommands.handleItemCommands(player, args);
+                case "zone":
+                    return zoneCommands.handleZoneCommands(player, args);
+                case "board":
+                    return scoreboardCommands.handleScoreboardCommands(player, args);
+                case "eco":
+                case "bal":
+                case "baltop":
+                    return economyCommands.handleEconomyCommands(label, player, args);
+
+                // Essetials cases
+                case "tppos":
+                case "tp":
+                case "tphere":
+                case "tpall":
+                case "tpa":
+                case "tpahere":
+                case "tpaccept":
+                case "tpadeny":
+                case "tpacancel":
+                case "back":
+                case "tpr":
+                case "spawn":
+                case "setspawn":
+                    return teleportationCommands.handleTeleportCommands(player, command, label, args);
+                case "home":
+                case "sethome":
+                case "delhome":
+                case "homes":
+                    return homeCommands.handleHomeCommands(player, command, label, args);
+                case "msg":
+                case "message":
+                case "dm":
+                case "r":
+                case "reply":
+                case "broadcast":
+                case "announce":
+                case "msgtoggle":
+                case "dmtoggle":
+                case "ignore":
+                    return messagingCommands.handleMessagingCommands(sender, command, label, args);
+                case "enchant":
+                case "exp":
+                case "give":
+                case "kill":
+                case "killall":
+                case "remove":
+                case "sudo":
+                case "weather":
+                case "time":
+                case "god":
+                    return adminCommands.handleAdminCommands(sender, command, label, args);
+                case "fly":
+                case "speed":
+                case "flyspeed":
+                case "gamemode":
+                case "gm":
+                case "heal":
+                case "feed":
+                case "rest":
+                case "repair":
+                case "afk":
+                case "enderchest":
+                case "ec":
+                case "trash":
+                case "top":
+                case "hat":
+                case "nick":
+                case "nickname":
+                case "realname":
+                case "list":
+                case "near":
+                case "getpos":
+                case "ping":
+                case "seen":
+                case "workbench":
+                case "wb":
+                case "craft":
+                case "anvil":
+                case "cartographytable":
+                case "grindstone":
+                case "loom":
+                case "smithing":
+                case "smithingtable":
+                case "stonecutter":
+                case "ptime":
+                case "pweather":
+                    return utilCommands.handleUtilCommands(sender, command, label, args);
+                    
+            }
+        }
+        return false;
+    }
+
+    public void invalidateSession(UUID playerUUID) {
+        activeSessions.remove(playerUUID);
+    }
+}

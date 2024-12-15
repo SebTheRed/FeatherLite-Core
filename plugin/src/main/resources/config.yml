@@ -1,0 +1,107 @@
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+#                                                         #
+#              FeatherLite-Core Config                    #
+#  FeatherLite uses a web app to change all config files  #
+#                                                         #
+#      command   ->     /app     <-   opens web editor    #
+#                                                         #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+
+# Define the permission groups that new users receive on first log in.
+first-join-permission-groups:
+  - default
+#  - member
+
+# Show damage / healing indicators.
+show-damage-indicators: true
+show-healing-indicators: true
+
+# Define the details of your currency.
+currency-name: "Dollars"
+currency-prefix: "$"
+starting-currency-amount: 10
+
+# Define minimum and maximum random teleportation (/tpr | /rtp) radius
+tpr-min-radius: 100
+tpr-max-radius: 2000
+
+# Define the cooldown - in seconds - for these utility commands. OPs override cooldowns.
+command-cooldowns:
+  heal: 60
+  feed: 60
+  rest: 60
+  repair: 60
+
+# Chat-manager provides [prefixes], bad-word filtering, and spam filtering. Switch to false if using other chat-controller plugin.
+use-chat-manager: true
+# Economy-manager provides money functionality on your server. Switch to false if using other economy plugin.
+use-economy-manager: true
+# Essential-manager provides vital server commands and features - similar to the EssentialsX plugin. Switch to false if using EssentialsX.
+use-essentials-manager: true
+# Permissions-manager provides group and individual permissions. Switch to false if using another permissions manager like LuckPerms.
+use-permissions-manager: true
+# Scoreboard-manager provides configurable scoreboards. Switch to false if using Featherboard, but be weary because it will stop FL extensions plugins from rendering their scoreboards.
+use-scoreboard-manager: true
+# Indicator-manager provides indicators for taking damage and healing. Switch to false if you have this handled in another plugin.
+use-indicator-manager: true
+# Zones-manager provides precise control over areas of your world. Switch to false if using alternate plugins like WorldGuard.
+use-zones-manager: true
+
+
+# Debugger tool should only be turned on to inspect potential problems within the plugin. This will flood your console.
+debugger-tool: false
+
+
+
+
+
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+#                     !!!!!!!!                            #
+#                    DANGER ZONE                          #
+# CHANGING VALUES BELOW CAN LEAD TO BREAKS IN THE PLUGIN  #
+# ONLY TOUCH IF YOU KNOW WHAT YOU'RE DOING!@!!            #
+#                     !!!!!!!!                            #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+
+# Items-manager controls all custom items across Featherlite and allows you to create your own custom items. Disabling will cause many FeatherLite plugins' custom items to fail.
+use-items-manager: true
+# Lobbies-manager provides crucial game, lobby, and party management. This is used across many FeatherLite plugins. Disabling will cause some FeatherLite extensions to fail.
+use-lobby-manager: true
+# Worlds-manager provides full functionality when controlling world imports/exports/duplications/etc. Disabling this will break the lobby manager, because lobby instances depend on the World duplication functionality. Disable if using Multiverse
+use-worlds-manager: true
+# Placeholder-manager creates and handles all FeatherLite placeholders. This DOES work with PlaceholderAPI, so there is no need to disable.
+use-placeholder-manager: true
+
+# Define all active item categories ( DO NOT TOUCH! )
+active-item-categories:
+  - armor.yml
+  - axe.yml
+  - crossbow.yml
+  - currency.yml
+  - food.yml
+  - ingredients.yml
+  - mace.yml
+  - potion.yml
+  - shield.yml
+  - bow.yml
+  - sword.yml
+  - tool.yml
+  - block.yml
+  - throwable.yml
+
+# Define all active item abilities
+item-abilities:
+  leap:
+    method: "leap"
+    params:
+      leap_strength: 1.5
+  smite:
+    method: "strikeLightning"
+    params:
+      lightning_range: 10
+
+
+# Made by Seb The Red & Team FeatherLite - with all rights reserved.

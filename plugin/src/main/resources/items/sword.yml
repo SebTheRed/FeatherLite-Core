@@ -1,0 +1,58 @@
+categoryInfo:
+  category-name: "Sword"
+  icon: "IRON_SWORD"
+
+items:
+
+  stone_sword:
+    name: "Stone Sword"
+    type: "sword"
+    material: "STONE_SWORD"
+
+  long_sword:
+    name: "&7Long Sword"
+    type: "sword"
+    material: "STONE_SWORD"
+    attackDamage: 10
+    attackSpeed: 0.1
+    customModelData: 0
+    lore:
+      - "&7A balanced weapon for warriors."
+
+  short_sword:
+    name: "&6Short Sword"
+    type: "sword"
+    material: "STONE_SWORD"
+    attackDamage: 5
+    attackSpeed: 2
+    customModelData: 1
+    lore:
+      - "&7Quick and agile."
+    enchantments:
+      UNBREAKING: 1
+
+  god_sword:
+    name: "&dGod Sword"
+    type: "sword"
+    material: "DIAMOND_SWORD"
+    attackDamage: 30
+    attackSpeed: 0.2
+    customModelData: 0
+    lore:
+      - "&6 A Divine Weapon."
+    abilities:
+      r_click:
+          method: "leap"
+          title: "Leap ! :D"
+          cooldown: 3
+          leap_strength: 10
+      shift_r_click:
+          method: "smite"
+          title: "Smite >:D"
+          cooldown: 3
+          lightning_range: 16
+      shift_l_click:
+          method: "bigleap"
+          title: "WOAH"
+          cooldown: 10
+          leap_strength: 10

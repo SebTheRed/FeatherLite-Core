@@ -1,0 +1,13 @@
+unique_name:
+  information:
+    name: "Unique Name"
+    world: "Example_World_Name"
+  coordinates:
+    corner-one:
+      x: 100
+      y: 100
+      z: 100
+    corner-two:
+      x: -100
+      y: 0
+      z: -100

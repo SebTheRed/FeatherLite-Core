@@ -1,0 +1,15 @@
+categoryInfo:
+  category-name: "Throwable"
+  icon: "EGG"
+
+items:
+  boom_ball:
+    name: "Boom Ball"
+    material: "SNOWBALL"
+    type: "throwable"
+    abilities:
+      on_throw:
+        method: "blockTrail"
+        title: "Block Trail"
+        cooldown: 0
+        wool_color: 'RED_WOOL'

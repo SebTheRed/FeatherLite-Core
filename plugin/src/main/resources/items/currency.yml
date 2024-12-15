@@ -1,0 +1,24 @@
+categoryInfo:
+  category-name: "Currency"
+  icon: "GOLD_INGOT"
+
+items:
+  gold_coin:
+    name: "&6Gold Coin"
+    type: "currency"
+    material: "GOLD_NUGGET"
+    customModelData: 0
+    lore:
+      - "&7Currency used by merchants."
+    custom-tags:
+      value: "1"
+
+  silver_coin:
+    name: "&7Silver Coin"
+    type: "currency"
+    material: "IRON_NUGGET"
+    customModelData: 0
+    lore:
+      - "&7Less valuable than gold."
+    custom-tags:
+      value: "0.1"

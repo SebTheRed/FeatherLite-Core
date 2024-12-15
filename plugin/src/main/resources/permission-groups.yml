@@ -1,0 +1,28 @@
+permission-groups:
+  default:
+    - core.party
+    - core.board.default
+    - core.eco.bal
+    - core.eco.baltop
+    - core.eco.pay
+
+  member:
+    - group.default
+    - core.back
+    - core.chat.white
+
+  gamer:
+    - core.game
+
+  mod:
+    - group.member
+    - core.seen
+    - core.broadcast
+    - core.tp
+
+  admin:
+    - group.mod
+    - core.world
+    - core.board.reload
+    - core.eco.*
+    - core.chat.badwords

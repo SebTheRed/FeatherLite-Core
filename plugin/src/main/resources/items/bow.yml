@@ -1,0 +1,30 @@
+categoryInfo:
+  category-name: "Bow"
+  icon: "BOW"
+
+items:
+  longbow:
+    name: "&6Longbow"
+    type: "bow"
+    material: "BOW"
+    customModelData: 0
+    lore:
+      - "&7A powerful bow with long range."
+    enchantments:
+      POWER: 4
+      UNBREAKING: 3
+
+  infinite_bow:
+    name: "&aInfinite Bow"
+    type: "bow"
+    material: "BOW"
+    customModelData: 0
+    arrowVelocity: 1.5
+    lore:
+      - "&7A bow with a fast draw speed."
+      - "&7Effective at close range."
+    enchantments:
+      INFINITY: 1
+      UNBREAKING: 5
+      MENDING: 1
+      POWER: 5

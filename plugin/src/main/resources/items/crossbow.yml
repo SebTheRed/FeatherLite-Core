@@ -1,0 +1,26 @@
+categoryInfo:
+  category-name: "Crossbow"
+  icon: "CROSSBOW"
+
+items:
+  sniper_crossbow:
+    name: "&6Sniper Crossbow"
+    type: "crossbow"
+    material: "CROSSBOW"
+    customModelData: 0
+    lore:
+      - "&7High range and damage."
+    enchantments:
+      POWER: 4
+      UNBREAKING: 2
+
+  rapidfire_crossbow:
+    name: "&aRapidfire Crossbow"
+    type: "crossbow"
+    material: "CROSSBOW"
+    customModelData: 0
+    lore:
+      - "&7Fast reloading mechanism."
+    enchantments:
+      QUICK_CHARGE: 3
+      UNBREAKING: 1

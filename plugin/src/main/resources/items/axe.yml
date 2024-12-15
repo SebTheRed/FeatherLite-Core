@@ -1,0 +1,25 @@
+categoryInfo:
+  category-name: "Axe"
+  icon: "IRON_AXE"
+
+items:
+  battle_axe:
+    name: "&cBattle Axe"
+    type: "axe"
+    material: "DIAMOND_AXE"
+    attackDamage: 3
+    attackSpeed: 0.4
+    customModelData: 0
+    lore:
+      - "&7A heavy axe meant for combat."
+
+  lumberjack_axe:
+    name: "&2Lumberjack's Axe"
+    type: "axe"
+    material: "STONE_AXE"
+    customModelData: 1
+    lore:
+      - "&7Efficient for chopping wood."
+    enchantments:
+      EFFICIENCY: 3
+      SHARPNESS: 5

@@ -1,0 +1,578 @@
+name: FeatherLite-Core
+main: com.featherlite.pluginBin.FeatherCore
+version: 1.0
+api-version: 1.21
+description: The one plugin to rule them all. All FeatherLite plugins depend on the Core.
+
+commands:
+  app:
+    description: Generates an editor session link for server management.
+    permission: core.editor
+    usage: /app
+  party:
+    description: Manages player parties.
+    usage: /party <create|invite|accept|deny|leave|disband|list>
+    permission: core.party
+  game:
+    description: Manages game instances.
+    usage: /game <join|leave|create|delete|close>
+    permission: core.game
+  world:
+    description: Manages worlds.
+    usage: /world <create|copy|tp|delete|load|unload>
+    aliases: [w]
+    permission: core.world
+  perms:
+    description: Manages permissions.
+    permission: core.permissions
+    usage: /perms
+  items: 
+    description: Opens the Item UI.
+    permission: core.items
+    usage: /items [reload]
+  zone:
+    description: Controls a Zone.
+    permission: core.zone
+    aliases: [zones]
+    usage: /zone [reload]
+
+  board:
+    description: Controls scoreboards.
+    aliases: [sb,b]
+    usage: /board <toggle|{board_name}|reload>
+
+  eco:
+    description: Use to manipulate player economy balances.
+    permission: core.eco
+    aliases: [economy, money]
+    usage: /eco <bal|baltop|pay|give|take>
+  bal:
+    description: Shows the player their balance.
+    permission: core.eco
+    aliases: [balance]
+    usage: /bal
+  baltop:
+    description: Shows the player the economy leaderboard.
+    permission: core.eco
+    usage: /baltop
+
+  tppos:
+    description: Teleports to a specific position in an optional world.
+    permission: core.teleport.tppos
+    usage: /tppos <x> <y> <z> [world]
+  tp:
+    description: Teleports to a player.
+    permission: core.teleport.tp
+    usage: /tp <player>
+  tphere:
+    description: Teleports a player to the command sender.
+    permission: core.teleport.tphere
+    usage: /tphere <player>
+  tpall:
+    description: Teleports all online players to you.
+    permission: core.teleport.tpall
+    usage: /tpall
+  tpa:
+    description: Requests a teleportation to another player.
+    permission: core.teleport.tpa
+    usage: /tpa <player>
+  tpahere:
+    description: Requests another player to teleport to the command sender.
+    permission: core.teleport.tpahere
+    usage: /tpahere <player>
+  tpaccept:
+    description: Accepts a teleporation request.
+    permission: core.teleport.tpa
+    usage: /tpaccept
+  tpadeny:
+    description: Denies a teleportation request.
+    permission: core.teleport.tpa
+    usage: /tpadeny
+  tpacancel:
+    description: Cancels any outbound teleporation requests.
+    permission: core.teleport.tpa
+    usage: /tpacancel
+  back:
+    description: Returns you to the last position you teleported to.
+    permission: core.teleport.back
+    usage: /back
+  tpr:
+    description: Telport randomly in the world you are in.
+    usage: /tpr
+    permission: core.teleport.tpr
+    aliases: [rtp]
+  spawn:
+    description: Teleport to the server spawn.
+    permission: core.teleport.spawn
+    usage: /spawn
+    aliases: [sp]
+  setspawn:
+    description: Set the server spawn.
+    permission: core.teleport.setspawn
+    usage: /setspawn
+
+  home:
+    description: Teleports you to a home you have set.
+    permission: core.home
+    usage: /home <home_name>
+  sethome:
+    description: "Sets a home for you to teleport to."
+    permission: core.home
+    usage: /sethome <home_name>
+  delhome:
+    description: "Deletes a home that you have set."
+    permission: core.home
+    usage: /delhome <home_name>
+  homes:
+    description: "Provides a list of your homes."
+    permission: core.home
+    usage: /homes
+
+  msg:
+    description: Sends a message to another player.
+    permission: core.message
+    aliases: [message]
+    usage: /msg <playername> <message>
+  r:
+    description: Replies to whoever sent you the most recent message.
+    permission: core.message
+    aliases: [reply]
+    usage: /r <message>
+  ignore:
+    description: Adds a player to your ignore list.
+    permission: core.message
+    usage: /ignore <playername>
+  msgtoggle:
+    description: Toggles DM's ( direct /msg )
+    permission: core.message
+    aliases: [messagetoggle]
+    usage: /msgtoggle
+  broadcast:
+    description: Broadcasts an announcement to all players online.
+    permission: core.broadcast
+    aliases: [announce]
+    usage: /broadcast <message>
+
+  enchant:
+    description: Enchants the item in the player's hand.
+    permission: core.enchant
+    usage: /enchant <enchantment_name> <level>
+  exp:
+    description: Gives the player in-game exp.
+    permission: core.exp
+    usage: /exp <give|set> <amount>
+  give:
+    description: Gives the player a vanilla item.
+    permission: core.give
+    usage: /give <player> <item> [amount]
+  kill:
+    description: Dead on the spot.
+    permission: core.kill
+    usage: /kill <player_name>\
+  killall:
+    description: Kills all sorts of things.
+    permission: core.killall
+    aliases: [remove]
+    usage: /killall <monsters|entities|boats|minecarts|players|drops|arrows|mobs [type]> [radius|world]
+  sudo:
+    description: Runs a command as the player. Very useful for development.
+    permission: core.sudo
+    usage: /sudo <playername> <command> <parameters>
+  weather:
+    description: Changes the weather in the world.
+    permission: core.weather
+    usage: /weather <clear|rain|thunder>
+  time:
+    description: Changes the time in the world.
+    permission: core.time
+    usage: /time <set|add> <value>
+  god:
+    description: Sets the player to god-mode.
+    permission: core.god
+    usage: /god
+
+  fly:
+    description: Toggles flight for the player.
+    permission: core.fly
+    usage: /fly
+  speed:
+    description: Changes the player's walking speed.
+    permission: core.speed
+    usage: /speed <integer>
+  flyspeed:
+    description: Changes the player's flying speed.
+    permission: core.flyspeed
+    usage: /flyspeed <integer>
+  gamemode:
+    description: Changes the player's gamemode.
+    permission: core.gamemode
+    usage: /gamemode <survival|creative|spectator>
+    aliases: [gm]
+  heal:
+    description: Heals the player to full health.
+    permission: core.heal
+    usage: /heal
+  feed:
+    description: Fully feeds the player.
+    permission: core.feed
+    usage: /feed
+  rest:
+    description: Fully rests the player.
+    permission: core.rest
+    usage: /rest
+  repair:
+    description: Fully repairs the item in hand.
+    permission: core.repair
+    usage: /repair
+  afk:
+    description: Sets the player to afk status.
+    permission: core.afk
+    usage: /afk
+  enderchest:
+    description: Opens the player's enderchest.
+    permission: core.enderchest
+    usage: /enderchest
+    aliases: [ec]
+  trash:
+    description: Opens a menu that when closed, disposes of all items within.
+    permission: core.trash
+    usage: /trash
+  top:
+    description: Teleports the player to the top of the highest block above them.
+    permission: core.top
+    usage: /top
+  hat:
+    description: Places the item in hand on the player's head.
+    permission: core.hat
+    usage: /hat
+  nick:
+    description: Changes the user's display name in chat.
+    permission: core.nick
+    usage: /nick <desired_name>
+    aliases: [nickname]
+  realname:
+    description: Shows the real username of a player.
+    permission: core.realname
+    usage: /realname <players_nickname>
+  list:
+    description: Lists all online players.
+    permission: core.list
+    usage: /list
+  near:
+    description: Lists all players in a circular radius.
+    permission: core.near
+    usage: /near <radius>
+  getpos:
+    description: Gives the X,Y,Z coordinates of the player's current position.
+    permission: core.getpos
+    usage: /getpos
+  ping:
+    description: Shows the player's ping.
+    permission: core.ping
+    usage: /ping
+  seen:
+    description: Shows the last time the player was online.
+    permission: core.seen
+    usage: /seen <player_name>
+
+  workbench:
+    description: Opens up the crafting table.
+    permission: core.workbench
+    usage: /workbench
+    aliases: [wb, craft]
+  anvil:
+    description: Opens up an anvil.
+    permission: core.anvil
+    usage: /anvil
+  cartographytable:
+    description: Opens up a cartography table.
+    permission: core.cartographytable
+    usage: /cartographytable
+  grindstone:
+    description: Opens up a grindstone.
+    permission: core.grindstone
+    usage: /grindstone
+  loom:
+    description: Opens up a loom.
+    permission: core.loom
+    usage: /loom
+  smithingtable:
+    description: Opens up a smithing table.
+    permission: core.smithing
+    usage: /smithingtable
+    aliases: [smithing]
+  stonecutter:
+    description: Opens up a stonecutter.
+    permission: core.stonecutter
+    usage: /stonecutter
+  ptime:
+    description: Changes the player's own relative time.
+    permission: core.ptime
+    usage: /ptime <morning|noon|night|{ticks_integer}>
+  pweather:
+    description: Changes the player's own relative weather.
+    permission: core.pweather
+    usage: /pweather <clear|storm|thunder>
+
+
+permissions:
+
+  core.editor:
+    description: Allows the player to use the editor session link.
+    default: op
+  core.permissions:
+    description: Allows the player to manage permissions.
+    default: op
+
+  core.party:
+    description: Allows the player to create and manage parties.
+    default: op
+  core.game:
+    description: Allows the player to create and manage game instances.
+    default: op
+
+  core.zone:
+    description: Allows the player to manage zones.
+    default: op
+  core.board.*:
+    description: Allows the player to manage scoreboards.
+    default: false
+    children:
+      core.board.reload: true
+  core.board.reload:
+    description: Allows user to reload all scoreboards.
+    default: op
+
+  core.eco.*:
+    description: All economy-related permissions.
+    default: false
+    children:
+      core.eco.balance: true
+      core.eco.baltop: true
+      core.eco.pay: true
+      core.eco.give: true
+      core.eco.take: true
+  core.eco.balance:
+    description: Allows viewing your balance.
+    default: false
+  core.eco.baltop:
+    description: Allows viewing the server's balance leaderboard.
+    default: false
+  core.eco.pay:
+    description: Allows paying other players.
+    default: false
+  core.eco.give:
+    description: Allows giving money to players.
+    default: op
+  core.eco.take:
+    description: Allows taking money from players.
+    default: op
+
+  core.world.*:
+    description: Allows the player to create and manage worlds.
+    default: false
+    children:
+      core.world.create: true
+      core.world.copy: true
+      core.world.list: true
+      core.world.tp: true
+      core.world.load: true
+      core.world.unload: true
+      core.world.delete: true
+      core.world.setborder: true
+  core.world.create:
+    description: Allows the player to create worlds.
+    default: false
+  core.world.copy:
+    description: Allows the player to copy worlds.
+    default: false
+  core.world.list:
+    description: Lists loaded worlds.
+    default: false
+  core.world.tp:
+    description: Allows the player to teleport to worlds.
+    default: false
+  core.world.load:
+    description: Allows the player to load worlds.
+    default: false
+  core.world.unload:
+    description: Allows the player to unload worlds.
+    default: false
+  core.world.delete:
+    description: Allows the player to delete worlds.
+    default: false
+  core.world.setborder:
+    description: Allows the player to set the world border.
+    default: false
+
+  core.items:  # New permission
+    description: Allows the player to open the Item UI.
+    default: op
+  core.items.reload:
+    description: Allows players to reload item configs.
+    default: op
+
+  core.home:
+    description: Allows players to set, delete, and teleport to homes.
+    default: op
+
+  core.teleport:
+    description: Allows players to use teleportation commands.
+    default: op
+  core.teleport.tpr:
+    description: Allows players to use random teleportation.
+    default: op
+  core.teleport.tppos:
+    description: Allows players to teleport to specific coordinates.
+    default: op
+  core.teleport.tp:
+    description: Allows players to teleport to other players.
+    default: op
+  core.teleport.tphere:
+    description: Allows players to teleport another player to them.
+    default: op
+  core.teleport.tpall:
+    description: Allows players to teleport all online players to them.
+    default: op
+  core.teleport.tpa:
+    description: Allows players to request teleports to other players.
+    default: op
+  core.teleport.tpahere:
+    description: Allows players to request others to teleport to them.
+    default: op
+  core.teleport.back:
+    description: Allows players to return to their last location.
+    default: op
+  core.teleport.spawn:
+    description: Allows players to teleport to the server's spawn location.
+    default: op
+  core.teleport.setspawn:
+    description: Allows players to set the server's spawn location.
+    default: op
+
+  core.message:
+    description: Allows players to message eachother.
+    default: op
+  core.broadcast:
+    description: Allows players to broadcast a message to the server.
+    default: op
+  core.time:
+    description: Allows players to change the time in the world.
+    default: op
+  core.weather:
+    description: Allows players to change the weather in the world.
+    default: op
+  core.sudo:
+    description: Allows players to execute commands as other players.
+    default: op
+  core.kill:
+    description: Allows players to instantly kill other players.
+    default: op
+  core.killall:
+    description: Kills all of many types of things.
+    default: op
+  core.give:
+    description: Allows players to give items to others.
+    default: op
+  core.exp:
+    description: Allows players to modify experience levels or points.
+    default: op
+  core.enchant:
+    description: Allows players to enchant items.
+    default: op
+  core.god:
+    description: Allows God-mode
+    default: op
+
+  core.heal:
+    description: Allows players to fully heal themselves or others.
+    default: op
+  core.feed:
+    description: Allows players to fully restore their hunger or that of others.
+    default: op
+  core.rest:
+    description: Allows players to fully heal and feed themselves or others.
+    default: op
+  core.repair:
+    description: Allows players to repair the durability of items.
+    default: op
+  core.afk:
+    description: Allows players to toggle AFK status.
+    default: op
+  core.enderchest:
+    description: Allows players to access their Ender Chest.
+    default: op
+  core.trash:
+    description: Allows players to open a trash inventory to dispose of items.
+    default: op
+  core.top:
+    description: Allows players to teleport to the highest block at their current location.
+    default: op
+  core.hat:
+    description: Allows players to equip the item in their hand as a hat.
+    default: op
+  core.nick:
+    description: Allows players to change their display name.
+    default: op
+  core.realname:
+    description: Allows players to retrieve the real username of another player based on their nickname.
+    default: op
+  core.list:
+    description: Allows players to list all online players.
+    default: op
+  core.near:
+    description: Allows players to view a list of nearby players within a given radius.
+    default: op
+  core.getpos:
+    description: Allows players to view their own or another player’s current coordinates.
+    default: op
+  core.ping:
+    description: Allows players to check their connection latency to the server.
+    default: op
+  core.seen:
+    description: Allows players to check when another player was last online.
+    default: op
+  core.workbench:
+    description: Allows players to open a crafting table interface.
+    default: op
+  core.anvil:
+    description: Allows players to open an anvil interface.
+    default: op
+  core.cartographytable:
+    description: Allows players to open a cartography table interface.
+    default: op
+  core.grindstone:
+    description: Allows players to open a grindstone interface.
+    default: op
+  core.loom:
+    description: Allows players to open a loom interface.
+    default: op
+  core.smithing:
+    description: Allows players to open a smithing table interface.
+    default: op
+  core.stonecutter:
+    description: Allows players to open a stonecutter interface.
+    default: op
+  core.ptime:
+    description: Allows players to change their personal in-game time.
+    default: op
+  core.pweather:
+    description: Allows players to change their personal in-game weather.
+    default: op
+
+  core.chat.*:
+    description: All chat-related permissions.
+    default: false
+    children:
+      core.chat.badwords: true
+      core.chat.spam: true
+      core.chat.white: true
+  core.chat.badwords:
+    description: Allows players to bypass the bad-word filter.
+    default: false
+  core.chat.spam:
+    description: Allows players to bypass the spam filter.
+    default: false
+  core.chat.white:
+    description: Grants the player white text in chat.
+    default: false

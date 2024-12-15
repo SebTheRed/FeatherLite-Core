@@ -1,0 +1,35 @@
+categoryInfo:
+  category-name: "Block"
+  icon: "CHEST"
+
+items:
+  leapBlock:
+    name: "&bLeap Block"
+    type: "block"
+    material: "CHEST"
+    placeAbility: "leap"
+    placeAbility_leapStrength: 5
+    temporaryOnPlace: true
+    lore:
+      - "&7Makes you jump"
+
+  blast_proof_glass:
+    name: "&dBlast Proof Glass"
+    type: "block"
+    material: "BLACK_STAINED_GLASS"
+
+  test_cobble:
+    name: "Test Cobble"
+    type: "block"
+    material: "COBBLESTONE"
+    temporaryOnPlace: true
+
+  towerItem:
+    name: "&2Red Tower Builder"
+    type: "block"
+    material: "CHEST"
+    placeAbility: "coreBuildTower"
+    placeAbility_towerMaterial: "RED_WOOL"
+    temporaryOnPlace: true
+    lore:
+      - "&7Builds a watchtower at this location"

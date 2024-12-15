@@ -1,0 +1,22 @@
+categoryInfo:
+  category-name: "Food"
+  icon: "BREAD"
+
+items:
+  steak:
+    name: "&cJuicy Steak"
+    type: "food"
+    material: "COOKED_BEEF"
+    customModelData: 0
+    lore:
+      - "&7Restores a lot of hunger."
+
+
+  apple_pie:
+    name: "&6Apple Crisp"
+    type: "food"
+    material: "APPLE"
+    customModelData: 0
+    lore:
+      - "&7A sweet treat!"
+

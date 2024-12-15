@@ -1,0 +1,24 @@
+categoryInfo:
+  category-name: "Tool"
+  icon: "IRON_PICKAXE"
+
+items:
+  iron_pickaxe:
+    name: "&7Iron Pickaxe"
+    type: "tool"
+    material: "IRON_PICKAXE"
+    customModelData: 0
+    lore:
+      - "&7Useful for mining."
+    enchantments:
+      EFFICIENCY: 3
+
+  farmer_hoe:
+    name: "&2Farmer's Hoe"
+    type: "tool"
+    material: "IRON_HOE"
+    customModelData: 1
+    lore:
+      - "&7Essential for farming."
+    enchantments:
+      EFFICIENCY: 2

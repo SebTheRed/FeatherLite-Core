@@ -1,0 +1,28 @@
+categoryInfo:
+  category-name: "Potion"
+  icon: "POTION"
+
+items:
+  health_potion:
+    name: "&cHealth Potion"
+    type: "potion"
+    material: "POTION"
+    customModelData: 0
+    effect: "REGENERATION"
+    duration: 10
+    amplifier: 1
+    lore:
+      - "&7Restores health over time."
+
+
+  speed_potion:
+    name: "&bSpeed Potion"
+    type: "potion"
+    material: "POTION"
+    customModelData: 0
+    effect: "SPEED"
+    duration: 15
+    amplifier: 2
+    lore:
+      - "&7Increases movement speed."
+

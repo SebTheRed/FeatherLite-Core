@@ -1,0 +1,21 @@
+categoryInfo:
+  category-name: "Shield"
+  icon: "SHIELD"
+
+items:
+  knight_shield:
+    name: "&7Knight's Shield"
+    type: "shield"
+    material: "SHIELD"
+    customModelData: 0
+    lore:
+      - "&7A shield used by knights."
+
+
+  enchanted_shield:
+    name: "&aEnchanted Shield"
+    type: "shield"
+    material: "SHIELD"
+    customModelData: 0
+    lore:
+      - "&7Provides magic protection."

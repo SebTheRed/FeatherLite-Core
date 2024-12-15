@@ -1,0 +1,94 @@
+categoryInfo:
+  category-name: "Armor"
+  icon: "IRON_CHESTPLATE"
+
+items:
+  testplate:
+    name: "Testplate"
+    type: "armor"
+    material: "IRON_CHESTPLATE"
+    customModelData: 0
+    armor: 1
+
+  testplate_2:
+    name: "Testplate 2"
+    type: "armor"
+    material: "IRON_CHESTPLATE"
+    customModelData: 0
+    armor: 10
+
+  testplate_3:
+    name: "Testplate 3"
+    type: "armor"
+    material: "IRON_CHESTPLATE"
+    customModelData: 0
+    scale: 2
+    armor: 10
+
+  giant_plate:
+    name: "Giant Plate"
+    type: "armor"
+    material: "GOLDEN_CHESTPLATE"
+    customModelData: 0
+    scale: 4
+
+  gnome_plate:
+    name: "Gnome Plate"
+    type: "armor"
+    material: "GOLDEN_CHESTPLATE"
+    customModelData: 0
+    scale: -0.6
+
+  every_plate:
+    name: "Every Plate"
+    type: "armor"
+    material: "DIAMOND_CHESTPLATE"
+    customModelData: 0
+    attackDamage: 10
+    attackKnockback: 10
+    attackSpeed: 0.2
+    burningTime: 10
+    armor: 10
+    armorToughness: 10
+    explosionKnockbackResistance: 10
+    knockbackResistance: 10
+    scale: 1
+    fallDamageMultiplier: 0.5
+    flyingSpeed: 1
+    gravity: 0.2
+    jumpStrength: 5
+    luck: 10
+    maxAbsorption: 10
+    maxHealth: 10
+    movementEfficiency: 2
+    movementSpeed: 1
+    oxygenBonus: 10
+    safeFallDistance: 10
+    stepHeight: 1
+    waterMovementEfficiency: 5
+
+
+  iron_helmet:
+    name: "&bSteel Helmet"
+    type: "armor"
+    material: "IRON_HELMET"
+    customModelData: 0
+    lore:
+      - "&7A solid piece of steel armor."
+    enchantments:
+      PROTECTION: 3
+      RESPIRATION: 2
+    armorToughness: 2
+
+  moon_boots:
+    name: "&4Moon Boots"
+    type: "boots"
+    material: "LEATHER_BOOTS"
+    customModelData: 1
+    dye: 255,255,255
+    lore:
+      - "Power of the moon."
+    armor: 1
+    gravity: -0.07
+    safeFallDistance: 8
+    enchantments:
