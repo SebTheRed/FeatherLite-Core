@@ -17,6 +17,9 @@ import com.featherlite.pluginBin.essentials.admin.AdminManager;
 import com.featherlite.pluginBin.essentials.util.UtilManager;
 import com.featherlite.pluginBin.essentials.util.PlayerJoinListenerForUtils;
 
+import com.featherlite.pluginBin.stats.PlayerStatsManager;
+import com.featherlite.pluginBin.stats.StatListeners;
+
 import com.featherlite.pluginBin.items.AbilityRegistry;
 import com.featherlite.pluginBin.items.CooldownManager;
 import com.featherlite.pluginBin.items.ItemListeners;
@@ -30,6 +33,7 @@ import com.featherlite.pluginBin.permissions.PermissionManager;
 import com.featherlite.pluginBin.permissions.PlayerJoinListener;
 import com.featherlite.pluginBin.placeholders.PlaceholderEconomy;
 import com.featherlite.pluginBin.scoreboards.ScoreboardManager;
+
 import com.featherlite.pluginBin.utils.IndicatorListener;
 import com.featherlite.pluginBin.webapp.WebAppManager;
 import com.featherlite.pluginBin.worlds.WorldBorderListener;
@@ -77,6 +81,8 @@ public class FeatherCore extends JavaPlugin {
     private PlayerDataManager playerDataManager;
     private TeleportationManager teleportationManager;
     private HomeManager homeManager;
+
+    private PlayerStatsManager playerStatsManager;
     // private AdminManager adminManager;
     // private MessagingManager messagingManager;
     // Command handler instances
@@ -148,6 +154,8 @@ public class FeatherCore extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new PlayerRespawnListener(teleportationManager, this), this);
 
+        playerStatsManager = new PlayerStatsManager(this);
+        getServer().getPluginManager().registerEvents(new StatListeners(playerStatsManager), this);
         // Initialize command handlers
         partyCommands = new PartyCommands(partyManager);
         appCommands = new AppCommands(webAppManager, activeSessions);
@@ -301,6 +309,8 @@ public class FeatherCore extends JavaPlugin {
     @Override
     public void onDisable() {
         getLogger().info("FeatherCore Plugin Disabled!");
+        Bukkit.getOnlinePlayers().forEach(playerStatsManager::savePlayerStats);
+
     }
 
 
@@ -389,6 +399,9 @@ public class FeatherCore extends JavaPlugin {
         return scoreboardManager;
     }
 
+    public PlayerStatsManager getPlayerStatsManager() {
+        return playerStatsManager;
+    }
 
 
 

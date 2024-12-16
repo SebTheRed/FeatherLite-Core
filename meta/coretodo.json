@@ -1,0 +1,186 @@
+{
+
+    "core tier":{
+        "items":{
+            "testing extrenal items": false,
+            "integrate lore customizer": false,
+            "finish testing": false
+        }, 
+        "scoreboard":{
+            "2 days to make": true,
+            "command to show/hide": true,
+            "make default config": true,
+            "allow game overrides": true,
+            "test fully": true
+        },
+        "perms":{
+            "get working ffs": true,
+            "test permission inheritance with group.perms": true,
+            "perms addGroup didn't work.": "problem is that addGroup sets `permission` with a plural, not the group.",
+            "test perms.* omni-permission breakouts": false,
+            "weave in perms where necessary | make ops' override": false
+        },
+        "lobbies & parties":{
+            "test and revise w/ cass": false
+        },
+        "worlds":{
+            "test rigorously": false,
+            "add world border param": true,
+            "permission to clear border": true
+        },
+        "placeholders": {
+            "that was easy": true,
+            "initial balances are working": true,
+            "test all placeholders": false
+        },
+        "economy":{
+            "1 day to make" : true,
+            "config with currency name": true,
+            "unique player file with all their currencies listed on it": true,
+            "commands": true,
+            "baltop": true,
+            "test to see if new players get $10": true,
+            "core.eco.pay not working??!!": false,
+            "TEST IT !!!": false
+        },
+        "essentials":{
+            "Teleportation":{
+
+                "setHome": [false, "Set home to your current location", "TESTED GOOD", "permission based home limits"],
+                "home": [false, "Teleport to your home.", "TESTED GOOD", "make home limit permission nodes"],
+                "delHome": [true, "Removes a home", "TESTED GOOD"],
+                "homes": [true, "Lists all homes", "TESTED GOOD"],
+
+                "tppos": [true, "TESTED GOOD", "Teleport to coordinates", "/tppos <x> <y> <z> <optional world name>"],
+
+                "tp": [true, "TESTED GOOD", "Teleport to a player", "/tp <player name>", "needs to overwrite default minecraft"],
+                "tphere": [true, "TESTED GOOD", "Teleport a player to you.", "/tphere <playername>"],
+                "tpAll": [false, "TESTED GOOD", "Teleports all online players to another player", "/tpall <playername>"],
+                
+
+                "tpa": [true, "TESTED GOOD", "Request to teleport to a player", "/tpa <playername>"],
+                "tpaHere": [true, "TESTED GOOD", "Request that a specified player teleport to you", "/tpahere <playername>"],
+                "tpaccept": [true, "TESTED GOOD", "Accepts teleport requests", "/tpaccept"],
+                "tpadeny": [true, "TESTED GOOD" ,"untested", "Rejects teleport requests.", "/tpdeny"],
+                "tpacancel": [true, "TESTED GOOD" ,"untested", "Cancel all outstanding teleport requests. Specify [player] to cancel requests with them.", "/tpacancel"],
+
+                "back": [true, "TESTED GOOD", "Teleports you to your location prior to tp/spawn/warp.", "/back", "should refer to player data .yml to retrieve last TP coords"],
+                
+                "tpr": [true, "TESTED GOOD", "Teleport randomly.", "Avoid water / lava"],
+                "spawn": [true, "cant fully test until properly testing zones" , "Teleport to the spawnpoint.", "check if within Zone - if so go to zone spawn point.", "if not within zone, or if zone doesn't have a set spawn-point fall back to the spawn the world manager provides."],
+                "setspawn": [false, "TESTED GOOD"]
+            },
+            "Messaging":{
+                "msg": [true, "GOOD WORKING", "Sends a private message to the specified player", "/msg <playername>"],
+                "r": [true, "needs to set the receiving player's last messaged when receiving a message", "Quickly reply to the last player to message you.", "/r <playername>"],                
+                "broadcast": [true, "GOOD WORKING", "Broadcasts a message to the entire server", "/broadcast <message>"],
+                "msgToggle": [true, "GOOD WORKING", "Blocks receiving all private messages", "/msgToggle"],
+                "ignore": [true, "GOOD WORKING", "Ignore or unignore other players.", "/ignore <playername>"]
+            },
+
+            "Admin": {
+
+                "enchant": [true, "TESTED GOOD" , "Enchants the item the user is holding."],
+                "exp": [true, "TESTED GOOD" ,"Give, set or look at a players exp."],
+                "give": [true, "TESTED GOOD" ,"Give a player an item."],
+
+                "kill": [true, "TESTED GOOD", "Kills specified player."],
+                "sudo": [true, "TESTED GOOD", "Make another user perform a command."],
+
+                "weather": [true, "TESTED GOOD" , "Sets the weather"],
+                "time": [true, "TESTED GOOD" ,"Display/Chage the world time.  Defaults to current world"]
+
+            },
+            "Utility": {
+
+                "fly": [true, "TESTED GOOD", "Take off, and soar!", "/fly"],
+                "speed": [true, "TESTED GOOD", "Change your walk speed", "/speed <integer>"],
+                "flyspeed": [true, "TESTED GOOD", "Change your fly speed", "/flyspeed <integer>"],
+                "gameMode": [true, "TESTED GOOD" ,"Change player gamemode", "/gamemode <creative|survival|spectator>", "alias /gm"],
+
+                "heal": [true, "TESTED GOOD - TEST CD", "Fully heals you or the given player.", "/heal"],
+                "feed": [true,"TESTED GOOD - TEST CD", "Satisfy the hunger", "feed"],
+                "rest": [true,"TESTED GOOD - TEST CD", "Rests you or the given player", "/rest"],
+                "repair": [true,"TESTED GOOD - TEST CD", "Repairs the durability of one or all items"],
+
+                "afk": [true,"TESTED GOOD", "Marks you as away-from-keyboard.", "/afk"],
+                "enderChest": [true,"TESTED GOOD", "Lets you see inside an enderchest", "/enderchest", "/ec"],
+                "trash": [true,"TESTED GOOD", "Opens a portable disposal menu", "/trash"],
+                "top": [true,"TESTED GOOD", "Teleports to the highest block at your current position", "/top"],
+                "hat": [true,"TESTED GOOD", "Get some cool new headgear", "/hat"],
+                "nick": [true,"TESTED GOOD", "Change your nickname or that of another player.", "/nick"],
+                "realName": [true,"TESTED NOT WORKING", "Displays the username of the user based on nick", "/realname"],
+                "list": [true,"TESTED GOOD", "List all online players.", "/list"],
+                "near": [true, "Add distance & customizable radius param" ,"test w/ people", "Lists the players near by or around a player.", "/near <radius>"],
+                "getpos": [true, "TESTED GOOD" ,"test w/ people" ,"Get your current coordinates or those of a player.", "/getpos"],
+                "ping": [true,"TESTED GOOD", "Test your ping to the server!", "/ping"],
+                "seen": [true,"TESTED GOOD", "Shows the last logout time of a player.", "/seen <playername>"],
+
+                "workbench": [true,"TESTED GOOD", "Opens up a workbench.", "/workbench", "/wb", "/craft"],
+                "anvil": [true,"TESTED GOOD", "Opens up an Anvil.", "/anvil"],
+                "cartographytable": [true,"TESTED GOOD", "Opens up a cartography table.", "/cartographytable"],
+                "grindstone": [true,"TESTED GOOD", "Opens up a grindstone", "/grindstone"],
+                "loom": [true,"TESTED GOOD", "Opens up a loom", "/loom"],
+                "smithingtable": [true,"TESTED GOOD", "Opens up a smithing table.", "/smithing"],
+                "stonecutter": [true,"TESTED GOOD", "Opens up a stonecutter.", "/stonecutter"],
+
+                "ptime": [true, "Add reset param" , "test w/ people", "Changes the time but only from the player's perspective.", "/ptime <morning|noon|night|{ticks integer}>"],
+                "pweather": [true, "add reset param" ,"test w/ people", "Change the weather but only from the player's perspective", "/pweather <clear|storm|thunder>"]
+            }
+        },
+        "ChatControl":{
+            "permission-based-prefixes": {
+                "permission group based prefixes": true,
+                "Looks like this -> [ChatPrefix]<userName>": true
+            },
+            "prevention": {
+                "config file for banned-words": true,
+                "Block spam (same non-command messages repeated) from appearing in chat": true
+
+            }
+        },
+        "killall":{
+            "mobs, players, etc": true,
+            "test killall players": true
+        },
+        "loot chest manager":{
+            "I think this should be part of the gamerules manager ?": false
+        },
+        "texture pack manager":{
+            "idk": false
+        },
+        "simple anticheat":{
+            "1 day to make": false
+        },
+        "particle creator & manager":{
+            "test all": false,
+            "fix particle clock": true
+        },
+        "display manager":{
+            "greatly increase its capabilities": false
+        },
+        "Stats Manager": {
+            "broken out by plugin": false,
+            "break out by game-type": false,
+            "win / loss": false,
+            "kill / death": false,
+            "beds broken": false,
+            "final kills": false,
+            "games played": false,
+            "minutes played": false,
+            "currency collected / diamonds/ emerald / gold / iron": false,
+            "win-streak": false,
+            "loss-streak": false
+        },
+        "weave in debug option with many console messages":{
+            "last step": false
+        },
+        "make use-X actually work": false,
+        "web app":{
+            "2 weeks": false,
+            "server browser - only feathercore plugins can register - automatic with consent": false
+        }
+    }
+
+
+}
