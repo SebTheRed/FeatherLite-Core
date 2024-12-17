@@ -13,4 +13,5 @@ public class ColorUtils {
     public static String translateColors(String text) {
         return ChatColor.translateAlternateColorCodes('&', text);
     }
+
 }

@@ -1,6 +1,7 @@
 package com.featherlite.pluginBin.lobbies;
 
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 
 import java.util.ArrayList;
 import java.util.List;

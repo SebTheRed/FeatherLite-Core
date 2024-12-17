@@ -1,4 +1,4 @@
-package com.featherlite.pluginBin.utils;
+package com.featherlite.pluginBin.displays;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -9,14 +9,16 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
+
+
 public class IndicatorListener implements Listener {
 
     private final JavaPlugin plugin;
     private final HealthIndicator healthIndicator;
 
-    public IndicatorListener(JavaPlugin plugin) {
+    public IndicatorListener(JavaPlugin plugin, DisplayPieceManager displayPieceManager) {
         this.plugin = plugin;
-        this.healthIndicator = new HealthIndicator(plugin);
+        this.healthIndicator = new HealthIndicator(plugin, displayPieceManager);
         Bukkit.getPluginManager().registerEvents(this, plugin); // Register the listener
     }
 

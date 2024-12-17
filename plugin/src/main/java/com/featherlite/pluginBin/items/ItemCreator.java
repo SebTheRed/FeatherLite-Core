@@ -62,22 +62,6 @@ public class ItemCreator {
         return this;
     }
 
-    // Helper method to add formatted lore based on a template
-    private void addFormattedLore(String templateKey, Map<String, String> replacements) {
-        String template = loreTemplates.getOrDefault(templateKey, "");
-        for (Map.Entry<String, String> entry : replacements.entrySet()) {
-            template = template.replace("{" + entry.getKey() + "}", entry.getValue());
-        }
-        addLore(template);
-    }
-    // Add lore for displaying custom attributes
-    public ItemCreator addLore(String line) {
-        List<String> lore = itemMeta.getLore();
-        if (lore == null) lore = new ArrayList<>();
-        lore.add(line);
-        itemMeta.setLore(lore);
-        return this;
-    }
 
     // Set item category for interpretation
     public ItemCreator setItemCategory(String category) {
@@ -108,33 +92,52 @@ public class ItemCreator {
     // Set draw speed
     public ItemCreator setDrawSpeed(double drawSpeed) {
         dataContainer.set(new NamespacedKey(plugin, "drawSpeed"), PersistentDataType.DOUBLE, (drawSpeed));
-        addLore("§7Draw Speed: " + (drawSpeed +1));
+        addLore(getFormattedLore("drawSpeed", Map.of("value", String.valueOf(drawSpeed))));
         return this;
     }
 
     // Set arrow velocity
     public ItemCreator setArrowVelocity(double arrowVelocity) {
         dataContainer.set(new NamespacedKey(plugin, "arrowVelocity"), PersistentDataType.DOUBLE, (arrowVelocity));
-        addFormattedLore("arrowVelocity", Map.of("value", String.valueOf(arrowVelocity)));
-        addLore("velocity: " + (arrowVelocity));
+        // addFormattedLore("arrowVelocity", Map.of("value", String.valueOf(arrowVelocity)));
+        addLore(getFormattedLore("arrowVelocity", Map.of("value", String.valueOf(arrowVelocity))));
         return this;
     }
 
     public ItemCreator setAbility(String trigger, String methodName, String title, Map<String, String> params) {
+        // Step 1: Store the ability method in the PersistentDataContainer
         NamespacedKey key = new NamespacedKey(plugin, "ability_" + trigger);
         dataContainer.set(key, PersistentDataType.STRING, methodName);
-        
-        // Add title to lore for display purposes
-        addLore("§7" + trigger + " Ability: " + title);
     
-        // Store parameters
+        // Step 2: Extract cooldown from params (default to "0" if missing)
+        String cooldown = params.getOrDefault("cooldown", "0");
+    
+        // Step 3: Fetch the lore template and replace placeholders
+        String formattedLore = getFormattedLore(trigger, Map.of(
+                "title", title,
+                "cooldown", cooldown
+        ));
+        addLore(formattedLore);
+    
+        // Step 4: Append additional parameters dynamically (excluding 'method', 'title', and 'cooldown')
         for (Map.Entry<String, String> entry : params.entrySet()) {
-            NamespacedKey paramKey = new NamespacedKey(plugin, "ability_" + trigger + "_" + entry.getKey());
-            dataContainer.set(paramKey, PersistentDataType.STRING, entry.getValue());
+            String paramKey = entry.getKey();
+            // if (!paramKey.equals("method") && !paramKey.equals("title") && !paramKey.equals("cooldown")) {
+            //     String paramLore = getFormattedLore("ability_param_format", Map.of(
+            //             "key", paramKey,
+            //             "value", entry.getValue()
+            //     ));
+            //     addLore(paramLore);
+            // }
+    
+            // Save each parameter in the PersistentDataContainer
+            NamespacedKey paramContainerKey = new NamespacedKey(plugin, "ability_" + trigger + "_" + paramKey);
+            dataContainer.set(paramContainerKey, PersistentDataType.STRING, entry.getValue());
         }
     
         return this;
     }
+    
     
     public ItemCreator setAbilityParam(String paramName, String paramValue) {
         NamespacedKey key = new NamespacedKey(plugin, "itemAbility_" + paramName);
@@ -222,14 +225,18 @@ public class ItemCreator {
 
     public ItemCreator setExplosionProof(boolean explosionProof) {
         dataContainer.set(new NamespacedKey(plugin, "explosionProof"), PersistentDataType.INTEGER, explosionProof ? 1 : 0);
-        addLore("§7Explosion Proof: " + (explosionProof ? "Yes" : "No"));
+        // addLore("§7Explosion Proof: " + (explosionProof ? "Yes" : "No"));
+        addLore(getFormattedLore("explosionProof", Map.of("value", String.valueOf(explosionProof?"Yes":"No"))));
+
         return this;
     }
     
     // Set the ability and parameters to run on block placement
     public ItemCreator setPlaceAbility(String abilityName, Map<String, String> params) {
         dataContainer.set(new NamespacedKey(plugin, "placeAbility"), PersistentDataType.STRING, abilityName);
-        addLore("§7Ability on Place: " + abilityName);
+        // addLore("§7Ability on Place: " + abilityName);
+        addLore(getFormattedLore("on-place", Map.of("value", String.valueOf(abilityName))));
+
         for (Map.Entry<String, String> entry : params.entrySet()) {
             dataContainer.set(new NamespacedKey(plugin, "placeAbility_" + entry.getKey()), PersistentDataType.STRING, entry.getValue());
         }
@@ -239,7 +246,9 @@ public class ItemCreator {
     // Set the ability and parameters to run on block break
     public ItemCreator setBreakAbility(String abilityName, Map<String, String> params) {
         dataContainer.set(new NamespacedKey(plugin, "breakAbility"), PersistentDataType.STRING, abilityName);
-        addLore("§7Ability on Break: " + abilityName);
+        // addLore("§7Ability on Break: " + abilityName);
+        addLore(getFormattedLore("on-block-break", Map.of("value", String.valueOf(abilityName))));
+
         for (Map.Entry<String, String> entry : params.entrySet()) {
             dataContainer.set(new NamespacedKey(plugin, "breakAbility_" + entry.getKey()), PersistentDataType.STRING, entry.getValue());
         }
@@ -249,7 +258,8 @@ public class ItemCreator {
     // Set block to be destroyed after placement
     public ItemCreator setTemporaryOnPlace(boolean temporary) {
         dataContainer.set(new NamespacedKey(plugin, "temporaryOnPlace"), PersistentDataType.INTEGER, temporary ? 1 : 0);
-        if (temporary) addLore("§7Temporary Block: Destroys after use");
+        // if (temporary) addLore("§7Temporary Block: Destroys after use");
+        addLore(getFormattedLore("temporary-block", Map.of("value", String.valueOf(""))));
         return this;
     }
 
@@ -284,7 +294,10 @@ public class ItemCreator {
             attributeModifiers.put(attribute, modifier);
 
             // Display in lore
-            addLore("§7" + formatAttributeName(attribute) + ": " + formatValue(value));
+            // addLore("§7" + formatAttributeName(attribute) + ": " + formatValue(value));
+            String loreKey = attribute.name().toLowerCase();
+            addLore(getFormattedLore(loreKey, Map.of("value", String.valueOf(value)))); 
+
         } else {
             plugin.getLogger().warning("Attribute " + attribute.name() + " is not compatible with " + itemStack.getType());
         }
@@ -482,5 +495,39 @@ public class ItemCreator {
         }
     }
 
+
+
+    // Helper method to fetch and format lore templates dynamically
+    public String getFormattedLore(String templateKey, Map<String, String> replacements) {
+        plugin.getLogger().info("Fetching lore template for key: " + templateKey);
+        String template = loreTemplates.getOrDefault(templateKey, "&7" + templateKey + ": {value}");
+        plugin.getLogger().info("Template found: " + template);
+        for (Map.Entry<String, String> entry : replacements.entrySet()) {
+            template = template.replace("{" + entry.getKey() + "}", entry.getValue());
+        }
+        return translateColorCodes(template);
+    }
+    
+
+    // Add lore for displaying custom attributes
+    public ItemCreator addLore(String line) {
+        List<String> lore = itemMeta.getLore();
+        if (lore == null) lore = new ArrayList<>();
+        lore.add(translateColorCodes(line)); // Convert color codes
+        itemMeta.setLore(lore);
+        return this;
+    }
+    /**
+     * Converts color codes using '&' to Minecraft-compatible '§' color codes.
+     *
+     * @param text The string containing '&' color codes.
+     * @return The formatted string with '§' color codes.
+     */
+    public String translateColorCodes(String text) {
+        if (text == null) return "";
+        return text.replace("&", "§");
+    }
+
+    
 
 }

@@ -26,7 +26,8 @@
         "worlds":{
             "test rigorously": false,
             "add world border param": true,
-            "permission to clear border": true
+            "permission to clear border": true,
+            "world command error handling": false
         },
         "placeholders": {
             "that was easy": true,
@@ -160,17 +161,8 @@
             "greatly increase its capabilities": false
         },
         "Stats Manager": {
-            "broken out by plugin": false,
-            "break out by game-type": false,
-            "win / loss": false,
-            "kill / death": false,
-            "beds broken": false,
-            "final kills": false,
-            "games played": false,
-            "minutes played": false,
-            "currency collected / diamonds/ emerald / gold / iron": false,
-            "win-streak": false,
-            "loss-streak": false
+            "complete": true,
+            "test w/ external plugin": false
         },
         "weave in debug option with many console messages":{
             "last step": false

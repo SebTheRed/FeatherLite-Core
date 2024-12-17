@@ -2,6 +2,8 @@
 package com.featherlite.pluginBin;
 
 import com.featherlite.pluginBin.commands.*;
+import com.featherlite.pluginBin.displays.DisplayPieceManager;
+import com.featherlite.pluginBin.displays.IndicatorListener;
 import com.featherlite.pluginBin.economy.EconomyManager;
 import com.featherlite.pluginBin.essentials.PlayerDataManager;
 import com.featherlite.pluginBin.essentials.commands.AdminCommands;
@@ -33,8 +35,6 @@ import com.featherlite.pluginBin.permissions.PermissionManager;
 import com.featherlite.pluginBin.permissions.PlayerJoinListener;
 import com.featherlite.pluginBin.placeholders.PlaceholderEconomy;
 import com.featherlite.pluginBin.scoreboards.ScoreboardManager;
-
-import com.featherlite.pluginBin.utils.IndicatorListener;
 import com.featherlite.pluginBin.webapp.WebAppManager;
 import com.featherlite.pluginBin.worlds.WorldBorderListener;
 import com.featherlite.pluginBin.worlds.WorldManager;
@@ -83,6 +83,8 @@ public class FeatherCore extends JavaPlugin {
     private HomeManager homeManager;
 
     private PlayerStatsManager playerStatsManager;
+    
+    private DisplayPieceManager displayPieceManager;
     // private AdminManager adminManager;
     // private MessagingManager messagingManager;
     // Command handler instances
@@ -106,7 +108,6 @@ public class FeatherCore extends JavaPlugin {
     public void onEnable() {
         saveDefaultConfig();
         loadLobbyLocations();
-        new IndicatorListener(this);
         getLogger().info("FeatherCore Plugin Enabled!");
 
         playerDataManager = new PlayerDataManager(this, "player_data");
@@ -141,6 +142,8 @@ public class FeatherCore extends JavaPlugin {
         economyManager = new EconomyManager(this, playerDataManager);
         particleManager = new ParticleManager(this);
 
+        displayPieceManager = new DisplayPieceManager(this);
+
         chatManager = new ChatManager(this);
         getServer().getPluginManager().registerEvents(new ChatControlListener(this, chatManager, permissionManager), this);
 
@@ -156,6 +159,11 @@ public class FeatherCore extends JavaPlugin {
 
         playerStatsManager = new PlayerStatsManager(this);
         getServer().getPluginManager().registerEvents(new StatListeners(playerStatsManager), this);
+
+
+        new IndicatorListener(this, displayPieceManager);
+
+
         // Initialize command handlers
         partyCommands = new PartyCommands(partyManager);
         appCommands = new AppCommands(webAppManager, activeSessions);
@@ -310,6 +318,8 @@ public class FeatherCore extends JavaPlugin {
     public void onDisable() {
         getLogger().info("FeatherCore Plugin Disabled!");
         Bukkit.getOnlinePlayers().forEach(playerStatsManager::savePlayerStats);
+
+        displayPieceManager.clearAllDisplays();
 
     }
 

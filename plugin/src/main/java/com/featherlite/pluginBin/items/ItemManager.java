@@ -36,33 +36,38 @@ public class ItemManager {
         this.plugin = plugin;
         this.abilityRegistry = new AbilityRegistry(plugin); // Pass plugin here
         
+        loadLoreTemplates();
 
         loadAllPluginItems();
-        loadLoreTemplates();
 
 
     }
 
     // Load lore templates from config.yml into the map
     private void loadLoreTemplates() {
-        // Locate the lore_customization.yml file
-        File loreFile = new File(plugin.getDataFolder(), "lore_customization.yml");
-
-        // Check if the file exists, and load it as a YamlConfiguration
-        if (loreFile.exists()) {
-            FileConfiguration loreConfig = YamlConfiguration.loadConfiguration(loreFile);
-            ConfigurationSection loreSection = loreConfig.getConfigurationSection("lore_customization");
-
-            if (loreSection != null) {
-                // Populate loreTemplates map with entries from lore_customization.yml
-                for (String key : loreSection.getKeys(false)) {
-                    loreTemplates.put(key, loreSection.getString(key));
-                }
-            } else {
-                plugin.getLogger().warning("No 'lore_customization' section found in lore_customization.yml");
+        // Define the file path
+        File loreFile = new File(plugin.getDataFolder(), "item-lore-templates.yml");
+    
+        // If the file doesn't exist, copy it from resources
+        if (!loreFile.exists()) {
+            plugin.getLogger().info("item-lore-templates.yml not found. Creating a default version...");
+            plugin.saveResource("item-lore-templates.yml", false); // Copy the file from /resources
+        }
+    
+        // Load the file as a configuration
+        FileConfiguration loreConfig = YamlConfiguration.loadConfiguration(loreFile);
+        ConfigurationSection loreSection = loreConfig.getConfigurationSection("lore_customization");
+    
+        if (loreSection != null) {
+            // Populate the loreTemplates map
+            for (String key : loreSection.getKeys(false)) {
+                String value = loreSection.getString(key);
+                loreTemplates.put(key, value);
+                plugin.getLogger().info("Loaded key: " + key + " | Value: " + value); // Debug log
+            
             }
         } else {
-            plugin.getLogger().warning("lore_customization.yml not found in plugin data folder.");
+            plugin.getLogger().warning("No 'lore_customization' section found in item-lore-templates.yml");
         }
     }
 
@@ -74,6 +79,7 @@ public class ItemManager {
     public void reloadItems(UIManager uiManager) {
         categorizedItems.clear();
         categoryIcons.clear();
+        loadLoreTemplates();
         loadAllPluginItems();
         plugin.getLogger().info("All items have been reloaded successfully.");
     
@@ -184,7 +190,7 @@ public ItemStack createItemFromConfig(ConfigurationSection itemSection) {
     // Mark as unbreakable if specified
     if (itemSection.getBoolean("unbreakable", false)) {
         itemCreator.setUnbreakable(true);
-        itemCreator.addLore("§7§lUnbreakable");
+        itemCreator.addLore(itemCreator.getFormattedLore("unbreakable", Map.of("value", String.valueOf(true))));
     }
 
     // // **Add item ability and parameters**
@@ -203,30 +209,6 @@ public ItemStack createItemFromConfig(ConfigurationSection itemSection) {
     //     }
     // }
 
-     // **Parse abilities**
-   // Parsing abilities
-   if (itemSection.isConfigurationSection("abilities")) {
-    ConfigurationSection abilitiesSection = itemSection.getConfigurationSection("abilities");
-
-    for (String trigger : abilitiesSection.getKeys(false)) {
-        ConfigurationSection triggerSection = abilitiesSection.getConfigurationSection(trigger);
-        if (triggerSection != null) {
-            String methodName = triggerSection.getString("method");
-            String title = triggerSection.getString("title"); // For lore display
-            Map<String, String> params = new HashMap<>();
-
-            for (String paramKey : triggerSection.getKeys(false)) {
-                if (!paramKey.equals("method") && !paramKey.equals("title")) {
-                    String paramValue = triggerSection.getString(paramKey);
-                    params.put(paramKey, paramValue);
-                }
-            }
-
-            // Add ability to the item
-            itemCreator.setAbility(trigger, methodName, title, params);
-        }
-    }
-}
 
     // Add enchantments if specified
     if (itemSection.isConfigurationSection("enchantments")) {
@@ -397,7 +379,29 @@ public ItemStack createItemFromConfig(ConfigurationSection itemSection) {
         itemCreator.setArrowVelocity(arrowVelocity);
     }
 
-    
+       // Parsing abilities
+   if (itemSection.isConfigurationSection("abilities")) {
+    ConfigurationSection abilitiesSection = itemSection.getConfigurationSection("abilities");
+
+        for (String trigger : abilitiesSection.getKeys(false)) {
+            ConfigurationSection triggerSection = abilitiesSection.getConfigurationSection(trigger);
+            if (triggerSection != null) {
+                String methodName = triggerSection.getString("method");
+                String title = triggerSection.getString("title"); // For lore display
+                Map<String, String> params = new HashMap<>();
+
+                for (String paramKey : triggerSection.getKeys(false)) {
+                    if (!paramKey.equals("method") && !paramKey.equals("title")) {
+                        String paramValue = triggerSection.getString(paramKey);
+                        params.put(paramKey, paramValue);
+                    }
+                }
+
+                // Add ability to the item
+                itemCreator.setAbility(trigger, methodName, title, params);
+            }
+        }
+    }
 
     if ("block".equals(itemType)) {
         boolean explosionProof = itemSection.getBoolean("explosionProof", false);
@@ -435,9 +439,9 @@ public ItemStack createItemFromConfig(ConfigurationSection itemSection) {
     // Set lore if specified
     List<String> lore = itemSection.getStringList("lore");
     if (!lore.isEmpty()) {
-        itemCreator.addLore("");
+        itemCreator.addLore(""); // Add an empty line for spacing
         for (String loreLine : lore) {
-            itemCreator.addLore(loreLine.replace("&", "§"));
+            itemCreator.addLore(itemCreator.translateColorCodes(loreLine)); // Convert color codes
         }
     }
 
@@ -459,4 +463,8 @@ public ItemStack createItemFromConfig(ConfigurationSection itemSection) {
     public Map<String, ItemStack> getItemsInCategory(String category) {
         return categorizedItems.getOrDefault(category, new HashMap<>());
     }
+
+
+    
+
 }

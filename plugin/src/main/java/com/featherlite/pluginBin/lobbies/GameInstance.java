@@ -70,7 +70,7 @@ public class GameInstance {
         return teams;
     }
 
-        public void setTeamSpawns(Map<String, Location> spawns) {
+    public void setTeamSpawns(Map<String, Location> spawns) {
         this.teamSpawns.putAll(spawns);
     }
 
@@ -150,6 +150,10 @@ public class GameInstance {
     
     public void addSpectator(Player player) {
         spectators.add(player.getUniqueId());
+    }
+
+    public void removeSpectator(Player player) {
+        spectators.remove(player.getUniqueId());
     }
 
     public List<UUID> getSpectators() {
