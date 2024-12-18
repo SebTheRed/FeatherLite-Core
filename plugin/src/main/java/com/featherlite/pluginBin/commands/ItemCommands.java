@@ -32,7 +32,7 @@ public class ItemCommands {
 
         if (args.length > 0 && args[0].equalsIgnoreCase("reload")) {
             if (player.hasPermission("feathercore.itemui.reload")) {  // Separate permission for reloading
-                itemManager.reloadItems(uiManager);
+                itemManager.reloadItems(sender, uiManager);
                 player.sendMessage("Items have been reloaded from the configuration.");
             } else {
                 player.sendMessage("You do not have permission to reload items.");

@@ -42,10 +42,13 @@ items:
       - "&6 A Divine Weapon."
     abilities:
       r_click:
-          method: "leap"
-          title: "Leap ! :D"
-          cooldown: 3
-          leap_strength: 10
+          method: "magicMissile"
+          title: "Magic Missile"
+          cooldown: 1
+          damage: 8
+          range: 20
+          speed: 1
+          colorName: "purple"
       shift_r_click:
           method: "smite"
           title: "Smite >:D"

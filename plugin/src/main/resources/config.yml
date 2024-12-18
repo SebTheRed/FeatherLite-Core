@@ -102,6 +102,13 @@ item-abilities:
     method: "strikeLightning"
     params:
       lightning_range: 10
+  magicMissile:
+    method: "magicMissile"
+    params:
+      damage: 8
+      range: 20
+      speed: 1
+      colorName: "purple"
 
 
 # Made by Seb The Red & Team FeatherLite - with all rights reserved.

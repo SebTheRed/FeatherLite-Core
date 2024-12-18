@@ -144,9 +144,20 @@ private final ParticleManager particleManager;
                             speed,
                             new Particle.DustOptions(color, 1.0F) // Default size is 1.0F
                     );
+                } else if (data instanceof Particle.DustOptions dustOptions) {
+                    return new ParticleEffect(
+                            particleType,
+                            count,
+                            offsetX,
+                            offsetY,
+                            offsetZ,
+                            speed,
+                            dustOptions // Pass DustOptions directly if provided
+                    );
                 }
-                throw new IllegalArgumentException("REDSTONE particles require a Color object as data.");
+                throw new IllegalArgumentException("REDSTONE particles require a Color object or DustOptions as data.");
             }
+            
 
             case DUST_COLOR_TRANSITION -> {
                 if (data instanceof Particle.DustTransition dustTransition) {
@@ -365,7 +376,7 @@ private final ParticleManager particleManager;
     /**
      * Utility method to play a particle effect at a specific location.
      */
-    private void playParticleEffect(World world, Location location, ParticleEffect effect) {
+    public void playParticleEffect(World world, Location location, ParticleEffect effect) {
         world.spawnParticle(
                 effect.getParticleType(),
                 location,

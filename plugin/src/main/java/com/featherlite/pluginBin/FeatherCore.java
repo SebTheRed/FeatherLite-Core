@@ -18,7 +18,7 @@ import com.featherlite.pluginBin.essentials.messaging.MessagingManager;
 import com.featherlite.pluginBin.essentials.admin.AdminManager;
 import com.featherlite.pluginBin.essentials.util.UtilManager;
 import com.featherlite.pluginBin.essentials.util.PlayerJoinListenerForUtils;
-
+import com.featherlite.pluginBin.projectiles.ProjectileManager;
 import com.featherlite.pluginBin.stats.PlayerStatsManager;
 import com.featherlite.pluginBin.stats.StatListeners;
 
@@ -85,6 +85,8 @@ public class FeatherCore extends JavaPlugin {
     private PlayerStatsManager playerStatsManager;
     
     private DisplayPieceManager displayPieceManager;
+
+    private ProjectileManager projectileManager;
     // private AdminManager adminManager;
     // private MessagingManager messagingManager;
     // Command handler instances
@@ -104,6 +106,8 @@ public class FeatherCore extends JavaPlugin {
     private TeleportationCommands teleportationCommands;
     private HomeCommands homeCommands;
 
+    
+
     @Override
     public void onEnable() {
         saveDefaultConfig();
@@ -120,9 +124,13 @@ public class FeatherCore extends JavaPlugin {
         utilManager = new UtilManager();
 
 
-
         // Initialize managers
-        abilityRegistry = new AbilityRegistry(this); // Initialize AbilityRegistry
+
+        particleManager = new ParticleManager(this);
+        projectileManager = new ProjectileManager(this);
+        displayPieceManager = new DisplayPieceManager(this);
+
+        abilityRegistry = new AbilityRegistry(this, projectileManager, particleManager, displayPieceManager); // Initialize AbilityRegistry
         cooldownManager = new CooldownManager();
         fileManager = new FileManager(this);
         fileManager.loadActiveItemCategories();
@@ -132,7 +140,7 @@ public class FeatherCore extends JavaPlugin {
 
         webAppManager = new WebAppManager(this, fileManager);
         partyManager = new PartyManager();
-        itemManager = new ItemManager(this);  // Initialize ItemManager
+        itemManager = new ItemManager(this, abilityRegistry);  // Initialize ItemManager
         uiManager = new UIManager(this, itemManager); // Initialize UIManager with ItemManager
         instanceManager = new InstanceManager(gameConfiguration, partyManager, worldManager, this);
         permissionManager = new PermissionManager(this, playerDataManager); // Initialize the permission manager
@@ -140,9 +148,7 @@ public class FeatherCore extends JavaPlugin {
         scoreboardManager = new ScoreboardManager(this);
 
         economyManager = new EconomyManager(this, playerDataManager);
-        particleManager = new ParticleManager(this);
 
-        displayPieceManager = new DisplayPieceManager(this);
 
         chatManager = new ChatManager(this);
         getServer().getPluginManager().registerEvents(new ChatControlListener(this, chatManager, permissionManager), this);

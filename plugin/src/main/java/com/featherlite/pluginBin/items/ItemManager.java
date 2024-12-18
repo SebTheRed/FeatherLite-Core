@@ -17,6 +17,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.util.HashMap;
@@ -32,9 +33,9 @@ public class ItemManager {
     private final Map<String, String> loreTemplates = new HashMap<>();
 
 
-    public ItemManager(JavaPlugin plugin) {
+    public ItemManager(JavaPlugin plugin, AbilityRegistry abilityRegistry) {
         this.plugin = plugin;
-        this.abilityRegistry = new AbilityRegistry(plugin); // Pass plugin here
+        this.abilityRegistry = abilityRegistry; // Pass plugin here
         
         loadLoreTemplates();
 
@@ -63,7 +64,7 @@ public class ItemManager {
             for (String key : loreSection.getKeys(false)) {
                 String value = loreSection.getString(key);
                 loreTemplates.put(key, value);
-                plugin.getLogger().info("Loaded key: " + key + " | Value: " + value); // Debug log
+                // plugin.getLogger().info("Loaded key: " + key + " | Value: " + value); // Debug log
             
             }
         } else {
@@ -76,13 +77,13 @@ public class ItemManager {
         return loreTemplates.getOrDefault(key, "§7{key}: {value}"); // Default format if not found
     }
 
-    public void reloadItems(UIManager uiManager) {
+    public void reloadItems(Player player, UIManager uiManager) {
         categorizedItems.clear();
         categoryIcons.clear();
         loadLoreTemplates();
         loadAllPluginItems();
         plugin.getLogger().info("All items have been reloaded successfully.");
-    
+        
         // Clear UI-related caches
         uiManager.clearCategoryInventories();
     }

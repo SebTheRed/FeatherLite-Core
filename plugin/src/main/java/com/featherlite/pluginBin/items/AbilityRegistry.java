@@ -1,9 +1,14 @@
 package com.featherlite.pluginBin.items;
 
 import com.featherlite.pluginBin.FeatherCore;
+import com.featherlite.pluginBin.displays.DisplayPieceManager;
+import com.featherlite.pluginBin.particles.ParticleManager;
+import com.featherlite.pluginBin.projectiles.ProjectileManager;
+
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -18,8 +23,15 @@ public class AbilityRegistry {
     private final JavaPlugin plugin;
     private final Map<String, AbilityInfo> abilityRegistry = new HashMap<>();
 
-    public AbilityRegistry(JavaPlugin plugin) {
+    private final ProjectileManager projectileManager;
+    private final ParticleManager particleManager;
+    private final DisplayPieceManager displayPieceManager;
+
+    public AbilityRegistry(JavaPlugin plugin, ProjectileManager projectileManager, ParticleManager particleManager, DisplayPieceManager displayPieceManager) {
         this.plugin = plugin;
+        this.projectileManager = projectileManager;
+        this.particleManager = particleManager;
+        this.displayPieceManager = displayPieceManager;
         loadAbilitiesFromPlugins();
     }
 
@@ -78,7 +90,7 @@ public class AbilityRegistry {
                     Class<?> abilityClass = Class.forName(className);
                     targetInstance = abilityClass.getConstructor().newInstance();
                 } else if (plugin instanceof FeatherCore) {
-                    targetInstance = new InternalAbilities(); // Use InternalAbilities for FeatherCore abilities
+                    targetInstance = new InternalAbilities(projectileManager, particleManager, displayPieceManager); // Use InternalAbilities for FeatherCore abilities
                 } else {
                     targetInstance = plugin;
                 }

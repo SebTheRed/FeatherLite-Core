@@ -36,11 +36,11 @@ public class PermissionManager {
         }
 
         FileConfiguration playerData = playerDataManager.getPlayerData(target);
-        List<String> groups = playerData.getStringList("permission.groups");
+        List<String> groups = playerData.getStringList("permissions.groups");
 
         if (!groups.contains(groupName)) {
             groups.add(groupName);
-            playerData.set("permission.groups", groups);
+            playerData.set("permissions.groups", groups);
             // fileManager.savePlayerConfig(playerConfig, target.getName(), target.getUniqueId().toString());
             playerDataManager.savePlayerData(target, playerData);
             attachPermissionsToPlayer(target);
