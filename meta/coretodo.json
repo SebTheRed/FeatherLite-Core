@@ -3,7 +3,7 @@
     "core tier":{
         "items":{
             "testing extrenal items": false,
-            "integrate lore customizer": false,
+            "integrate lore customizer": true,
             "finish testing": false
         }, 
         "scoreboard":{
@@ -16,7 +16,7 @@
         "perms":{
             "get working ffs": true,
             "test permission inheritance with group.perms": true,
-            "perms addGroup didn't work.": "problem is that addGroup sets `permission` with a plural, not the group.",
+            "perms addGroup didn't work.": "TEST TEST TEST problem is that addGroup sets `permission` with a plural, not the group.",
             "test perms.* omni-permission breakouts": false,
             "weave in perms where necessary | make ops' override": false
         },

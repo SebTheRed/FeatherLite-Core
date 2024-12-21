@@ -248,12 +248,13 @@ public class AdminCommands implements TabCompleter {
                     // Check if the first argument is "set" or "add"
                     if (args[0].equalsIgnoreCase("set")) {
                         suggestions.add("morning");
+                        suggestions.add("day");
                         suggestions.add("noon");
                         suggestions.add("night");
                         suggestions.add("midnight");
-                        suggestions.add("<tick_value>"); // Placeholder for numeric ticks
+                        suggestions.add("<tick_time>"); // Placeholder for numeric ticks
                     } else if (args[0].equalsIgnoreCase("add")) {
-                        suggestions.add("<tick_value>"); // Only numeric values are valid for "add"
+                        suggestions.add("<tick_time>"); // Only numeric values are valid for "add"
                     }
                 }
                 break;

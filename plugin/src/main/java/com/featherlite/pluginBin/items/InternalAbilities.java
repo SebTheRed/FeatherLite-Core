@@ -126,7 +126,8 @@ public class InternalAbilities {
             }
         }
 
-        Location spawnLocation = player.getEyeLocation().add(player.getLocation().getDirection().normalize().multiply(1.0));
+        Location spawnLocation = player.getEyeLocation().add(player.getLocation().getDirection().normalize().multiply(2.0));
+        
 
         // Use the passed DisplayPieceManager to create a DisplayPiece
         DisplayPiece displayPiece = displayPieceManager.createBlockDisplay(

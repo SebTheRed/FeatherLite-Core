@@ -88,6 +88,9 @@ public class AdminManager {
             case "morning":
                 time = 0; // Sunrise (start of the day)
                 break;
+            case "day":
+                time = 2000;
+                break;
             case "noon":
                 time = 6000; // Midday
                 break;
@@ -105,7 +108,7 @@ public class AdminManager {
                         throw new NumberFormatException("Invalid tick range"); // Custom exception for bad range
                     }
                 } catch (NumberFormatException e) {
-                    throw new IllegalArgumentException("Invalid time. Use 'morning', 'noon', 'night', or a tick value (0-24000).");
+                    throw new IllegalArgumentException("Invalid time. Use 'morning', 'day' 'noon', 'night', or a tick value (0-24000).");
                 }
         }
     
