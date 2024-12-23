@@ -24,6 +24,7 @@
             "test and revise w/ cass": false
         },
         "worlds":{
+            "created worlds need added to registry": false,
             "test rigorously": false,
             "add world border param": true,
             "permission to clear border": true,

@@ -101,10 +101,22 @@ public class DisplayPiece {
     public void move(Location targetLocation, int durationTicks) {
         // Calculate the relative offset from the display's current position
         Vector3f startTranslation = currentTranslation;
+        
+        Location currentLocation = displayEntity.getLocation();
+
+        // Calculate the delta translation with directional correction
         Vector3f deltaTranslation = new Vector3f(
-                (float) (targetLocation.getX() - displayEntity.getLocation().getX()),
-                (float) (targetLocation.getY() - displayEntity.getLocation().getY()),
-                (float) (targetLocation.getZ() - displayEntity.getLocation().getZ())
+            targetLocation.getX() >= currentLocation.getX()
+                ? (float) (targetLocation.getX() - currentLocation.getX())
+                : (float) (currentLocation.getX() - targetLocation.getX()),
+    
+            targetLocation.getY() >= currentLocation.getY()
+                ? (float) (targetLocation.getY() - currentLocation.getY())
+                : (float) (currentLocation.getY() - targetLocation.getY()),
+    
+            targetLocation.getZ() >= currentLocation.getZ()
+                ? (float) (targetLocation.getZ() - currentLocation.getZ())
+                : (float) (currentLocation.getZ() - targetLocation.getZ())
         );
     
         // Create matrices for the animation

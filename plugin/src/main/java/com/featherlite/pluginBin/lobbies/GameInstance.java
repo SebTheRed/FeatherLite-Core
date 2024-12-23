@@ -1,10 +1,14 @@
 package com.featherlite.pluginBin.lobbies;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.util.*;
 
+/**
+ * Represents a runtime instance of a minigame session.
+ */
 public class GameInstance {
     public enum GameState {
         WAITING,
@@ -12,50 +16,70 @@ public class GameInstance {
         ENDED
     }
 
-    private final UUID instanceId;
-    private final String gameType;
-    private final int minPlayers;
-    private final int maxPlayers;
-    private final int maxTime;
-    private final Map<String, List<UUID>> teams; // Maps team name to player UUIDs
-    private final Map<String,Location> teamSpawns;
-    private final Map<UUID, String> partyToTeam; // Maps party leader UUID to their team
-    private GameState state;
-    private final List<UUID> spectators;
-    private String worldName;
 
-    public GameInstance(String gameType, int minPlayers, int maxPlayers, List<String> teamNames, int maxTime) {
+    private final UUID instanceId;
+    private final String gameName; // Name of the minigame
+    private final String gameType; // Type of the game (e.g., "SkyWars")
+    private String worldName; // Name of the world for this instance
+    private final int minPlayers; // Minimum players required to start the game
+    private final int maxPlayers; // Maximum players allowed in the game
+    private final int maxTime; // In minutes
+    private final Map<String, List<UUID>> teams; // Maps team names to player UUIDs
+    private final Map<String, Location> teamSpawns; // Maps team names to spawn locations
+    private final List<UUID> spectators; // List of spectators
+    private final Object pluginConfig; // Optional plugin-specific configuration
+    private GameState state;
+
+    public GameInstance(
+            String gameName,
+            String gameType,
+            String worldName,
+            int minPlayers,
+            int maxPlayers,
+            int maxTime,
+            List<String> teamNames,
+            Map<String, Location> teamSpawns,
+            Object pluginConfig
+    ) {
         this.instanceId = UUID.randomUUID();
+        this.gameName = gameName;
         this.gameType = gameType;
+        this.worldName = worldName;
         this.minPlayers = minPlayers;
         this.maxPlayers = maxPlayers;
         this.maxTime = maxTime;
         this.teams = new HashMap<>();
-        this.teamSpawns = new HashMap<>();
-        this.partyToTeam = new HashMap<>();
-        this.state = GameState.WAITING;
+        this.teamSpawns = teamSpawns != null ? teamSpawns : new HashMap<>();
         this.spectators = new ArrayList<>();
+        this.pluginConfig = pluginConfig;
+        this.state = GameState.WAITING;
 
-        // Initialize empty teams based on the team names
+        // Initialize teams
         for (String team : teamNames) {
             teams.put(team, new ArrayList<>());
         }
     }
 
+    // --- Getters ---
     public UUID getInstanceId() {
         return instanceId;
     }
 
-    public GameState getState() {
-        return state;
-    }
-
-    public void setState(GameState state) {
-        this.state = state;
+    public String getGameName() {
+        return gameName;
     }
 
     public String getGameType() {
         return gameType;
+    }
+
+    public String getWorldName() {
+        return worldName;
+    }
+
+    public boolean setWorldName(String newName) {
+        worldName = newName;
+        return true;
     }
 
     public int getMinPlayers() {
@@ -66,142 +90,94 @@ public class GameInstance {
         return maxPlayers;
     }
 
-    public Map<String, List<UUID>> getTeams() {
-        return teams;
+    public int getMaxTime() {
+        return maxTime;
+    }
+    
+    public Object getPluginConfig() {
+        return pluginConfig;
     }
 
-    public void setTeamSpawns(Map<String, Location> spawns) {
-        this.teamSpawns.putAll(spawns);
+    public Map<String, List<UUID>> getTeams() {
+        return teams;
     }
 
     public Map<String, Location> getTeamSpawns() {
         return teamSpawns;
     }
 
-    public void setWorldName(String worldName) {
-        this.worldName = worldName;
-    }
-
-    public String getWorldName() {
-        return worldName;
-    }
-
-    // Overfill method to add a party to a team, allowing members to spread across teams if needed
-    public void addPartyToTeam(Party party) {
-        List<UUID> remainingMembers = new ArrayList<>(party.getMembers());
-        List<String> assignedTeams = new ArrayList<>();
-        int currentPlayerCount = teams.values().stream().mapToInt(List::size).sum();
-
-        // Calculate available slots
-        int availableSlots = maxPlayers - currentPlayerCount;
-        if (remainingMembers.size() > availableSlots) {
-            Player leader = Bukkit.getPlayer(party.getLeader());
-            if (leader != null) {
-                leader.sendMessage("There isn't enough space in the game for your entire party. Please try again with fewer members.");
-            }
-            return;
-        }
-
-        // Attempt to assign each member to a team with available space
-        for (String teamName : teams.keySet()) {
-            List<UUID> teamMembers = teams.get(teamName);
-
-            // Fill the team until we hit the per-team max or we run out of party members
-            while (!remainingMembers.isEmpty() && teamMembers.size() < maxPlayers / teams.size()) {
-                UUID member = remainingMembers.remove(0);
-                teamMembers.add(member);
-                assignedTeams.add(teamName);
-            }
-
-            if (remainingMembers.isEmpty()) break;
-        }
-
-        // If there are remaining members, continue assigning even if teams are "overfilled"
-        if (!remainingMembers.isEmpty()) {
-            for (String teamName : teams.keySet()) {
-                List<UUID> teamMembers = teams.get(teamName);
-
-                while (!remainingMembers.isEmpty() && currentPlayerCount < maxPlayers) {
-                    UUID member = remainingMembers.remove(0);
-                    teamMembers.add(member);
-                    assignedTeams.add(teamName);
-                    currentPlayerCount++;
-                }
-
-                if (remainingMembers.isEmpty()) break;
-            }
-        }
-
-        // Assign the party leader's team for tracking purposes
-        if (!assignedTeams.isEmpty()) {
-            partyToTeam.put(party.getLeader(), assignedTeams.get(0));
-        }
-
-        // Notify the party if all members were assigned to teams
-        if (!remainingMembers.isEmpty()) {
-            Player leader = Bukkit.getPlayer(party.getLeader());
-            if (leader != null) {
-                leader.sendMessage("Some members of your party couldn't be assigned to the same team due to game limits.");
-            }
-        } else {
-            broadcastToPlayers(party.getMembers(), "Your party has been added to the teams: " + String.join(", ", assignedTeams));
-        }
-    }
-    
-    public void addSpectator(Player player) {
-        spectators.add(player.getUniqueId());
-    }
-
-    public void removeSpectator(Player player) {
-        spectators.remove(player.getUniqueId());
-    }
-
     public List<UUID> getSpectators() {
         return spectators;
     }
 
-    public boolean isFull() {
-        return teams.values().stream().mapToInt(List::size).sum() >= maxPlayers;
+    public GameState getState() {
+        return state;
     }
 
-    public boolean hasMinPlayers() {
-        return teams.values().stream().mapToInt(List::size).sum() >= minPlayers;
+    public void setState(GameState state) {
+        this.state = state;
     }
 
-    public int getMaxTime() {
-        return maxTime;
-    }
-
+    // --- Core Logic ---
     public void startGame() {
-        if (hasMinPlayers() && state == GameState.WAITING) {
+        if (getTotalPlayerCount() >= minPlayers) {
             state = GameState.IN_PROGRESS;
             broadcastToAllPlayers("The game has started!");
+        } else {
+            broadcastToAllPlayers("Not enough players to start the game.");
         }
     }
 
     public void endGame() {
-        if (state == GameState.IN_PROGRESS) {
-            state = GameState.ENDED;
-            broadcastToAllPlayers("The game has ended!");
+        state = GameState.ENDED;
+        broadcastToAllPlayers("The game has ended!");
+    }
+
+    public void addPlayerToTeam(Player player, String teamName) {
+        if (isFull()) {
+            player.sendMessage("This game is full.");
+            return;
         }
+
+        String targetTeam = teamName != null && teams.containsKey(teamName) ? teamName : getRandomAvailableTeam();
+
+        if (targetTeam == null) {
+            player.sendMessage("No available teams found.");
+            return;
+        }
+
+        teams.get(targetTeam).add(player.getUniqueId());
+        player.teleport(teamSpawns.get(targetTeam));
+        broadcastToAllPlayers(player.getName() + " joined the " + targetTeam + " team.");
     }
 
-    
+    public void addSpectator(Player player) {
+        spectators.add(player.getUniqueId());
+        player.sendMessage("You are now spectating this game.");
+    }
+
+    public boolean isFull() {
+        return getTotalPlayerCount() >= maxPlayers;
+    }
+
+    public int getTotalPlayerCount() {
+        return teams.values().stream().mapToInt(List::size).sum();
+    }
+
+    private String getRandomAvailableTeam() {
+        return teams.entrySet().stream()
+                .filter(entry -> entry.getValue().size() < maxPlayers / teams.size())
+                .map(Map.Entry::getKey)
+                .findAny()
+                .orElse(null);
+    }
+
     public void broadcastToAllPlayers(String message) {
-        teams.values().forEach(playerList -> playerList.forEach(uuid -> {
-            Player player = Bukkit.getPlayer(uuid);
-            if (player != null) {
-                player.sendMessage(message);
-            }
-        }));
-    }
-
-    public void broadcastToPlayers(Collection<UUID> players, String message) {
-        players.forEach(uuid -> {
-            Player player = Bukkit.getPlayer(uuid);
-            if (player != null) {
-                player.sendMessage(message);
-            }
-        });
+        teams.values().forEach(players ->
+                players.forEach(uuid -> {
+                    Player player = Bukkit.getPlayer(uuid);
+                    if (player != null) player.sendMessage(message);
+                })
+        );
     }
 }

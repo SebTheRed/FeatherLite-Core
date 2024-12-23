@@ -19,6 +19,7 @@ public class Projectile {
 
     private final DisplayPiece displayPiece;              // Visual representation of the projectile
     private boolean isAlive;                              // Tracks whether the projectile is active
+    private final Location finalLocation;                 // Precomputed final position of the projectile
 
     public Projectile(Location start, Vector direction, double speed, int lifetime,
                       DisplayPiece displayPiece,
@@ -32,6 +33,14 @@ public class Projectile {
         this.onCollision = onCollision;
         this.onUpdate = onUpdate;
         this.isAlive = true;
+
+        // Precompute the farthest possible location for the projectile
+        this.finalLocation = start.clone().add(direction.clone().multiply(speed * lifetime));
+
+        // Move the displayPiece smoothly over the projectile's lifetime
+        if (displayPiece != null) {
+            displayPiece.move(finalLocation, lifetime);
+        }
     }
 
     /**
@@ -57,12 +66,7 @@ public class Projectile {
             return false;
         }
 
-        // Move the display entity to the new location
-        if (displayPiece != null) {
-            displayPiece.move(nextLocation, 1); // Smooth movement
-        }
-
-        // Update position
+        // Update the projectile's position
         currentLocation = nextLocation;
 
         // Trigger the onUpdate callback (user handles particles or other effects)

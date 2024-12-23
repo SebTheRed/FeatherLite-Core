@@ -31,14 +31,30 @@ public class InstanceManager {
         this.plugin = plugin;
     }
 
-    public GameInstance createInstance(String category, String mode, String baseWorldName) {
-        // Fetch the game configuration
-        GameConfiguration.GameConfig config = gameConfiguration.getGameMode(category, mode);
-        if (config == null) {
-            plugin.getLogger().warning("Invalid game configuration for category: " + category + ", mode: " + mode);
-            return null;
-        }
-
+    /**
+     * Creates a new GameInstance.
+     *
+     * @param gameName        The name of the game (e.g., "BedWars").
+     * @param gameType        The type of the game (e.g., "SkyWars", "CaptureTheFlag").
+     * @param baseWorldName   The name of the base/template world to copy.
+     * @param minPlayers      The minimum number of players required to start the game.
+     * @param maxPlayers      The maximum number of players allowed in the game.
+     * @param teamNames       A list of team names (e.g., ["Red", "Blue", "Green"]).
+     * @param teamSpawns      A map of team names to spawn locations.
+     * @param pluginConfig    A plugin-specific configuration object, or null if not needed.
+     * @return The created GameInstance, or null if the creation failed.
+     */
+    public GameInstance createInstance(
+            String gameName,
+            String gameType,
+            String baseWorldName,
+            int minPlayers,
+            int maxPlayers,
+            int maxTime,
+            List<String> teamNames,
+            Map<String, Location> teamSpawns,
+            Object pluginConfig // Plugin-specific data, optional
+    ) {
         // Generate a unique world name for the new instance
         String newWorldName = baseWorldName + "_instance" + (++instanceCount);
 
@@ -51,21 +67,17 @@ public class InstanceManager {
 
         // Create a new game instance object
         GameInstance instance = new GameInstance(
-                config.getModeName(),
-                config.getMinPlayers(),
-                config.getMaxPlayers(),
-                config.getTeams(),
-                config.getMaxTime()
+                gameName,
+                gameType,
+                newWorldName,
+                minPlayers,
+                maxPlayers,
+                maxTime,
+                teamNames,
+                teamSpawns,
+                pluginConfig // Pass plugin-specific config
         );
         instance.setWorldName(newWorldName);
-
-        // Assign spawn points based on the configuration
-        Map<String, Location> teamSpawns = config.getWorldSpawns().get(newWorldName);
-        if (teamSpawns == null) {
-            plugin.getLogger().warning("No spawn points defined for world: " + newWorldName);
-            return null;
-        }
-        instance.setTeamSpawns(teamSpawns);
 
         // Store the active instance in the manager
         activeInstances.put(instance.getInstanceId(), instance);
