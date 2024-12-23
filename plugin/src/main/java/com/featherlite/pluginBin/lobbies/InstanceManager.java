@@ -19,13 +19,11 @@ import java.util.Random;
 public class InstanceManager {
     private final FeatherCore plugin;
     private final Map<UUID, GameInstance> activeInstances = new HashMap<>();
-    private final GameConfiguration gameConfiguration;
     private final PartyManager partyManager;
     private final WorldManager worldManager;
     private int instanceCount = 0; // Track unique instance numbers
 
-    public InstanceManager(GameConfiguration gameConfiguration, PartyManager partyManager, WorldManager worldManager, FeatherCore plugin) {
-        this.gameConfiguration = gameConfiguration;
+    public InstanceManager(PartyManager partyManager, WorldManager worldManager, FeatherCore plugin) {
         this.partyManager = partyManager;
         this.worldManager = worldManager;
         this.plugin = plugin;
