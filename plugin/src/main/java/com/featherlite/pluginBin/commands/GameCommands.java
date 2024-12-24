@@ -2,6 +2,7 @@ package com.featherlite.pluginBin.commands;
 
 import com.featherlite.pluginBin.lobbies.GameInstance;
 import com.featherlite.pluginBin.lobbies.InstanceManager;
+import com.featherlite.pluginBin.lobbies.GamesManager;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
@@ -9,9 +10,11 @@ import java.util.UUID;
 public class GameCommands {
 
     private final InstanceManager instanceManager;
+    private final GamesManager gamesManager;
 
-    public GameCommands(InstanceManager instanceManager) {
+    public GameCommands(InstanceManager instanceManager, GamesManager gamesManager) {
         this.instanceManager = instanceManager;
+        this.gamesManager = gamesManager;
     }
 
     public boolean handleGameCommands(Player player, String[] args) {
@@ -44,13 +47,12 @@ public class GameCommands {
                     return true;
                 }
                 if (args.length < 3) {
-                    player.sendMessage("Usage: /game create <category> <mode>");
+                    player.sendMessage("Usage: /game create <game-name> <world>");
                     return true;
                 }
-                String category = args[1];
-                String mode = args[2];
+                String gameName = args[1];
                 String worldName = args[3];
-                GameInstance newGame = instanceManager.createInstance(category, mode, worldName);
+                GameInstance newGame = gamesManager.startGameInstance(gameName, worldName, instanceManager);
                 if (newGame == null) {
                     player.sendMessage("Failed to create game instance. Check the category and mode.");
                 } else {

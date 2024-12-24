@@ -37,17 +37,6 @@ public class PlaceholderLobbies {
         return "0";
     }
 
-    // Placeholder: <game_min_players>
-    public static String getMinPlayers(Player player) {
-        GameInstance instance = getGameInstanceForPlayer(player);
-        return instance != null ? String.valueOf(instance.getMinPlayers()) : "0";
-    }
-
-    // Placeholder: <game_max_players>
-    public static String getMaxPlayers(Player player) {
-        GameInstance instance = getGameInstanceForPlayer(player);
-        return instance != null ? String.valueOf(instance.getMaxPlayers()) : "0";
-    }
 
     // Placeholder: <game_world>
     public static String getGameWorld(Player player) {

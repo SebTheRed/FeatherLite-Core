@@ -21,8 +21,7 @@ public class GameInstance {
     private final String gameName; // Name of the minigame
     private final String gameType; // Type of the game (e.g., "SkyWars")
     private String worldName; // Name of the world for this instance
-    private final int minPlayers; // Minimum players required to start the game
-    private final int maxPlayers; // Maximum players allowed in the game
+    private final Map<String, Integer> teamSizes; // A map of teams and their sizes.
     private final int maxTime; // In minutes
     private final Map<String, List<UUID>> teams; // Maps team names to player UUIDs
     private final Map<String, Location> teamSpawns; // Maps team names to spawn locations
@@ -34,8 +33,7 @@ public class GameInstance {
             String gameName,
             String gameType,
             String worldName,
-            int minPlayers,
-            int maxPlayers,
+            Map<String, Integer> teamSizes,
             int maxTime,
             List<String> teamNames,
             Map<String, Location> teamSpawns,
@@ -45,8 +43,7 @@ public class GameInstance {
         this.gameName = gameName;
         this.gameType = gameType;
         this.worldName = worldName;
-        this.minPlayers = minPlayers;
-        this.maxPlayers = maxPlayers;
+        this.teamSizes = teamSizes;
         this.maxTime = maxTime;
         this.teams = new HashMap<>();
         this.teamSpawns = teamSpawns != null ? teamSpawns : new HashMap<>();
@@ -82,12 +79,8 @@ public class GameInstance {
         return true;
     }
 
-    public int getMinPlayers() {
-        return minPlayers;
-    }
-
-    public int getMaxPlayers() {
-        return maxPlayers;
+    public Map<String, Integer> getTeamSizes() {
+        return teamSizes;
     }
 
     public int getMaxTime() {
@@ -120,13 +113,16 @@ public class GameInstance {
 
     // --- Core Logic ---
     public void startGame() {
-        if (getTotalPlayerCount() >= minPlayers) {
+        int requiredPlayers = teamSizes.values().stream().mapToInt(Integer::intValue).sum(); // Total required players
+    
+        if (getTotalPlayerCount() >= requiredPlayers) {
             state = GameState.IN_PROGRESS;
             broadcastToAllPlayers("The game has started!");
         } else {
             broadcastToAllPlayers("Not enough players to start the game.");
         }
     }
+    
 
     public void endGame() {
         state = GameState.ENDED;
@@ -157,8 +153,10 @@ public class GameInstance {
     }
 
     public boolean isFull() {
-        return getTotalPlayerCount() >= maxPlayers;
+        return teams.entrySet().stream()
+                .allMatch(entry -> entry.getValue().size() >= teamSizes.get(entry.getKey())); // All teams must be full
     }
+    
 
     public int getTotalPlayerCount() {
         return teams.values().stream().mapToInt(List::size).sum();
@@ -166,11 +164,12 @@ public class GameInstance {
 
     private String getRandomAvailableTeam() {
         return teams.entrySet().stream()
-                .filter(entry -> entry.getValue().size() < maxPlayers / teams.size())
+                .filter(entry -> entry.getValue().size() < teamSizes.get(entry.getKey())) // Check against the team's size limit
                 .map(Map.Entry::getKey)
                 .findAny()
                 .orElse(null);
     }
+    
 
     public void broadcastToAllPlayers(String message) {
         teams.values().forEach(players ->

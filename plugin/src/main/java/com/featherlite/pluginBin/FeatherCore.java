@@ -30,7 +30,6 @@ import com.featherlite.pluginBin.items.UIManager;
 import com.featherlite.pluginBin.lobbies.InstanceManager;
 import com.featherlite.pluginBin.lobbies.PartyManager;
 import com.featherlite.pluginBin.particles.ParticleManager;
-import com.featherlite.pluginBin.lobbies.GameConfiguration;
 import com.featherlite.pluginBin.permissions.PermissionManager;
 import com.featherlite.pluginBin.permissions.PlayerJoinListener;
 import com.featherlite.pluginBin.placeholders.PlaceholderEconomy;
@@ -41,6 +40,8 @@ import com.featherlite.pluginBin.worlds.WorldManager;
 import com.featherlite.pluginBin.zones.ZoneManager;
 import com.featherlite.pluginBin.chat.ChatControlListener;
 import com.featherlite.pluginBin.chat.ChatManager;
+
+import com.featherlite.pluginBin.lobbies.GamesManager;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -59,7 +60,6 @@ public class FeatherCore extends JavaPlugin {
     private FileManager fileManager;
     private WebAppManager webAppManager;
     private PartyManager partyManager;
-    private GameConfiguration gameConfiguration;
     private WorldManager worldManager;
     private InstanceManager instanceManager;
     private PermissionManager permissionManager;
@@ -77,6 +77,7 @@ public class FeatherCore extends JavaPlugin {
     private UtilManager utilManager;
     private ParticleManager particleManager;
     private ChatManager chatManager;
+    private GamesManager gamesManager;
 
     private PlayerDataManager playerDataManager;
     private TeleportationManager teleportationManager;
@@ -134,7 +135,6 @@ public class FeatherCore extends JavaPlugin {
         cooldownManager = new CooldownManager();
         fileManager = new FileManager(this);
         fileManager.loadActiveItemCategories();
-        gameConfiguration = new GameConfiguration(this);
         worldManager = new WorldManager(this);
         worldManager.loadPersistedWorlds();
 
@@ -142,7 +142,8 @@ public class FeatherCore extends JavaPlugin {
         partyManager = new PartyManager();
         itemManager = new ItemManager(this, abilityRegistry);  // Initialize ItemManager
         uiManager = new UIManager(this, itemManager); // Initialize UIManager with ItemManager
-        instanceManager = new InstanceManager(gameConfiguration, partyManager, worldManager, this);
+        instanceManager = new InstanceManager(partyManager, worldManager, this);
+        gamesManager = new GamesManager();
         permissionManager = new PermissionManager(this, playerDataManager); // Initialize the permission manager
         zoneManager = new ZoneManager(this);
         scoreboardManager = new ScoreboardManager(this);
@@ -173,7 +174,7 @@ public class FeatherCore extends JavaPlugin {
         // Initialize command handlers
         partyCommands = new PartyCommands(partyManager);
         appCommands = new AppCommands(webAppManager, activeSessions);
-        gameCommands = new GameCommands(instanceManager);
+        gameCommands = new GameCommands(instanceManager, gamesManager);
         worldCommands = new WorldCommands(worldManager);
         permissionCommands = new PermissionsCommands(permissionManager);
         itemCommands = new ItemCommands(uiManager, itemManager, this); // Only pass the main plugin instance
@@ -385,6 +386,10 @@ public class FeatherCore extends JavaPlugin {
 
     public InstanceManager getInstanceManager() {
         return instanceManager;
+    }
+
+    public GamesManager getGamesManager() {
+        return gamesManager;
     }
 
     public PartyManager getPartyManager() {

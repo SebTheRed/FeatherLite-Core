@@ -35,8 +35,7 @@ public class InstanceManager {
      * @param gameName        The name of the game (e.g., "BedWars").
      * @param gameType        The type of the game (e.g., "SkyWars", "CaptureTheFlag").
      * @param baseWorldName   The name of the base/template world to copy.
-     * @param minPlayers      The minimum number of players required to start the game.
-     * @param maxPlayers      The maximum number of players allowed in the game.
+     * @param teamSizes       The team names and their sizes.
      * @param teamNames       A list of team names (e.g., ["Red", "Blue", "Green"]).
      * @param teamSpawns      A map of team names to spawn locations.
      * @param pluginConfig    A plugin-specific configuration object, or null if not needed.
@@ -46,8 +45,7 @@ public class InstanceManager {
             String gameName,
             String gameType,
             String baseWorldName,
-            int minPlayers,
-            int maxPlayers,
+            Map<String, Integer> teamSizes,
             int maxTime,
             List<String> teamNames,
             Map<String, Location> teamSpawns,
@@ -68,8 +66,7 @@ public class InstanceManager {
                 gameName,
                 gameType,
                 newWorldName,
-                minPlayers,
-                maxPlayers,
+                teamSizes,
                 maxTime,
                 teamNames,
                 teamSpawns,
@@ -239,8 +236,9 @@ public class InstanceManager {
             String currentTeam = availableTeams.get(teamIndex);
             instance.getTeams().get(currentTeam).add(memberUUID);
     
-            if (instance.getTeams().get(currentTeam).size() >= instance.getMaxPlayers() / instance.getTeams().size()) {
-                teamIndex++;
+            // Check if the current team is now full
+            if (instance.getTeams().get(currentTeam).size() >= instance.getTeamSizes().get(currentTeam)) {
+                teamIndex++; // Move to the next available team
             }
     
             remainingMembers--;
@@ -255,16 +253,24 @@ public class InstanceManager {
         return remainingMembers == 0; // Success if no remaining members
     }
     
+    
     private List<String> getAvailableTeams(GameInstance instance, int requiredSlots) {
         List<String> availableTeams = new ArrayList<>();
+    
         for (Map.Entry<String, List<UUID>> entry : instance.getTeams().entrySet()) {
-            int availableSlots = (instance.getMaxPlayers() / instance.getTeams().size()) - entry.getValue().size();
+            String teamName = entry.getKey();
+            int currentSize = entry.getValue().size();
+            int maxSize = instance.getTeamSizes().get(teamName); // Get max size for this team
+    
+            int availableSlots = maxSize - currentSize;
             if (availableSlots >= requiredSlots) {
-                availableTeams.add(entry.getKey());
+                availableTeams.add(teamName);
             }
         }
+    
         return availableTeams;
     }
+    
 
 
     // Method to check if a player is part of an active instance
@@ -292,19 +298,25 @@ public class InstanceManager {
     // Assign an individual player to a random team with available slots
     private String assignPlayerToRandomTeam(GameInstance instance) {
         List<String> availableTeams = new ArrayList<>();
+    
         for (Map.Entry<String, List<UUID>> entry : instance.getTeams().entrySet()) {
-            if (entry.getValue().size() < instance.getMaxPlayers() / instance.getTeams().size()) {
-                availableTeams.add(entry.getKey());
+            String teamName = entry.getKey();
+            int currentSize = entry.getValue().size();
+            int maxSize = instance.getTeamSizes().get(teamName); // Get max size for this team
+    
+            if (currentSize < maxSize) {
+                availableTeams.add(teamName); // Add team to the pool if it has available slots
             }
         }
-
+    
         if (availableTeams.isEmpty()) {
             return null; // No available teams found
         }
-
+    
         // Pick a random team from available ones
         return availableTeams.get(new Random().nextInt(availableTeams.size()));
-    };
+    }
+    
     
     public void handlePlayerLeave(Player player) {
         for (GameInstance instance : activeInstances.values()) {
