@@ -228,7 +228,7 @@ public ItemStack createItemFromConfig(ConfigurationSection itemSection) {
 
     if (itemSection.contains("effect")) {
         String effectName = itemSection.getString("effect").toUpperCase();
-        plugin.getLogger().info("Attempting to set effect: " + effectName);
+        // plugin.getLogger().info("Attempting to set effect: " + effectName);
     
         PotionEffectType effectType = Registry.EFFECT.get(NamespacedKey.minecraft(effectName.toLowerCase()));
         
@@ -237,18 +237,18 @@ public ItemStack createItemFromConfig(ConfigurationSection itemSection) {
             int amplifier = itemSection.getInt("amplifier", 0);
     
             // Log the extracted effect data for debugging
-            plugin.getLogger().info("Effect found: " + effectName +
-                                    " | Type: " + effectType.getName() +
-                                    " | Duration: " + duration +
-                                    " | Amplifier: " + amplifier);
+            // plugin.getLogger().info("Effect found: " + effectName +
+            //                         " | Type: " + effectType.getName() +
+            //                         " | Duration: " + duration +
+            //                         " | Amplifier: " + amplifier);
     
             if (itemType.equals("potion")) {
                 // Apply effect as potion metadata
-                plugin.getLogger().info("Applying effect to potion item.");
+                // plugin.getLogger().info("Applying effect to potion item.");
                 itemCreator.setPotionEffect(effectType, duration, amplifier);
             } else if (itemType.equals("food") || itemType.equals("consumable")) {
                 // Store effect in PersistentDataContainer for non-potion items
-                plugin.getLogger().info("Applying effect to food/consumable item.");
+                // plugin.getLogger().info("Applying effect to food/consumable item.");
                 itemCreator.setFoodEffect(effectType, duration, amplifier);
             } else {
                 plugin.getLogger().warning("Effect can only be used on type 'potion', 'consumable', or 'food': " + effectName);

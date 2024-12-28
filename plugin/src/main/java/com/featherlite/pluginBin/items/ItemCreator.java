@@ -142,7 +142,7 @@ public class ItemCreator {
     public ItemCreator setAbilityParam(String paramName, String paramValue) {
         NamespacedKey key = new NamespacedKey(plugin, "itemAbility_" + paramName);
         dataContainer.set(key, PersistentDataType.STRING, paramValue);
-        plugin.getLogger().info("Setting ability param: " + paramName + " with value: " + paramValue);  // Log the parameter being set
+        // plugin.getLogger().info("Setting ability param: " + paramName + " with value: " + paramValue);  // Log the parameter being set
 
         return this;
     }
@@ -173,9 +173,9 @@ public class ItemCreator {
             PotionMeta potionMeta = (PotionMeta) itemMeta;
             
             // Debugging statement to log the effect details being set
-            plugin.getLogger().info("Setting potion effect: " + effectType.getName() +
-                                    " | Duration: " + duration +
-                                    " ticks | Amplifier: " + amplifier);
+            // plugin.getLogger().info("Setting potion effect: " + effectType.getName() +
+            //                         " | Duration: " + duration +
+            //                         " ticks | Amplifier: " + amplifier);
             
             PotionEffect potionEffect = new PotionEffect(effectType, duration, amplifier);
             potionMeta.addCustomEffect(potionEffect, true);
@@ -499,9 +499,9 @@ public class ItemCreator {
 
     // Helper method to fetch and format lore templates dynamically
     public String getFormattedLore(String templateKey, Map<String, String> replacements) {
-        plugin.getLogger().info("Fetching lore template for key: " + templateKey);
+        // plugin.getLogger().info("Fetching lore template for key: " + templateKey);
         String template = loreTemplates.getOrDefault(templateKey, "&7" + templateKey + ": {value}");
-        plugin.getLogger().info("Template found: " + template);
+        // plugin.getLogger().info("Template found: " + template);
         for (Map.Entry<String, String> entry : replacements.entrySet()) {
             template = template.replace("{" + entry.getKey() + "}", entry.getValue());
         }

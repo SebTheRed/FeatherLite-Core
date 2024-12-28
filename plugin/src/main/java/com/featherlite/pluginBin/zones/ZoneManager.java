@@ -40,14 +40,15 @@ public class ZoneManager {
 
     // New method to load zones from other plugins
     private void loadZonesFromOtherPlugins() {
-        for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
-            File zonesFolder = new File(plugin.getDataFolder(), "zones");
+        for (Plugin extPlugin : Bukkit.getPluginManager().getPlugins()) {
+            File zonesFolder = new File(extPlugin.getDataFolder(), "zones");
             if (zonesFolder.exists() && zonesFolder.isDirectory()) {
                 for (File file : zonesFolder.listFiles()) {
                     if (file.getName().endsWith(".yml")) {
                         String zoneName = file.getName().replace(".yml", "");
                         Zone zone = new Zone(zoneName, file);
                         zones.put(zoneName, zone); // Add the zone to the manager
+                        plugin.getLogger().info("Zone " + zoneName + " loaded from " + extPlugin.getName());
                     }
                 }
             }
@@ -69,7 +70,8 @@ public class ZoneManager {
         Map<String, Zone> zonesInWorld = new HashMap<>();
         for (Map.Entry<String, Zone> entry : zones.entrySet()) {
             Zone zone = entry.getValue();
-            if (zone.getWorld().equalsIgnoreCase(worldName)) {
+            // Match instance worlds by prefix (e.g., "Example_World_Name" matches "Example_World_Name_instance1")
+            if (worldName.startsWith(zone.getWorld())) {
                 zonesInWorld.put(entry.getKey(), zone);
             }
         }
@@ -82,7 +84,7 @@ public class ZoneManager {
 
     public Zone getZoneAtLocation(Location location) {
         return zones.values().stream()
-                .filter(zone -> zone.isWithinBounds(location))
+                .filter(zone -> zone.isWithinBounds(location) && location.getWorld().getName().startsWith(zone.getWorld()))
                 .findFirst()
                 .orElse(null);
     }

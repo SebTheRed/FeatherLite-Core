@@ -102,7 +102,7 @@ public class AbilityRegistry {
             // Register the ability in the registry
             AbilityInfo abilityInfo = new AbilityInfo(targetInstance, methodName, params);
             abilityRegistry.put(abilityName, abilityInfo);
-            plugin.getLogger().info("Registered ability: " + abilityName + " from " + plugin.getName() + " with method: " + methodName);
+            // plugin.getLogger().info("Registered ability: " + abilityName + " from " + plugin.getName() + " with method: " + methodName);
         }
     }
     
@@ -127,13 +127,13 @@ public class AbilityRegistry {
             // Log the class and method that we’re trying to invoke
             Object abilitySource = abilityInfo.getAbilitySource();
             String methodName = abilityInfo.getMethodName();
-            plugin.getLogger().info("Attempting to invoke method '" + methodName + "' on class '" + abilitySource.getClass().getName() + "'");
+            // plugin.getLogger().info("Attempting to invoke method '" + methodName + "' on class '" + abilitySource.getClass().getName() + "'");
     
             // Check if method exists with expected parameters (Player and Map)
             Method method = abilitySource.getClass().getMethod(methodName, Player.class, Map.class);
     
             // Log parameters being passed to the method for verification
-            plugin.getLogger().info("Parameters for ability '" + abilityName + "': " + finalParams);
+            // plugin.getLogger().info("Parameters for ability '" + abilityName + "': " + finalParams);
     
             // Invoke the method
             player.sendMessage("§aExecuting ability: " + abilityName + " from " + abilityInfo.getSourceName());

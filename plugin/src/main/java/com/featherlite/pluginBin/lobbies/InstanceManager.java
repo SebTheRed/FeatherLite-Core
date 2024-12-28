@@ -10,6 +10,7 @@ import com.featherlite.pluginBin.FeatherCore;
 import com.featherlite.pluginBin.worlds.WorldManager;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +39,7 @@ public class InstanceManager {
      * @param teamSizes       The team names and their sizes.
      * @param teamNames       A list of team names (e.g., ["Red", "Blue", "Green"]).
      * @param teamSpawns      A map of team names to spawn locations.
+     * @param rawWaitingRoom  A map of the waiting room.
      * @param pluginConfig    A plugin-specific configuration object, or null if not needed.
      * @return The created GameInstance, or null if the creation failed.
      */
@@ -48,42 +50,90 @@ public class InstanceManager {
             Map<String, Integer> teamSizes,
             int maxTime,
             List<String> teamNames,
-            Map<String, Location> teamSpawns,
-            Object pluginConfig // Plugin-specific data, optional
+            Map<String, Object> pluginConfig
     ) {
-        // Generate a unique world name for the new instance
-        String newWorldName = baseWorldName + "_instance" + (++instanceCount);
+        // Extract map-specific data from pluginConfig
+        @SuppressWarnings("unchecked")
+        Map<String, Map<String, Map<String, Double>>> mapSpecificTeamSpawns =
+                (Map<String, Map<String, Map<String, Double>>>) pluginConfig.get("mapSpecificTeamSpawns");
 
-        // Use the WorldManager to create and load the instance world
-        World instanceWorld = worldManager.createInstanceWorld(baseWorldName, newWorldName);
-        if (instanceWorld == null) {
-            plugin.getLogger().warning("Failed to create instance world: " + newWorldName);
+        @SuppressWarnings("unchecked")
+        Map<String, Map<String, Double>> mapSpecificWaitingRooms =
+                (Map<String, Map<String, Double>>) pluginConfig.get("mapSpecificWaitingRooms");
+
+        // Validate that the map exists in the config
+        if (!mapSpecificTeamSpawns.containsKey(baseWorldName) || !mapSpecificWaitingRooms.containsKey(baseWorldName)) {
+            plugin.getLogger().warning("No map data found for the selected map: " + baseWorldName);
             return null;
         }
 
-        // Create a new game instance object
+        // Resolve spawns and waiting room for the selected map
+        Map<String, Map<String, Double>> rawTeamSpawns = mapSpecificTeamSpawns.get(baseWorldName);
+        Map<String, Double> rawWaitingRoom = mapSpecificWaitingRooms.get(baseWorldName);
+
+        World instanceWorld = worldManager.createInstanceWorld(baseWorldName, baseWorldName + "_instance");
+        if (instanceWorld == null) {
+            plugin.getLogger().warning("Failed to create instance world: " + baseWorldName + "_instance");
+            return null;
+        }
+
+        Map<String, Location> resolvedTeamSpawns = resolveTeamSpawns(rawTeamSpawns, instanceWorld);
+        Location resolvedWaitingRoom = new Location(
+                instanceWorld,
+                rawWaitingRoom.getOrDefault("x", 0.0),
+                rawWaitingRoom.getOrDefault("y", 64.0), // Default Y level
+                rawWaitingRoom.getOrDefault("z", 0.0)
+        );
+
+        // Create and store the GameInstance
         GameInstance instance = new GameInstance(
                 gameName,
                 gameType,
-                newWorldName,
+                baseWorldName,
                 teamSizes,
                 maxTime,
                 teamNames,
-                teamSpawns,
-                pluginConfig // Pass plugin-specific config
+                resolvedTeamSpawns,
+                resolvedWaitingRoom,
+                pluginConfig
         );
-        instance.setWorldName(newWorldName);
 
-        // Store the active instance in the manager
         activeInstances.put(instance.getInstanceId(), instance);
-
-        // Start the instance timer
         startInstanceTimer(instance);
-
-        plugin.getLogger().info("Game instance created successfully: " + newWorldName);
+        plugin.getLogger().info("Game instance created successfully: " + baseWorldName + "_instance");
         return instance;
-    };
+    }
+
     
+
+    /**
+     * Resolves raw team spawns into actual Location objects using the instance world.
+     *
+     * @param rawTeamSpawns A map of team names to raw spawn coordinates.
+     * @param instanceWorld The world in which to resolve the locations.
+     * @return A map of team names to resolved Location objects.
+     */
+    private Map<String, Location> resolveTeamSpawns(Map<String, Map<String, Double>> rawTeamSpawns, World instanceWorld) {
+        Map<String, Location> resolvedSpawns = new HashMap<>();
+
+        for (Map.Entry<String, Map<String, Double>> entry : rawTeamSpawns.entrySet()) {
+            String teamName = entry.getKey();
+            Map<String, Double> coords = entry.getValue();
+
+            // Resolve the Location using the instanceWorld
+            Location location = new Location(
+                    instanceWorld,
+                    coords.getOrDefault("x", 0.0),
+                    coords.getOrDefault("y", 64.0), // Default Y to ground level if missing
+                    coords.getOrDefault("z", 0.0)
+            );
+
+            resolvedSpawns.put(teamName, location);
+        }
+
+        return resolvedSpawns;
+    }
+
 
     public GameInstance getInstance(UUID instanceId) {
         return activeInstances.get(instanceId);
@@ -176,6 +226,7 @@ public class InstanceManager {
     };
     
 
+    
 
     public void addPlayerToInstance(Player player, GameInstance instance, String teamName) {
         Party playerParty = partyManager.getParty(player);
@@ -212,9 +263,11 @@ public class InstanceManager {
         instance.getTeams().get(assignedTeam).add(player.getUniqueId());
     
         // Teleport the player to the assigned team's spawn location
-        Location spawnLocation = instance.getTeamSpawns().get(assignedTeam);
-        if (spawnLocation != null) {
-            worldManager.teleportPlayer(player, spawnLocation);
+        Location waitingRoomLoc = instance.getWaitingRoom();
+        if (waitingRoomLoc != null) {
+            player.teleport(waitingRoomLoc);
+        } else {
+            player.sendMessage("Waiting room location does not exist ? Report this bug to server owner.");
         }
     
         instance.broadcastToAllPlayers(player.getName() + " has joined the " + assignedTeam + " team!");
@@ -346,6 +399,10 @@ public class InstanceManager {
             }
         }
         return null; // Player is not in any active instance
+    }
+
+    public Map<UUID, GameInstance> getActiveInstances() {
+        return Collections.unmodifiableMap(activeInstances);
     }
 
 }

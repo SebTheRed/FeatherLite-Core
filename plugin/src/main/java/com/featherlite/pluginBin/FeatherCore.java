@@ -200,6 +200,7 @@ public class FeatherCore extends JavaPlugin {
         getCommand("party").setExecutor(this);
         getCommand("party").setTabCompleter(partyCommands);
         getCommand("game").setExecutor(this);
+        getCommand("game").setTabCompleter(gameCommands);
         getCommand("world").setExecutor(this);
         getCommand("world").setTabCompleter(worldCommands);
         getCommand("perms").setExecutor(this);

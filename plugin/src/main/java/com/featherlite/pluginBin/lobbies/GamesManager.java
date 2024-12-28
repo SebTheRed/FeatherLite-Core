@@ -21,8 +21,7 @@ public class GamesManager {
         private final Map<String, Integer> teamSizes;
         private final int maxTime;
         private final List<String> teamNames;
-        private final Map<String, Location> teamSpawns;
-        private final Object pluginConfig;
+        private final Map<String, Object> pluginConfig;
         private final Plugin ownerPlugin;
 
         public GameData(
@@ -33,8 +32,7 @@ public class GamesManager {
                 Map<String, Integer> teamSizes,
                 int maxTime,
                 List<String> teamNames,
-                Map<String, Location> teamSpawns,
-                Object pluginConfig,
+                Map<String, Object> pluginConfig,
                 Plugin ownerPlugin
         ) {
             this.gameName = gameName;
@@ -44,7 +42,6 @@ public class GamesManager {
             this.teamSizes = teamSizes;
             this.maxTime = maxTime;
             this.teamNames = teamNames;
-            this.teamSpawns = teamSpawns;
             this.pluginConfig = pluginConfig;
             this.ownerPlugin = ownerPlugin;
         }
@@ -77,11 +74,7 @@ public class GamesManager {
             return teamNames;
         }
 
-        public Map<String, Location> getTeamSpawns() {
-            return teamSpawns;
-        }
-
-        public Object getPluginConfig() {
+        public Map<String, Object> getPluginConfig() {
             return pluginConfig;
         }
 
@@ -99,11 +92,9 @@ public class GamesManager {
      * @param gameType      The type of the game (e.g., "Bedwars").
      * @param description   A brief description of the game.
      * @param worldOptions  The names of the world choices for the game.
-     * @param minPlayers    The minimum number of players required.
-     * @param maxPlayers    The maximum number of players allowed.
+     * @param teamSizes    The max-sizes of teams.
      * @param maxTime       The maximum time (in seconds) for the game.
      * @param teamNames     The names of the teams.
-     * @param teamSpawns    A map of team names to spawn locations.
      * @param pluginConfig  Plugin-specific configuration, or null if not needed.
      * @param ownerPlugin   The plugin that owns the game.
      */
@@ -115,8 +106,7 @@ public class GamesManager {
             Map<String,Integer> teamSizes,
             int maxTime,
             List<String> teamNames,
-            Map<String, Location> teamSpawns,
-            Object pluginConfig,
+            Map<String, Object> pluginConfig,
             Plugin ownerPlugin
     ) {
         if (registeredGames.containsKey(gameName)) {
@@ -124,16 +114,15 @@ public class GamesManager {
         }
 
         GameData gameData = new GameData(
-                gameName,
-                gameType,
-                description,
-                worldOptions,
-                teamSizes,
-                maxTime,
-                teamNames,
-                teamSpawns,
-                pluginConfig,
-                ownerPlugin
+            gameName,
+            gameType,
+            description,
+            worldOptions,
+            teamSizes,
+            maxTime,
+            teamNames,
+            pluginConfig, // Store all map-specific data in pluginConfig
+            ownerPlugin
         );
 
         registeredGames.put(gameName, gameData);
@@ -169,8 +158,8 @@ public class GamesManager {
                 gameData.getTeamSizes(),
                 gameData.getMaxTime(),
                 gameData.getTeamNames(),
-                gameData.getTeamSpawns(),
                 gameData.getPluginConfig()
+
         );
     }
 

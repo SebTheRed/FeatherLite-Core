@@ -553,8 +553,8 @@ public class Zone {
             return false;
         }
     
-        // Ensure the location is within the same world as the zone
-        if (!location.getWorld().equals(cornerOne.getWorld())) {
+        // Ensure the location's world name starts with the zone's world name
+        if (!location.getWorld().getName().startsWith(this.world)) {
             return false;
         }
     
@@ -573,7 +573,8 @@ public class Zone {
         return locX >= x1 && locX <= x2 &&
                locY >= y1 && locY <= y2 &&
                locZ >= z1 && locZ <= z2;
-    };
+    }
+    
 
     
     

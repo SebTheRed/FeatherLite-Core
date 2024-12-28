@@ -19,12 +19,13 @@ public class GameInstance {
 
     private final UUID instanceId;
     private final String gameName; // Name of the minigame
-    private final String gameType; // Type of the game (e.g., "SkyWars")
+    private final String gameType; // Type of the game (e.g., "Bedwars")
     private String worldName; // Name of the world for this instance
     private final Map<String, Integer> teamSizes; // A map of teams and their sizes.
     private final int maxTime; // In minutes
     private final Map<String, List<UUID>> teams; // Maps team names to player UUIDs
     private final Map<String, Location> teamSpawns; // Maps team names to spawn locations
+    private Location waitingRoom;
     private final List<UUID> spectators; // List of spectators
     private final Object pluginConfig; // Optional plugin-specific configuration
     private GameState state;
@@ -37,6 +38,7 @@ public class GameInstance {
             int maxTime,
             List<String> teamNames,
             Map<String, Location> teamSpawns,
+            Location waitingRoom,
             Object pluginConfig
     ) {
         this.instanceId = UUID.randomUUID();
@@ -47,6 +49,7 @@ public class GameInstance {
         this.maxTime = maxTime;
         this.teams = new HashMap<>();
         this.teamSpawns = teamSpawns != null ? teamSpawns : new HashMap<>();
+        this.waitingRoom = waitingRoom;
         this.spectators = new ArrayList<>();
         this.pluginConfig = pluginConfig;
         this.state = GameState.WAITING;
@@ -103,8 +106,13 @@ public class GameInstance {
         return spectators;
     }
 
+
     public GameState getState() {
         return state;
+    }
+
+    public Location getWaitingRoom() {
+        return waitingRoom;
     }
 
     public void setState(GameState state) {
@@ -146,6 +154,20 @@ public class GameInstance {
         player.teleport(teamSpawns.get(targetTeam));
         broadcastToAllPlayers(player.getName() + " joined the " + targetTeam + " team.");
     }
+    
+    public void teleportPlayersToWaitingRoom() {
+        teams.values().forEach(players ->
+                players.forEach(playerUUID -> {
+                    Player player = Bukkit.getPlayer(playerUUID);
+                    if (player != null && player.isOnline()) {
+                        player.teleport(waitingRoom);
+                        player.sendMessage("You have been teleported to the waiting room. Please wait for the game to start.");
+                    }
+                })
+        );
+    }
+    
+
 
     public void addSpectator(Player player) {
         spectators.add(player.getUniqueId());
