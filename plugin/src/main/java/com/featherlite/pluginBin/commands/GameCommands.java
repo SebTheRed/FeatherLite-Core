@@ -4,11 +4,13 @@ import com.featherlite.pluginBin.lobbies.GameInstance;
 import com.featherlite.pluginBin.lobbies.InstanceManager;
 import com.featherlite.pluginBin.lobbies.GamesManager;
 import com.featherlite.pluginBin.lobbies.GamesManager.GameData;
+import com.featherlite.pluginBin.lobbies.GamesUI;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.command.Command;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -19,19 +21,28 @@ public class GameCommands implements TabCompleter {
 
     private final InstanceManager instanceManager;
     private final GamesManager gamesManager;
+    private final GamesUI gamesUI;
 
-    public GameCommands(InstanceManager instanceManager, GamesManager gamesManager) {
+    public GameCommands(InstanceManager instanceManager, GamesManager gamesManager, GamesUI gamesUI) {
         this.instanceManager = instanceManager;
         this.gamesManager = gamesManager;
+        this.gamesUI = gamesUI;
     }
 
     public boolean handleGameCommands(Player player, String[] args) {
         if (args.length < 1) {
-            player.sendMessage("Usage: /game <join|leave|create|delete|close>");
+            // Default to opening the Games UI
+            gamesUI.openMainMenu(player);
             return true;
         }
-    
+
         switch (args[0].toLowerCase()) {
+            case "ui":
+            case "menu":
+                // Open the Games UI
+                gamesUI.openMainMenu(player);
+                return true;
+
             case "join":
                 if (args.length < 2) {
                     player.sendMessage("Usage: /game join <instanceID>");
@@ -50,8 +61,8 @@ public class GameCommands implements TabCompleter {
                     player.sendMessage("Invalid instance ID.");
                 }
                 break;
-    
-                case "create":
+
+            case "create":
                 if (!player.hasPermission("games.create")) {
                     player.sendMessage("You do not have permission to create games.");
                     return true;
@@ -60,17 +71,17 @@ public class GameCommands implements TabCompleter {
                     player.sendMessage("Usage: /game create \"<game-name>\" <world>");
                     return true;
                 }
-    
+
                 // Extract quoted game name
                 String gameName = extractQuotedArgument(args, 1);
                 if (gameName == null) {
                     player.sendMessage("Please provide the game name in quotes (e.g., \"Four Team Bedwars - Quads\").");
                     return true;
                 }
-    
+
                 // Get the world name
                 String worldName = args[args.length - 1];
-    
+
                 try {
                     GameInstance newGame = gamesManager.startGameInstance(gameName, worldName, instanceManager);
                     if (newGame == null) {
@@ -85,7 +96,7 @@ public class GameCommands implements TabCompleter {
                     e.printStackTrace(); // Log the error for debugging
                 }
                 break;
-    
+
             case "delete":
                 if (args.length < 2) {
                     player.sendMessage("Usage: /game delete <instanceID>");
@@ -99,12 +110,12 @@ public class GameCommands implements TabCompleter {
                     player.sendMessage("Invalid instance ID.");
                 }
                 break;
-    
+
             case "leave":
                 instanceManager.handlePlayerLeave(player);
                 player.sendMessage("You left the game.");
                 break;
-    
+
             case "close":
                 if (args.length < 3) {
                     player.sendMessage("Usage: /game close <instanceID> <lobbyName>");
@@ -119,9 +130,9 @@ public class GameCommands implements TabCompleter {
                     player.sendMessage("Invalid instance ID or lobby name.");
                 }
                 break;
-    
+
             default:
-                player.sendMessage("Unknown command. Use /game <join|leave|create|delete|close>");
+                player.sendMessage("Unknown command. Use /game <ui|menu|join|leave|create|delete|close>");
         }
         return true;
     }
@@ -129,10 +140,10 @@ public class GameCommands implements TabCompleter {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         List<String> suggestions = new ArrayList<>();
-    
+
         if (args.length == 1) {
             // Suggest subcommands
-            suggestions.addAll(Arrays.asList("join", "leave", "create", "delete", "close"));
+            suggestions.addAll(Arrays.asList("ui", "menu", "join", "leave", "create", "delete", "close"));
         } else if (args.length == 2) {
             switch (args[0].toLowerCase()) {
                 case "create":
@@ -161,20 +172,12 @@ public class GameCommands implements TabCompleter {
                 }
             }
         }
-    
+
         // Filter suggestions based on current input to make them dynamic
         return suggestions.stream()
                 .filter(s -> s.toLowerCase().startsWith(args[args.length - 1].toLowerCase()))
                 .collect(Collectors.toList());
     }
-
-
-
-
-
-
-
-
 
     /**
      * Extracts a quoted argument from an array of arguments.
@@ -207,5 +210,4 @@ public class GameCommands implements TabCompleter {
 
         return inQuotes ? null : quoted.toString(); // Return null if quotes are unbalanced
     }
-    
 }

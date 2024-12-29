@@ -2,6 +2,7 @@ package com.featherlite.pluginBin.lobbies;
 
 import org.bukkit.Location;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
 
@@ -22,7 +23,6 @@ public class GamesManager {
         private final int maxTime;
         private final List<String> teamNames;
         private final Map<String, Object> pluginConfig;
-        private final Plugin ownerPlugin;
 
         public GameData(
                 String gameName,
@@ -32,8 +32,7 @@ public class GamesManager {
                 Map<String, Integer> teamSizes,
                 int maxTime,
                 List<String> teamNames,
-                Map<String, Object> pluginConfig,
-                Plugin ownerPlugin
+                Map<String, Object> pluginConfig
         ) {
             this.gameName = gameName;
             this.gameType = gameType;
@@ -43,7 +42,6 @@ public class GamesManager {
             this.maxTime = maxTime;
             this.teamNames = teamNames;
             this.pluginConfig = pluginConfig;
-            this.ownerPlugin = ownerPlugin;
         }
 
         public String getGameName() {
@@ -78,12 +76,11 @@ public class GamesManager {
             return pluginConfig;
         }
 
-        public Plugin getOwnerPlugin() {
-            return ownerPlugin;
-        }
     }
 
     private final Map<String, GameData> registeredGames = new HashMap<>();
+    private final Map<String, List<GameData>> gamesByType = new HashMap<>(); // Group games by type
+
 
     /**
      * Registers a new game with the GamesManager.
@@ -96,7 +93,6 @@ public class GamesManager {
      * @param maxTime       The maximum time (in seconds) for the game.
      * @param teamNames     The names of the teams.
      * @param pluginConfig  Plugin-specific configuration, or null if not needed.
-     * @param ownerPlugin   The plugin that owns the game.
      */
     public void registerGame(
             String gameName,
@@ -106,8 +102,7 @@ public class GamesManager {
             Map<String,Integer> teamSizes,
             int maxTime,
             List<String> teamNames,
-            Map<String, Object> pluginConfig,
-            Plugin ownerPlugin
+            Map<String, Object> pluginConfig
     ) {
         if (registeredGames.containsKey(gameName)) {
             throw new IllegalArgumentException("A game with this name is already registered: " + gameName);
@@ -121,11 +116,12 @@ public class GamesManager {
             teamSizes,
             maxTime,
             teamNames,
-            pluginConfig, // Store all map-specific data in pluginConfig
-            ownerPlugin
+            pluginConfig // Store all map-specific data in pluginConfig
         );
 
         registeredGames.put(gameName, gameData);
+        gamesByType.computeIfAbsent(gameType, k -> new ArrayList<>()).add(gameData);
+
     }
 
     /**
@@ -138,6 +134,24 @@ public class GamesManager {
         return registeredGames.get(gameName);
     }
 
+    /**
+     * Retrieves all game types.
+     *
+     * @return A set of all game types.
+     */
+    public Set<String> getAllGameTypes() {
+        return gamesByType.keySet();
+    }
+
+    /**
+     * Retrieves all games of a specific type.
+     *
+     * @param gameType The type of the game (case-insensitive).
+     * @return A list of all games of the specified type, or an empty list if none exist.
+     */
+    public List<GameData> getGamesByType(String gameType) {
+        return gamesByType.getOrDefault(gameType.toLowerCase(), Collections.emptyList());
+    }
     /**
      * Starts a new game instance using the registered game data.
      *

@@ -14,11 +14,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class IndicatorListener implements Listener {
 
     private final JavaPlugin plugin;
-    private final HealthIndicator healthIndicator;
+    private final NumberIndicator healthIndicator;
 
     public IndicatorListener(JavaPlugin plugin, DisplayPieceManager displayPieceManager) {
         this.plugin = plugin;
-        this.healthIndicator = new HealthIndicator(plugin, displayPieceManager);
+        this.healthIndicator = new NumberIndicator(plugin, displayPieceManager);
         Bukkit.getPluginManager().registerEvents(this, plugin); // Register the listener
     }
 

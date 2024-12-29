@@ -16,6 +16,7 @@ commands:
   game:
     description: Manages game instances.
     usage: /game <join|leave|create|delete|close>
+    aliases: [games]
     permission: core.game
   world:
     description: Manages worlds.

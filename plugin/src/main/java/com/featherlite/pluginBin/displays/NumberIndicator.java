@@ -6,12 +6,12 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class HealthIndicator {
+public class NumberIndicator {
 
     private final JavaPlugin plugin;
     private final DisplayPieceManager displayPieceManager;
 
-    public HealthIndicator(JavaPlugin plugin, DisplayPieceManager displayPieceManager) {
+    public NumberIndicator(JavaPlugin plugin, DisplayPieceManager displayPieceManager) {
         this.plugin = plugin;
         this.displayPieceManager = displayPieceManager;
     }
@@ -27,7 +27,7 @@ public class HealthIndicator {
             return; // Check if damage indicators are enabled in the config
         }
 
-        String text = "§c-" + String.format("%.1f", damage); // Red text for damage
+        String text = "§c-" + String.format("%.1f", damage) + "♡"; // Red text for damage
         spawnIndicator(location, text, "damage");
     }
 
@@ -42,7 +42,7 @@ public class HealthIndicator {
             return; // Check if healing indicators are enabled in the config
         }
 
-        String text = "§a+" + String.format("%.1f", healing); // Green text for healing
+        String text = "§a+" + String.format("%.1f", healing) + "♡"; // Green text for healing
         spawnIndicator(location, text, "healing");
     }
 
@@ -53,7 +53,7 @@ public class HealthIndicator {
      * @param text     The text to display.
      * @param idPrefix The prefix for the display piece ID.
      */
-    private void spawnIndicator(Location location, String text, String idPrefix) {
+    public void spawnIndicator(Location location, String text, String idPrefix) {
         World world = location.getWorld();
         if (world == null) return;
 

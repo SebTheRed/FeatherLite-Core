@@ -42,6 +42,7 @@ import com.featherlite.pluginBin.chat.ChatControlListener;
 import com.featherlite.pluginBin.chat.ChatManager;
 
 import com.featherlite.pluginBin.lobbies.GamesManager;
+import com.featherlite.pluginBin.lobbies.GamesUI;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -78,6 +79,7 @@ public class FeatherCore extends JavaPlugin {
     private ParticleManager particleManager;
     private ChatManager chatManager;
     private GamesManager gamesManager;
+    private GamesUI gamesUI;
 
     private PlayerDataManager playerDataManager;
     private TeleportationManager teleportationManager;
@@ -144,6 +146,9 @@ public class FeatherCore extends JavaPlugin {
         uiManager = new UIManager(this, itemManager); // Initialize UIManager with ItemManager
         instanceManager = new InstanceManager(partyManager, worldManager, this);
         gamesManager = new GamesManager();
+        gamesUI = new GamesUI(gamesManager, instanceManager);
+        getServer().getPluginManager().registerEvents(gamesUI, this);
+
         permissionManager = new PermissionManager(this, playerDataManager); // Initialize the permission manager
         zoneManager = new ZoneManager(this);
         scoreboardManager = new ScoreboardManager(this);
@@ -174,7 +179,7 @@ public class FeatherCore extends JavaPlugin {
         // Initialize command handlers
         partyCommands = new PartyCommands(partyManager);
         appCommands = new AppCommands(webAppManager, activeSessions);
-        gameCommands = new GameCommands(instanceManager, gamesManager);
+        gameCommands = new GameCommands(instanceManager, gamesManager, gamesUI);
         worldCommands = new WorldCommands(worldManager);
         permissionCommands = new PermissionsCommands(permissionManager);
         itemCommands = new ItemCommands(uiManager, itemManager, this); // Only pass the main plugin instance
@@ -201,6 +206,8 @@ public class FeatherCore extends JavaPlugin {
         getCommand("party").setTabCompleter(partyCommands);
         getCommand("game").setExecutor(this);
         getCommand("game").setTabCompleter(gameCommands);
+        getCommand("games").setExecutor(this);
+        getCommand("games").setTabCompleter(gameCommands);
         getCommand("world").setExecutor(this);
         getCommand("world").setTabCompleter(worldCommands);
         getCommand("perms").setExecutor(this);
@@ -425,6 +432,10 @@ public class FeatherCore extends JavaPlugin {
         return playerStatsManager;
     }
 
+    public DisplayPieceManager getDisplayPieceManager() {
+        return displayPieceManager;
+    }
+
 
 
 
@@ -439,6 +450,7 @@ public class FeatherCore extends JavaPlugin {
                 case "app":
                     return appCommands.handleAppCommands(player, args);
                 case "game":
+                case "games":
                     return gameCommands.handleGameCommands(player, args);
                 case "world":
                     return worldCommands.handleWorldCommands(player, args);
