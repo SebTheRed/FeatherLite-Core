@@ -79,11 +79,15 @@ public class DisplayPieceManager {
     public boolean removeDisplay(String id) {
         DisplayPiece piece = displayPieces.remove(id);
         if (piece != null) {
-            piece.remove();
+            // Forcefully remove the entity from the world
+            if (piece.getDisplayEntity().isValid()) {
+                piece.remove();
+            }
             return true;
         }
-        return false;
+        return false; // Indicate failure to remove
     }
+    
 
     /**
      * Clear all displays.
