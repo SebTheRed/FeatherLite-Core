@@ -125,7 +125,7 @@ public class GameCommands implements TabCompleter {
                 try {
                     UUID instanceId = UUID.fromString(args[1]);
                     String lobbyName = args[2];
-                    instanceManager.closeInstance(instanceId, true, lobbyName);
+                    instanceManager.closeInstance(instanceId);
                     player.sendMessage("Game instance closed successfully and players teleported to " + lobbyName + "!");
                 } catch (IllegalArgumentException e) {
                     player.sendMessage("Invalid instance ID or lobby name.");

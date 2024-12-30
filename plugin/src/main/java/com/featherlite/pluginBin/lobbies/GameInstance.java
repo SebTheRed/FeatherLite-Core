@@ -1,5 +1,6 @@
 package com.featherlite.pluginBin.lobbies;
 
+import com.featherlite.pluginBin.lobbies.InstanceManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -16,7 +17,7 @@ public class GameInstance {
         ENDED
     }
 
-
+    private final InstanceManager instanceManager;
     private final UUID instanceId;
     private final boolean isInstancePublic;
     private final String gameName; // Name of the minigame
@@ -31,7 +32,10 @@ public class GameInstance {
     private final Object pluginConfig; // Optional plugin-specific configuration
     private GameState state;
 
+    private int readinessTaskId = -1; // To track the scheduled task ID
+
     public GameInstance(
+            InstanceManager instanceManager,
             boolean isInstancePublic,
             String gameName,
             String gameType,
@@ -43,6 +47,7 @@ public class GameInstance {
             Location waitingRoom,
             Object pluginConfig
     ) {
+        this.instanceManager = instanceManager;
         this.instanceId = UUID.randomUUID();
         this.isInstancePublic = isInstancePublic;
         this.gameName = gameName;
@@ -93,6 +98,26 @@ public class GameInstance {
         return teamSizes;
     }
 
+    // Getter for the number of required players
+    public int getRequiredPlayers() {
+        return teamSizes.values().stream()
+                .mapToInt(sizeMap -> sizeMap.getOrDefault("min", 0))
+                .sum();
+    }
+
+    // Getter and Setter for the readiness task ID
+    public int getReadinessTaskId() {
+        return readinessTaskId;
+    }
+
+    public void setReadinessTaskId(int taskId) {
+        this.readinessTaskId = taskId;
+    }
+
+    public void clearReadinessTaskId() {
+        this.readinessTaskId = -1;
+    }
+
     public int getMaxTime() {
         return maxTime;
     }
@@ -128,22 +153,28 @@ public class GameInstance {
 
     // --- Core Logic ---
     public void startGame() {
-        int requiredPlayers = teamSizes.values().stream()
-                .mapToInt(sizeMap -> sizeMap.getOrDefault("min", 1)) // Sum up the "min" values
-                .sum();
+        if (state != GameState.WAITING) return;
     
-        if (getTotalPlayerCount() >= requiredPlayers) {
-            state = GameState.IN_PROGRESS;
-            broadcastToAllPlayers("The game has started!");
-        } else {
-            broadcastToAllPlayers("Not enough players to start the game. Minimum required: " + requiredPlayers);
-        }
+        state = GameState.IN_PROGRESS;
+    
+        // Distribute players into teams
+        assignPlayersToTeams();
+    
+        // Teleport players to their respective team spawns
+        teleportPlayersToTeamSpawns();
+    
+        // Notify players
+        broadcastToAllPlayers("The game has started! Good luck!");
     }
+    
     
 
     public void endGame() {
         state = GameState.ENDED;
+        Bukkit.getPluginManager().callEvent(new GameEndEvent(this));
         broadcastToAllPlayers("The game has ended!");
+        instanceManager.closeInstance(instanceId);
+
     }
 
     public void addPlayerToTeam(Player player, String teamName) {
@@ -181,7 +212,33 @@ public class GameInstance {
                 })
         );
     }
-    
+
+    // Assign players to teams as evenly as possible
+    private void assignPlayersToTeams() {
+        List<Player> waitingPlayers = getAllPlayersInWaitingRoom();
+        List<String> teamNames = new ArrayList<>(teams.keySet());
+
+        int teamIndex = 0;
+        for (Player player : waitingPlayers) {
+            String teamName = teamNames.get(teamIndex);
+            teams.get(teamName).add(player.getUniqueId());
+            teamIndex = (teamIndex + 1) % teamNames.size(); // Rotate to the next team
+        }
+    }
+
+    // Teleport players to their assigned team spawns
+    private void teleportPlayersToTeamSpawns() {
+        teams.forEach((teamName, playerList) -> {
+            Location spawnLocation = teamSpawns.get(teamName);
+            for (UUID playerId : playerList) {
+                Player player = Bukkit.getPlayer(playerId);
+                if (player != null) {
+                    player.teleport(spawnLocation);
+                    player.sendMessage("You have been teleported to the " + teamName + " spawn!");
+                }
+            }
+        });
+    }
 
 
     public void addSpectator(Player player) {
@@ -215,4 +272,14 @@ public class GameInstance {
                 })
         );
     }
+
+
+    private List<Player> getAllPlayersInWaitingRoom() {
+        return teams.values().stream()
+                .flatMap(List::stream)
+                .map(Bukkit::getPlayer)
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
 }

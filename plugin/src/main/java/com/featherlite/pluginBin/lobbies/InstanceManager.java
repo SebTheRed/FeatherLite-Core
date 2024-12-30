@@ -88,6 +88,7 @@ public class InstanceManager {
 
         // Create and store the GameInstance
         GameInstance instance = new GameInstance(
+                this,
                 isInstancePublic,
                 gameName,
                 gameType,
@@ -101,17 +102,18 @@ public class InstanceManager {
         );
 
         activeInstances.put(instance.getInstanceId(), instance);
-        startInstanceTimer(instance);
+        startReadinessTimer(instance);
+        // startInstanceTimer(instance);
         plugin.getLogger().info("Game instance created successfully: " + baseWorldName + "_instance");
         return instance;
     }
 
 
     public List<GameInstance> getInstancesByRegisteredGame(String registeredGameName) {
-    return activeInstances.values().stream()
-        .filter(instance -> instance.getGameName().equalsIgnoreCase(registeredGameName))
-        .toList();
-}
+        return activeInstances.values().stream()
+            .filter(instance -> instance.getGameName().equalsIgnoreCase(registeredGameName))
+            .toList();
+    }
 
     /**
      * Resolves raw team spawns into actual Location objects using the instance world.
@@ -146,6 +148,45 @@ public class InstanceManager {
         return activeInstances.get(instanceId);
     };
 
+
+
+
+
+
+    public void startReadinessTimer(GameInstance instance) {
+        if (instance.getState() != GameInstance.GameState.WAITING) {
+            plugin.getLogger().warning("Cannot start readiness timer: GameInstance is not in the WAITING state.");
+            return;
+        }
+    
+        int taskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
+            if (instance.getState() != GameInstance.GameState.WAITING) {
+                Bukkit.getScheduler().cancelTask(instance.getReadinessTaskId());
+                instance.clearReadinessTaskId();
+                return;
+            }
+    
+            if (instance.getTotalPlayerCount() >= instance.getRequiredPlayers()) {
+                Bukkit.getScheduler().cancelTask(instance.getReadinessTaskId());
+                instance.startGame(); // Transition the game to IN_PROGRESS
+                instance.clearReadinessTaskId();
+            } else {
+                instance.broadcastToAllPlayers("Waiting for more players: " + 
+                    instance.getTotalPlayerCount() + "/" + instance.getRequiredPlayers());
+            }
+        }, 0L, 20L * 20); // Run every 20 seconds (20 ticks = 1 second)
+    
+        instance.setReadinessTaskId(taskId); // Track the task ID in the instance
+        plugin.getLogger().info("Started readiness timer for GameInstance: " + instance.getInstanceId());
+    }
+    
+
+
+
+
+
+
+
     public void removeInstance(UUID instanceId) {
         GameInstance instance = activeInstances.remove(instanceId);
         if (instance != null) {
@@ -157,20 +198,15 @@ public class InstanceManager {
         }
     };
 
-    public void closeInstance(UUID instanceId, boolean broadcastMessage, String lobbyName) {
+    public void closeInstance(UUID instanceId) {
         GameInstance instance = activeInstances.remove(instanceId);
         if (instance == null) {
             plugin.getLogger().warning("Attempted to close an invalid or non-existent instance with ID: " + instanceId);
             return;
         }
 
-        // Broadcast a message if specified
-        if (broadcastMessage) {
-            instance.broadcastToAllPlayers("This game instance is being closed. You will be teleported back to the lobby.");
-        }
-
         // Teleport all players safely to the specified lobby
-        teleportPlayersToSafeLocation(instance, lobbyName);
+        teleportPlayersToSafeLocation(instance);
 
         // End the game if it's still in progress
         if (instance.getState() == GameInstance.GameState.IN_PROGRESS) {
@@ -182,7 +218,8 @@ public class InstanceManager {
         plugin.getLogger().info("Successfully closed and removed instance: " + instanceId);
     };
 
-    private void teleportPlayersToSafeLocation(GameInstance instance, String lobbyName) {
+    private void teleportPlayersToSafeLocation(GameInstance instance) {
+        String lobbyName = "Spawn";
         // Fetch the specified lobby location from the core plugin
         final Location safeLocation = plugin.getLobbyLocation(lobbyName);
         Location backupLocation = Bukkit.getWorld("world").getSpawnLocation();
@@ -215,15 +252,15 @@ public class InstanceManager {
     };
     
 
-    private void startInstanceTimer(GameInstance instance) {
-        // Schedule a task to end the game when maxTime expires
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            if (instance.getState() == GameInstance.GameState.IN_PROGRESS) {
-                instance.broadcastToAllPlayers("Time's up! The game has ended.");
-                instance.endGame();
-            }
-        }, instance.getMaxTime() * 20L); // Convert seconds to ticks (20 ticks = 1 second)
-    };
+    // private void startInstanceTimer(GameInstance instance) {
+    //     // Schedule a task to end the game when maxTime expires
+    //     Bukkit.getScheduler().runTaskLater(plugin, () -> {
+    //         if (instance.getState() == GameInstance.GameState.IN_PROGRESS) {
+    //             instance.broadcastToAllPlayers("Time's up! The game has ended.");
+    //             instance.endGame();
+    //         }
+    //     }, instance.getMaxTime() * 20L); // Convert seconds to ticks (20 ticks = 1 second)
+    // };
 
     public void teleportTeamPlayers(GameInstance instance, String team, Player player) {
         Location spawnLocation = instance.getTeamSpawns().get(team);
