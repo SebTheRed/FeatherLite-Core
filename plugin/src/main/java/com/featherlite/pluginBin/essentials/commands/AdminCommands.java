@@ -261,7 +261,7 @@ public class AdminCommands implements TabCompleter {
             case "killall":
             case "remove":
                 if (args.length == 1) {
-                    suggestions.addAll(List.of("monsters", "entities", "boats", "minecarts", "players", "drops", "arrows", "mobs"));
+                    suggestions.addAll(List.of("monsters", "displays", "entities", "boats", "minecarts", "players", "drops", "arrows", "mobs"));
                 } else if (args.length == 2) {
                     suggestions.add("<radius>");
                     suggestions.add("world");

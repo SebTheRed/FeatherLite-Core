@@ -32,7 +32,7 @@ public class InstanceManager {
 
     /**
      * Creates a new GameInstance.
-     *
+     * @param isInstancePublic Is this instance open to the public or is invite only?
      * @param gameName        The name of the game (e.g., "BedWars").
      * @param gameType        The type of the game (e.g., "SkyWars", "CaptureTheFlag").
      * @param baseWorldName   The name of the base/template world to copy.
@@ -44,6 +44,7 @@ public class InstanceManager {
      * @return The created GameInstance, or null if the creation failed.
      */
     public GameInstance createInstance(
+            boolean isInstancePublic,
             String gameName,
             String gameType,
             String baseWorldName,
@@ -87,6 +88,7 @@ public class InstanceManager {
 
         // Create and store the GameInstance
         GameInstance instance = new GameInstance(
+                isInstancePublic,
                 gameName,
                 gameType,
                 baseWorldName,
@@ -104,7 +106,12 @@ public class InstanceManager {
         return instance;
     }
 
-    
+
+    public List<GameInstance> getInstancesByRegisteredGame(String registeredGameName) {
+    return activeInstances.values().stream()
+        .filter(instance -> instance.getGameName().equalsIgnoreCase(registeredGameName))
+        .toList();
+}
 
     /**
      * Resolves raw team spawns into actual Location objects using the instance world.

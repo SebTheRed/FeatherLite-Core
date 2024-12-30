@@ -18,6 +18,7 @@ public class GameInstance {
 
 
     private final UUID instanceId;
+    private final boolean isInstancePublic;
     private final String gameName; // Name of the minigame
     private final String gameType; // Type of the game (e.g., "Bedwars")
     private String worldName; // Name of the world for this instance
@@ -31,6 +32,7 @@ public class GameInstance {
     private GameState state;
 
     public GameInstance(
+            boolean isInstancePublic,
             String gameName,
             String gameType,
             String worldName,
@@ -42,6 +44,7 @@ public class GameInstance {
             Object pluginConfig
     ) {
         this.instanceId = UUID.randomUUID();
+        this.isInstancePublic = isInstancePublic;
         this.gameName = gameName;
         this.gameType = gameType;
         this.worldName = worldName;
@@ -63,6 +66,10 @@ public class GameInstance {
     // --- Getters ---
     public UUID getInstanceId() {
         return instanceId;
+    }
+
+    public boolean getIsInstancePublic() {
+        return isInstancePublic;
     }
 
     public String getGameName() {

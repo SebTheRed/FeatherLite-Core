@@ -150,7 +150,7 @@ public class GamesManager {
      * @return A list of all games of the specified type, or an empty list if none exist.
      */
     public List<GameData> getGamesByType(String gameType) {
-        return gamesByType.getOrDefault(gameType.toLowerCase(), Collections.emptyList());
+        return gamesByType.getOrDefault(gameType, Collections.emptyList());
     }
     /**
      * Starts a new game instance using the registered game data.
@@ -159,13 +159,14 @@ public class GamesManager {
      * @param instanceManager The InstanceManager to handle the game instance.
      * @return The created GameInstance, or null if the game could not be started.
      */
-    public GameInstance startGameInstance(String gameName, String worldChoice, InstanceManager instanceManager) {
+    public GameInstance startGameInstance(String gameName, String worldChoice, boolean isInstancePublic, InstanceManager instanceManager) {
         GameData gameData = getGameData(gameName);
         if (gameData == null) {
             throw new IllegalArgumentException("No game registered with the name: " + gameName);
         }
 
         return instanceManager.createInstance(
+                isInstancePublic,
                 gameData.getGameName(),
                 gameData.getGameType(),
                 worldChoice,

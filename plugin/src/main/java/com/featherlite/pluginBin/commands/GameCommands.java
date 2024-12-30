@@ -81,9 +81,10 @@ public class GameCommands implements TabCompleter {
 
                 // Get the world name
                 String worldName = args[args.length - 1];
+                boolean isInstancePublic = Boolean.parseBoolean(args[2]);
 
                 try {
-                    GameInstance newGame = gamesManager.startGameInstance(gameName, worldName, instanceManager);
+                    GameInstance newGame = gamesManager.startGameInstance(gameName, worldName, isInstancePublic, instanceManager);
                     if (newGame == null) {
                         player.sendMessage("Failed to create game instance. Please check the game name and world.");
                     } else {

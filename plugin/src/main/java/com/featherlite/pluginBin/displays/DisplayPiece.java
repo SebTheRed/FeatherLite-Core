@@ -46,7 +46,15 @@ public class DisplayPiece {
         }
     }
 
-        /**
+    /**
+     * Gets the exact entity - for removal sake.
+     * @return
+     */
+    public Display getDisplayEntity() {
+        return this.displayEntity;
+    }
+
+    /**
      * Set the display billboard mode.
      */
     public void setBillboard(Display.Billboard billboard) {

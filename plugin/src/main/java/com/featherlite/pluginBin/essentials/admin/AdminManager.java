@@ -8,6 +8,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.entity.Display;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.enchantments.Enchantment;
@@ -144,6 +146,16 @@ public class AdminManager {
         int count = 0;
     
         switch (targetType.toLowerCase()) {
+            case "displays":
+                Bukkit.getWorlds().forEach(worldName -> {
+                    for (Entity entity : worldName.getEntities()) {
+                        if (entity instanceof Display) {
+                            entity.remove();
+                            // plugin.getLogger().info("Force-removed lingering display entity: " + entity.getUniqueId());
+
+                        }
+                    }
+                });
             case "monsters":
                 count = world.getEntitiesByClass(org.bukkit.entity.Monster.class).size();
                 world.getEntitiesByClass(org.bukkit.entity.Monster.class).forEach(entity -> {

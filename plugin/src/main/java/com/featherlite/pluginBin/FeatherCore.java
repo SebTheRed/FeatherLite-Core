@@ -43,11 +43,13 @@ import com.featherlite.pluginBin.chat.ChatManager;
 
 import com.featherlite.pluginBin.lobbies.GamesManager;
 import com.featherlite.pluginBin.lobbies.GamesUI;
+import org.bukkit.entity.Entity;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -335,6 +337,16 @@ public class FeatherCore extends JavaPlugin {
         Bukkit.getOnlinePlayers().forEach(playerStatsManager::savePlayerStats);
 
         displayPieceManager.clearAllDisplays();
+
+        // Additional cleanup for lingering entities
+        Bukkit.getWorlds().forEach(world -> {
+            for (Entity entity : world.getEntities()) {
+                if (entity instanceof Display) {
+                    entity.remove();
+                    this.getLogger().info("Force-removed lingering display entity: " + entity.getUniqueId());
+                }
+            }
+        });
 
     }
 
