@@ -19,7 +19,7 @@ public class GamesManager {
         private final String gameType;
         private final String description;
         private final List<String> worldOptions;
-        private final Map<String, Integer> teamSizes;
+        private final Map<String, Map<String, Integer>> teamSizes;
         private final int maxTime;
         private final List<String> teamNames;
         private final Map<String, Object> pluginConfig;
@@ -29,7 +29,7 @@ public class GamesManager {
                 String gameType,
                 String description,
                 List<String> worldOptions,
-                Map<String, Integer> teamSizes,
+                Map<String, Map<String, Integer>> teamSizes,
                 int maxTime,
                 List<String> teamNames,
                 Map<String, Object> pluginConfig
@@ -60,7 +60,7 @@ public class GamesManager {
             return worldOptions;
         }
 
-        public Map<String, Integer> getTeamSizes() {
+        public Map<String, Map<String, Integer>> getTeamSizes() {
             return teamSizes;
         }
 
@@ -99,7 +99,7 @@ public class GamesManager {
             String gameType,
             String description,
             List<String> worldOptions,
-            Map<String,Integer> teamSizes,
+            Map<String, Map<String, Integer>> teamSizes,
             int maxTime,
             List<String> teamNames,
             Map<String, Object> pluginConfig

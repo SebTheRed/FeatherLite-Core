@@ -15,7 +15,6 @@ import com.featherlite.pluginBin.lobbies.GamesManager.GameData;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -352,8 +351,10 @@ public class GamesUI implements Listener {
             meta.setDisplayName(ChatColor.GREEN + instance.getGameName());
             List<String> lore = new ArrayList<>();
             lore.add(ChatColor.GRAY + "World: " + instance.getWorldName());
-            lore.add(ChatColor.GRAY + "Players: " + instance.getTotalPlayerCount() + "/" + instance.getTeamSizes().values().stream().mapToInt(Integer::intValue).sum());
-            lore.add(ChatColor.GRAY + "State: " + instance.getState());
+            lore.add(ChatColor.GRAY + "Players: " + instance.getTotalPlayerCount() + "/" +
+            instance.getTeamSizes().values().stream()
+                   .mapToInt(sizeMap -> sizeMap.getOrDefault("max", 0)) // Sum up the "max" values
+                   .sum());            lore.add(ChatColor.GRAY + "State: " + instance.getState());
             lore.add("");
             lore.add(ChatColor.YELLOW + "Click to join this game.");
             meta.setLore(lore);

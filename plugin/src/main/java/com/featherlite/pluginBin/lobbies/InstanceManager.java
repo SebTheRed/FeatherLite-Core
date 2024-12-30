@@ -48,7 +48,7 @@ public class InstanceManager {
             String gameName,
             String gameType,
             String baseWorldName,
-            Map<String, Integer> teamSizes,
+            Map<String, Map<String, Integer>> teamSizes,
             int maxTime,
             List<String> teamNames,
             Map<String, Object> pluginConfig
@@ -297,7 +297,7 @@ public class InstanceManager {
             instance.getTeams().get(currentTeam).add(memberUUID);
     
             // Check if the current team is now full
-            if (instance.getTeams().get(currentTeam).size() >= instance.getTeamSizes().get(currentTeam)) {
+            if (instance.getTeams().get(currentTeam).size() >= instance.getTeamSizes().get(currentTeam).get("max")) {
                 teamIndex++; // Move to the next available team
             }
     
@@ -320,7 +320,8 @@ public class InstanceManager {
         for (Map.Entry<String, List<UUID>> entry : instance.getTeams().entrySet()) {
             String teamName = entry.getKey();
             int currentSize = entry.getValue().size();
-            int maxSize = instance.getTeamSizes().get(teamName); // Get max size for this team
+            int maxSize = instance.getTeamSizes().get(teamName).get("max");
+            int minSize = instance.getTeamSizes().get(teamName).get("min");
     
             int availableSlots = maxSize - currentSize;
             if (availableSlots >= requiredSlots) {
@@ -362,7 +363,8 @@ public class InstanceManager {
         for (Map.Entry<String, List<UUID>> entry : instance.getTeams().entrySet()) {
             String teamName = entry.getKey();
             int currentSize = entry.getValue().size();
-            int maxSize = instance.getTeamSizes().get(teamName); // Get max size for this team
+            int maxSize = instance.getTeamSizes().get(teamName).get("max");
+            int minSize = instance.getTeamSizes().get(teamName).get("min");
     
             if (currentSize < maxSize) {
                 availableTeams.add(teamName); // Add team to the pool if it has available slots

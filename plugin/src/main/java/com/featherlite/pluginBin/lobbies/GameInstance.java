@@ -22,7 +22,7 @@ public class GameInstance {
     private final String gameName; // Name of the minigame
     private final String gameType; // Type of the game (e.g., "Bedwars")
     private String worldName; // Name of the world for this instance
-    private final Map<String, Integer> teamSizes; // A map of teams and their sizes.
+    private final Map<String, Map<String, Integer>> teamSizes; // A map of teams and their sizes.
     private final int maxTime; // In minutes
     private final Map<String, List<UUID>> teams; // Maps team names to player UUIDs
     private final Map<String, Location> teamSpawns; // Maps team names to spawn locations
@@ -36,7 +36,7 @@ public class GameInstance {
             String gameName,
             String gameType,
             String worldName,
-            Map<String, Integer> teamSizes,
+            Map<String, Map<String, Integer>> teamSizes,
             int maxTime,
             List<String> teamNames,
             Map<String, Location> teamSpawns,
@@ -89,7 +89,7 @@ public class GameInstance {
         return true;
     }
 
-    public Map<String, Integer> getTeamSizes() {
+    public Map<String, Map<String, Integer>> getTeamSizes() {
         return teamSizes;
     }
 
@@ -128,13 +128,15 @@ public class GameInstance {
 
     // --- Core Logic ---
     public void startGame() {
-        int requiredPlayers = teamSizes.values().stream().mapToInt(Integer::intValue).sum(); // Total required players
+        int requiredPlayers = teamSizes.values().stream()
+                .mapToInt(sizeMap -> sizeMap.getOrDefault("min", 1)) // Sum up the "min" values
+                .sum();
     
         if (getTotalPlayerCount() >= requiredPlayers) {
             state = GameState.IN_PROGRESS;
             broadcastToAllPlayers("The game has started!");
         } else {
-            broadcastToAllPlayers("Not enough players to start the game.");
+            broadcastToAllPlayers("Not enough players to start the game. Minimum required: " + requiredPlayers);
         }
     }
     
@@ -149,18 +151,24 @@ public class GameInstance {
             player.sendMessage("This game is full.");
             return;
         }
-
+    
         String targetTeam = teamName != null && teams.containsKey(teamName) ? teamName : getRandomAvailableTeam();
-
+    
         if (targetTeam == null) {
             player.sendMessage("No available teams found.");
             return;
         }
-
+    
+        if (teams.get(targetTeam).size() >= teamSizes.get(targetTeam).getOrDefault("max", Integer.MAX_VALUE)) {
+            player.sendMessage("The " + targetTeam + " team is full.");
+            return;
+        }
+    
         teams.get(targetTeam).add(player.getUniqueId());
         player.teleport(teamSpawns.get(targetTeam));
         broadcastToAllPlayers(player.getName() + " joined the " + targetTeam + " team.");
     }
+    
     
     public void teleportPlayersToWaitingRoom() {
         teams.values().forEach(players ->
@@ -183,7 +191,7 @@ public class GameInstance {
 
     public boolean isFull() {
         return teams.entrySet().stream()
-                .allMatch(entry -> entry.getValue().size() >= teamSizes.get(entry.getKey())); // All teams must be full
+                .allMatch(entry -> entry.getValue().size() >= teamSizes.get(entry.getKey()).getOrDefault("max", Integer.MAX_VALUE));
     }
     
 
@@ -193,12 +201,11 @@ public class GameInstance {
 
     private String getRandomAvailableTeam() {
         return teams.entrySet().stream()
-                .filter(entry -> entry.getValue().size() < teamSizes.get(entry.getKey())) // Check against the team's size limit
+                .filter(entry -> entry.getValue().size() < teamSizes.get(entry.getKey()).getOrDefault("max", Integer.MAX_VALUE))
                 .map(Map.Entry::getKey)
                 .findAny()
                 .orElse(null);
     }
-    
 
     public void broadcastToAllPlayers(String message) {
         teams.values().forEach(players ->
