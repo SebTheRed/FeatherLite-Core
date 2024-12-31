@@ -1,10 +1,12 @@
 package com.featherlite.pluginBin.displays;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.ItemDisplay;
+import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -15,10 +17,14 @@ import java.util.Map;
 public class DisplayPieceManager {
     private final JavaPlugin plugin;
     private final Map<String, DisplayPiece> displayPieces = new HashMap<>();
+    private final Map<Player, PlayerDisplayName> playerDisplays = new HashMap<>();
+
 
 
     public DisplayPieceManager(JavaPlugin plugin) {
         this.plugin = plugin;
+        startTextDisplayCleanupClock();
+
     }
 
     /**
@@ -72,6 +78,25 @@ public class DisplayPieceManager {
         return displayPiece;
     }
 
+
+    public void startTextDisplayCleanupClock() {
+    // Run the task every 5 seconds (100 ticks)
+        Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+            Bukkit.getWorlds().stream()
+                .filter(world -> !world.getPlayers().isEmpty()) // Only process worlds with active players
+                .forEach(world -> {
+                    world.getEntitiesByClass(TextDisplay.class).forEach(display -> {
+                        // Check if the display text contains "HP" or "XP"
+                        String text = display.getText();
+                        if (text != null && (text.contains("♡") || text.contains("XP"))) {
+                            display.remove(); // Remove the display
+                            plugin.getLogger().info("Removed TextDisplay: " + text); // Log for debugging
+                        }
+                    });
+                });
+        }, 0L, 100L); // Initial delay = 0, repeat every 5 seconds (100 ticks)
+    }
+    
     /**
      * Remove a display piece.
      * @param id The id of the display to be removed.
@@ -96,4 +121,72 @@ public class DisplayPieceManager {
         displayPieces.values().forEach(DisplayPiece::remove);
         displayPieces.clear();
     }
+
+
+
+
+    /**
+     * Create a pseudo-display name for a player.
+     */
+    public void createPlayerDisplay(Player player) {
+        if (playerDisplays.containsKey(player)) return; // Already exists
+        PlayerDisplayName displayName = new PlayerDisplayName(player, this, plugin);
+        playerDisplays.put(player, displayName);
+    }
+
+    /**
+     * Update the display text for a player.
+     */
+    public void updatePlayerDisplayText(Player player, String newText) {
+        PlayerDisplayName displayName = playerDisplays.get(player);
+        if (displayName != null) {
+            displayName.updateText(newText);
+        }
+    }
+
+    /**
+     * Remove the display for a player.
+     */
+    public void removePlayerDisplay(Player player) {
+        PlayerDisplayName displayName = playerDisplays.remove(player);
+        if (displayName != null) {
+            displayName.removeDisplay();
+        }
+    }
+    /**
+     * Remove all player displays (e.g., on server shutdown).
+     */
+    public void clearAllPlayerDisplays() {
+        playerDisplays.values().forEach(PlayerDisplayName::removeDisplay);
+        playerDisplays.clear();
+    }
+
+
+    /**
+     * Create a TextDisplay and mount it to a player.
+     */
+    public void mountDisplayOnPlayer(Player player, String text) {
+        // Spawn the TextDisplay at the player's location
+        Location location = player.getLocation();
+        String id = "display_" + player.getUniqueId(); // Generate a unique ID for tracking
+
+        DisplayPiece displayPiece = createTextDisplay(
+                id,
+                player.getWorld(),
+                location,
+                text,
+                false // Non-persistent
+        );
+
+        // Customize the TextDisplay
+        displayPiece.setBillboard(org.bukkit.entity.Display.Billboard.CENTER); // Center the text
+        displayPiece.setBrightness(15, 15); // Max brightness
+        displayPiece.setShadowStrength(0.5f); // Subtle shadow
+
+        // Mount the TextDisplay to the player
+        player.addPassenger(displayPiece.getDisplayEntity());
+    }
+
+
+
 }

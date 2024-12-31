@@ -165,7 +165,7 @@ public class FeatherCore extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(permissionManager), this);
         getServer().getPluginManager().registerEvents(new ItemListeners(abilityRegistry, cooldownManager, this), this);
 
-        getServer().getPluginManager().registerEvents(new PlayerJoinListenerForUtils(playerDataManager), this);
+        getServer().getPluginManager().registerEvents(new PlayerJoinListenerForUtils(playerDataManager, displayPieceManager), this);
 
         getServer().getPluginManager().registerEvents(new WorldBorderListener(worldManager), this);
 

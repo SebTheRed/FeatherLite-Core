@@ -69,8 +69,8 @@ public class NumberIndicator {
         displayPiece.setShadowStrength(0.5f);
 
         // Animate upward movement over 15 ticks (0.75 seconds)
-        Location targetLocation = location.clone().add(0, 1.5, 0); // Move 1.5 blocks upward
-        displayPiece.move(targetLocation, 20); // Smooth translation
+        // Location targetLocation = location.clone().add(0, 1.5, 0); // Move 1.5 blocks upward
+        // displayPiece.move(targetLocation, 20); // Smooth translation
 
         // Schedule automatic removal of the display after 15 ticks
         Bukkit.getScheduler().runTaskLater(plugin, () -> displayPieceManager.removeDisplay(id), 20L);
