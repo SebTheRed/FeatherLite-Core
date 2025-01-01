@@ -46,8 +46,8 @@ items:
           title: "Magic Missile"
           cooldown: 1
           damage: 8
-          range: 20
-          speed: 1
+          range: 32
+          speed: 2
           colorName: "purple"
       shift_r_click:
           method: "smite"

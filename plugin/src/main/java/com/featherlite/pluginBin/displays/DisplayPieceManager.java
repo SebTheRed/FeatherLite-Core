@@ -17,7 +17,6 @@ import java.util.Map;
 public class DisplayPieceManager {
     private final JavaPlugin plugin;
     private final Map<String, DisplayPiece> displayPieces = new HashMap<>();
-    private final Map<Player, PlayerDisplayName> playerDisplays = new HashMap<>();
 
 
 
@@ -122,44 +121,6 @@ public class DisplayPieceManager {
         displayPieces.clear();
     }
 
-
-
-
-    /**
-     * Create a pseudo-display name for a player.
-     */
-    public void createPlayerDisplay(Player player) {
-        if (playerDisplays.containsKey(player)) return; // Already exists
-        PlayerDisplayName displayName = new PlayerDisplayName(player, this, plugin);
-        playerDisplays.put(player, displayName);
-    }
-
-    /**
-     * Update the display text for a player.
-     */
-    public void updatePlayerDisplayText(Player player, String newText) {
-        PlayerDisplayName displayName = playerDisplays.get(player);
-        if (displayName != null) {
-            displayName.updateText(newText);
-        }
-    }
-
-    /**
-     * Remove the display for a player.
-     */
-    public void removePlayerDisplay(Player player) {
-        PlayerDisplayName displayName = playerDisplays.remove(player);
-        if (displayName != null) {
-            displayName.removeDisplay();
-        }
-    }
-    /**
-     * Remove all player displays (e.g., on server shutdown).
-     */
-    public void clearAllPlayerDisplays() {
-        playerDisplays.values().forEach(PlayerDisplayName::removeDisplay);
-        playerDisplays.clear();
-    }
 
 
     /**

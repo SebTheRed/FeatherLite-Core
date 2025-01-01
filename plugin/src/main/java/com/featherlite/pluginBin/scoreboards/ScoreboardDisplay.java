@@ -35,7 +35,7 @@ public class ScoreboardDisplay {
         Objective objective = scoreboard.registerNewObjective(
                 name, // Unique name of the objective
                 Criteria.DUMMY, // Use the modern Criteria enum
-                ColorUtils.translateColors(placeholderManager.resolvePlaceholders(title, player)), // Title with colors
+                ColorUtils.parseColors(placeholderManager.resolvePlaceholders(title, player)), // Title with colors
                 RenderType.INTEGER // Use integer render type for scores
         );
 
@@ -45,7 +45,7 @@ public class ScoreboardDisplay {
         int scoreValue = lines.size();
         for (String line : lines) {
             String resolvedLine = placeholderManager.resolvePlaceholders(line, player);
-            objective.getScore(ColorUtils.translateColors(resolvedLine)).setScore(scoreValue--); // Add translated line
+            objective.getScore(ColorUtils.parseColors(resolvedLine)).setScore(scoreValue--); // Add translated line
         }
 
         // Set the scoreboard for the player
@@ -66,7 +66,7 @@ public class ScoreboardDisplay {
         }
     
         // Update title
-        objective.setDisplayName(ColorUtils.translateColors(placeholderManager.resolvePlaceholders(title, player)));
+        objective.setDisplayName(ColorUtils.parseColors(placeholderManager.resolvePlaceholders(title, player)));
     
         // Clear old lines
         for (String entry : scoreboard.getEntries()) {
@@ -77,7 +77,7 @@ public class ScoreboardDisplay {
         int scoreValue = lines.size();
         for (String line : lines) {
             String resolvedLine = placeholderManager.resolvePlaceholders(line, player);
-            objective.getScore(ColorUtils.translateColors(resolvedLine)).setScore(scoreValue--); // Set the new score
+            objective.getScore(ColorUtils.parseColors(resolvedLine)).setScore(scoreValue--); // Set the new score
         }
     }
     

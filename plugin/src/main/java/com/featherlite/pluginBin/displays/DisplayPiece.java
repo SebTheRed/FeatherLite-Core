@@ -100,39 +100,47 @@ public class DisplayPiece {
         displayEntity.setGlowColorOverride(color);
     }
 
-    /**
-     * Move the display smoothly to a target location.
-     *
-     * @param targetLocation The target location.
-     * @param durationTicks  The duration of the movement in ticks.
-     */
-    public void move(Location targetLocation, int durationTicks) {
-        // Calculate the relative offset from the display's current position
-        Vector3f startTranslation = currentTranslation;
+    // /**
+    //  * Move the display smoothly to a target location.
+    //  *
+    //  * @param targetLocation The target location.
+    //  * @param durationTicks  The duration of the movement in ticks.
+    //  */
+    // public void move(Location targetLocation, int durationTicks) {
+    //     // Calculate the relative offset from the display's current position
+    //     Vector3f startTranslation = currentTranslation;
         
-        Location currentLocation = displayEntity.getLocation();
+    //     Location currentLocation = displayEntity.getLocation();
 
-        // Calculate the delta translation with directional correction
-        Vector3f deltaTranslation = new Vector3f(
-            targetLocation.getX() >= currentLocation.getX()
-                ? (float) (targetLocation.getX() - currentLocation.getX())
-                : (float) (currentLocation.getX() - targetLocation.getX()),
+    //     // Calculate the delta translation with directional correction
+    //     Vector3f deltaTranslation = new Vector3f(
+    //         targetLocation.getX() >= currentLocation.getX()
+    //             ? (float) (targetLocation.getX() - currentLocation.getX())
+    //             : (float) (currentLocation.getX() - targetLocation.getX()),
     
-            targetLocation.getY() >= currentLocation.getY()
-                ? (float) (targetLocation.getY() - currentLocation.getY())
-                : (float) (currentLocation.getY() - targetLocation.getY()),
+    //         targetLocation.getY() >= currentLocation.getY()
+    //             ? (float) (targetLocation.getY() - currentLocation.getY())
+    //             : (float) (currentLocation.getY() - targetLocation.getY()),
     
-            targetLocation.getZ() >= currentLocation.getZ()
-                ? (float) (targetLocation.getZ() - currentLocation.getZ())
-                : (float) (currentLocation.getZ() - targetLocation.getZ())
-        );
+    //         targetLocation.getZ() >= currentLocation.getZ()
+    //             ? (float) (targetLocation.getZ() - currentLocation.getZ())
+    //             : (float) (currentLocation.getZ() - targetLocation.getZ())
+    //     );
     
-        // Create matrices for the animation
-        Matrix4f startMatrix = new Matrix4f().translate(startTranslation);
-        Matrix4f endMatrix = new Matrix4f().translate(startTranslation.add(deltaTranslation, new Vector3f()));
+    //     // Create matrices for the animation
+    //     Matrix4f startMatrix = new Matrix4f().translate(startTranslation);
+    //     Matrix4f endMatrix = new Matrix4f().translate(startTranslation.add(deltaTranslation, new Vector3f()));
     
-        // Schedule the animation
-        scheduleMatrixAnimation(startMatrix, endMatrix, durationTicks);
+    //     // Schedule the animation
+    //     scheduleMatrixAnimation(startMatrix, endMatrix, durationTicks);
+    // }
+
+    public void move(Location targeLocation) {
+        displayEntity.teleport(targeLocation);
+        // displayEntity.setTeleportDuration(40);
+        // displayEntity.setTeleportDuration(durationTicks);
+
+
     }
 
     /**
@@ -141,11 +149,15 @@ public class DisplayPiece {
      * @param targetScale   The target scale (uniform scaling).
      * @param durationTicks The duration of the scaling in ticks.
      */
-    public void scale(float targetScale, int durationTicks) {
-        Matrix4f startMatrix = new Matrix4f().scale(currentScale);
-        Matrix4f endMatrix = new Matrix4f().scale(targetScale);
-
-        scheduleMatrixAnimation(startMatrix, endMatrix, durationTicks);
+    public void scale(float targetScale) {
+        displayEntity.setTransformation(
+            new Transformation(
+                    new Vector3f(), // no translation
+                    new AxisAngle4f(), // no left rotation
+                    new Vector3f(targetScale, targetScale, targetScale), // scale up by a factor of 2 on all axes
+                    new AxisAngle4f() // no right rotation
+            )
+        );
     }
 
     /**
@@ -185,6 +197,7 @@ public class DisplayPiece {
         displayEntity.setInterpolationDuration(20); // Smooth animation duration
     }
 
+    
     private void scheduleMatrixAnimation(Matrix4f startMatrix, Matrix4f endMatrix, int durationTicks) {
         final BukkitTask[] taskHolder = new BukkitTask[1]; // Wrapper to hold the task reference
         

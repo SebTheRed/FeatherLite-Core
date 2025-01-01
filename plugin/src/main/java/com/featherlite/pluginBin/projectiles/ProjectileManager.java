@@ -5,7 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
-
+import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -32,6 +32,7 @@ public class ProjectileManager {
      * @param onUpdate      The logic to run every tick while the projectile is active.
      */
     public void launchProjectile(
+            Player caster,
             Location start,
             Vector direction,
             double speed,
@@ -41,6 +42,7 @@ public class ProjectileManager {
             Consumer<Projectile> onUpdate
     ) {
         Projectile projectile = new Projectile(
+                caster,
                 start,
                 direction,
                 speed,

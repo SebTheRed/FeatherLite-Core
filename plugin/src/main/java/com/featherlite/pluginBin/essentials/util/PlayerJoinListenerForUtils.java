@@ -1,7 +1,9 @@
 package com.featherlite.pluginBin.essentials.util;
 
+
 import com.featherlite.pluginBin.displays.DisplayPieceManager;
 import com.featherlite.pluginBin.essentials.PlayerDataManager;
+import com.featherlite.pluginBin.utils.ColorUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -26,11 +28,11 @@ public class PlayerJoinListenerForUtils implements Listener {
         FileConfiguration playerData = playerDataManager.getPlayerData(player);
         String savedNickname = playerData.getString("nickname");
 
-        displayPieceManager.mountDisplayOnPlayer(player, savedNickname);
+        // displayPieceManager.mountDisplayOnPlayer(player, ColorUtils.parseColors(savedNickname));
 
         if (savedNickname != null && !savedNickname.isEmpty()) {
-            String formattedNickname = ChatColor.translateAlternateColorCodes('&', savedNickname);
-            player.setDisplayName(formattedNickname);
+            String formattedNickname = ColorUtils.parseColors(savedNickname);
+            // player.setDisplayName(formattedNickname);
             player.setPlayerListName(formattedNickname);
         }
     }
@@ -38,6 +40,5 @@ public class PlayerJoinListenerForUtils implements Listener {
     @EventHandler
     public void onPlayerLeave(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        displayPieceManager.removePlayerDisplay(player);
     }
 }

@@ -16,6 +16,7 @@ import com.featherlite.pluginBin.displays.DisplayPieceManager;
 import com.featherlite.pluginBin.particles.ParticleEffectCreator;
 import com.featherlite.pluginBin.particles.ParticleManager;
 import com.featherlite.pluginBin.projectiles.ProjectileManager;
+import org.bukkit.inventory.ItemStack;
 import java.util.Map;
 import org.bukkit.Color;
 
@@ -66,63 +67,63 @@ public class InternalAbilities {
 
     public void magicMissile(Player player, Map<String, String> params) {
         // Parse parameters
-        int damage = Integer.parseInt(params.getOrDefault("missile_damage", "5"));
-        int range = Integer.parseInt(params.getOrDefault("missile_range", "100"));
-        double speed = Double.parseDouble(params.getOrDefault("missile_speed", "1.0"));
-        String colorName = params.getOrDefault("missile_color", "purple").toLowerCase();
+        int damage = Integer.parseInt(params.getOrDefault("damage", "5"));
+        int range = Integer.parseInt(params.getOrDefault("range", "20"));
+        double speed = Double.parseDouble(params.getOrDefault("speed", "2.0"));
+        String colorName = params.getOrDefault("color", "purple").toLowerCase();
 
         // Define particle color and display block based on colorName
         Color particleColor;
-        Material displayMaterial;
+        ItemStack displayMaterial;
 
         switch (colorName) {
             case "red" -> {
                 particleColor = Color.RED;
-                displayMaterial = Material.RED_STAINED_GLASS;
+                displayMaterial = new ItemStack(Material.RED_STAINED_GLASS);
             }
             case "orange" -> {
                 particleColor = Color.ORANGE;
-                displayMaterial = Material.ORANGE_STAINED_GLASS;
+                displayMaterial = new ItemStack(Material.ORANGE_STAINED_GLASS);
             }
             case "yellow" -> {
                 particleColor = Color.YELLOW;
-                displayMaterial = Material.YELLOW_STAINED_GLASS;
+                displayMaterial = new ItemStack(Material.YELLOW_STAINED_GLASS);
             }
             case "lime" -> {
                 particleColor = Color.LIME;
-                displayMaterial = Material.LIME_STAINED_GLASS;
+                displayMaterial = new ItemStack(Material.LIME_STAINED_GLASS);
             }
             case "green" -> {
                 particleColor = Color.GREEN;
-                displayMaterial = Material.GREEN_STAINED_GLASS;
+                displayMaterial = new ItemStack(Material.GREEN_STAINED_GLASS);
             }
             case "cyan" -> {
                 particleColor = Color.AQUA;
-                displayMaterial = Material.CYAN_STAINED_GLASS;
+                displayMaterial = new ItemStack(Material.CYAN_STAINED_GLASS);
             }
             case "light_blue" -> {
                 particleColor = Color.AQUA;
-                displayMaterial = Material.LIGHT_BLUE_STAINED_GLASS;
+                displayMaterial = new ItemStack(Material.LIGHT_BLUE_STAINED_GLASS);
             }
             case "blue" -> {
                 particleColor = Color.BLUE;
-                displayMaterial = Material.BLUE_STAINED_GLASS;
+                displayMaterial = new ItemStack(Material.BLUE_STAINED_GLASS);
             }
             case "purple" -> {
                 particleColor = Color.PURPLE;
-                displayMaterial = Material.PURPLE_STAINED_GLASS;
+                displayMaterial = new ItemStack(Material.PURPLE_STAINED_GLASS);
             }
             case "magenta" -> {
                 particleColor = Color.FUCHSIA;
-                displayMaterial = Material.MAGENTA_STAINED_GLASS;
+                displayMaterial = new ItemStack(Material.MAGENTA_STAINED_GLASS);
             }
             case "pink" -> {
                 particleColor = Color.fromRGB(255, 182, 193); // Light pink
-                displayMaterial = Material.PINK_STAINED_GLASS;
+                displayMaterial = new ItemStack(Material.PINK_STAINED_GLASS);
             }
             default -> {
                 particleColor = Color.PURPLE; // Default color
-                displayMaterial = Material.PURPLE_STAINED_GLASS;
+                displayMaterial = new ItemStack(Material.PURPLE_STAINED_GLASS);
             }
         }
 
@@ -130,7 +131,7 @@ public class InternalAbilities {
         
 
         // Use the passed DisplayPieceManager to create a DisplayPiece
-        DisplayPiece displayPiece = displayPieceManager.createBlockDisplay(
+        DisplayPiece displayPiece = displayPieceManager.createItemDisplay(
                 "magic_missile_" + System.currentTimeMillis(),
                 player.getWorld(),
                 player.getLocation(),
@@ -138,8 +139,11 @@ public class InternalAbilities {
                 false
         );
 
+        displayPiece.scale(0.5f);
+
         // Launch the projectile
         projectileManager.launchProjectile(
+                player,
                 spawnLocation, // Start location (eye height)
                 player.getLocation().getDirection(), // Direction the player is looking
                 speed,                               // Speed

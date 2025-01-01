@@ -3,12 +3,15 @@ package com.featherlite.pluginBin.projectiles;
 import com.featherlite.pluginBin.displays.DisplayPiece;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Display;
+import org.bukkit.entity.Player;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.util.Vector;
 
 import java.util.function.Consumer;
 
 public class Projectile {
+    private Player caster;
     private Location currentLocation;                     // Current position of the projectile
     private final Vector direction;                       // Direction vector for movement
     private final double speed;                           // Speed of the projectile
@@ -21,9 +24,12 @@ public class Projectile {
     private boolean isAlive;                              // Tracks whether the projectile is active
     private final Location finalLocation;                 // Precomputed final position of the projectile
 
-    public Projectile(Location start, Vector direction, double speed, int lifetime,
+    
+
+    public Projectile(Player caster, Location start, Vector direction, double speed, int lifetime,
                       DisplayPiece displayPiece,
                       Consumer<ProjectileHitResult> onCollision, Consumer<Projectile> onUpdate) {
+        this.caster = caster;
         this.currentLocation = start.clone();
         this.direction = direction.normalize();
         this.speed = speed;
@@ -37,10 +43,6 @@ public class Projectile {
         // Precompute the farthest possible location for the projectile
         this.finalLocation = start.clone().add(direction.clone().multiply(speed * lifetime));
 
-        // Move the displayPiece smoothly over the projectile's lifetime
-        if (displayPiece != null) {
-            displayPiece.move(finalLocation, lifetime);
-        }
     }
 
     /**
@@ -68,6 +70,9 @@ public class Projectile {
 
         // Update the projectile's position
         currentLocation = nextLocation;
+        if (displayPiece != null) {
+            displayPiece.move(nextLocation);
+        }
 
         // Trigger the onUpdate callback (user handles particles or other effects)
         if (onUpdate != null) {
@@ -83,7 +88,7 @@ public class Projectile {
     private ProjectileHitResult checkCollision(Location start, Location end) {
         var result = world.rayTrace(start, direction, speed,
                 FluidCollisionMode.NEVER, true, 0.5,
-                entity -> !(entity instanceof DisplayPiece));
+                entity -> !(entity instanceof Display && entity != caster));
 
         if (result != null) {
             if (result.getHitEntity() != null) {
