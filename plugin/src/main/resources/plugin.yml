@@ -42,6 +42,11 @@ commands:
     aliases: [sb,b]
     usage: /board <toggle|{board_name}|reload>
 
+  inventory:
+    description: Controls inventory back-ups.
+    aliases: [inv]
+    usage: /inventory restore <player-username>
+
   eco:
     description: Use to manipulate player economy balances.
     permission: core.eco

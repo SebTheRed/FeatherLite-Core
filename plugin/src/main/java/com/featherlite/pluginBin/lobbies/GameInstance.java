@@ -231,16 +231,26 @@ public class GameInstance {
 
     private void teleportPlayersToTeamSpawns() {
         teams.forEach((teamName, playerList) -> {
-            Location spawnLocation = teamSpawns.get(teamName);
+            Location spawnLocation = teamSpawns.get(teamName.toLowerCase());
+            if (spawnLocation == null) {
+                Bukkit.getLogger().warning("No spawn location found for team: " + teamName);
+                return; // Skip teleportation for this team
+            }
+    
             for (UUID playerId : playerList) {
                 Player player = Bukkit.getPlayer(playerId);
                 if (player != null) {
-                    player.teleport(spawnLocation);
-                    player.sendMessage("You have been teleported to the " + teamName + " spawn!");
+                    try {
+                        player.teleport(spawnLocation);
+                        player.sendMessage("You have been teleported to the " + teamName + " spawn!");
+                    } catch (IllegalArgumentException e) {
+                        Bukkit.getLogger().warning("Failed to teleport player " + player.getName() + " to " + teamName + " spawn: " + e.getMessage());
+                    }
                 }
             }
         });
     }
+    
 
     public void addSpectator(Player player) {
         spectators.add(player.getUniqueId());

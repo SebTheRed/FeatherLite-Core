@@ -3,7 +3,10 @@ package com.featherlite.pluginBin.essentials.util;
 
 import com.featherlite.pluginBin.displays.DisplayPieceManager;
 import com.featherlite.pluginBin.essentials.PlayerDataManager;
+import com.featherlite.pluginBin.utils.InventoryManager;
 import com.featherlite.pluginBin.utils.ColorUtils;
+
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -16,10 +19,12 @@ public class PlayerJoinListenerForUtils implements Listener {
 
     private final PlayerDataManager playerDataManager;
     private final DisplayPieceManager displayPieceManager;
+    private final InventoryManager inventoryManager;
 
-    public PlayerJoinListenerForUtils(PlayerDataManager playerDataManager, DisplayPieceManager displayPieceManager) {
+    public PlayerJoinListenerForUtils(PlayerDataManager playerDataManager, DisplayPieceManager displayPieceManager, InventoryManager inventoryManager) {
         this.playerDataManager = playerDataManager;
         this.displayPieceManager = displayPieceManager;
+        this.inventoryManager = inventoryManager;
     }
 
     @EventHandler
@@ -35,6 +40,13 @@ public class PlayerJoinListenerForUtils implements Listener {
             // player.setDisplayName(formattedNickname);
             player.setPlayerListName(formattedNickname);
         }
+
+        if (inventoryManager.hasStoredInventory(player)) {
+            Bukkit.getLogger().info("Restoring inventory for player: " + player.getName());
+            inventoryManager.restoreInventory(player);
+            player.sendMessage("§aYour saved inventory has been restored!");
+        }
+
     }
 
     @EventHandler

@@ -133,24 +133,29 @@ public class InstanceManager {
      */
     private Map<String, Location> resolveTeamSpawns(Map<String, Map<String, Double>> rawTeamSpawns, World instanceWorld) {
         Map<String, Location> resolvedSpawns = new HashMap<>();
-
+    
         for (Map.Entry<String, Map<String, Double>> entry : rawTeamSpawns.entrySet()) {
-            String teamName = entry.getKey();
+            String teamName = entry.getKey().toLowerCase();
             Map<String, Double> coords = entry.getValue();
-
-            // Resolve the Location using the instanceWorld
+    
+            if (coords == null || !coords.containsKey("x") || !coords.containsKey("y") || !coords.containsKey("z")) {
+                Bukkit.getLogger().warning("Missing or incomplete spawn coordinates for team: " + teamName);
+                continue;
+            }
+    
             Location location = new Location(
                     instanceWorld,
                     coords.getOrDefault("x", 0.0),
-                    coords.getOrDefault("y", 64.0), // Default Y to ground level if missing
+                    coords.getOrDefault("y", 64.0), // Default to Y=64
                     coords.getOrDefault("z", 0.0)
             );
-
+    
             resolvedSpawns.put(teamName, location);
         }
-
+    
         return resolvedSpawns;
     }
+    
 
 
     public GameInstance getInstance(UUID instanceId) {

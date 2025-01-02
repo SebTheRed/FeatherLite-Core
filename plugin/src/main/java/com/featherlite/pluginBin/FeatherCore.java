@@ -21,7 +21,7 @@ import com.featherlite.pluginBin.essentials.util.PlayerJoinListenerForUtils;
 import com.featherlite.pluginBin.projectiles.ProjectileManager;
 import com.featherlite.pluginBin.stats.PlayerStatsManager;
 import com.featherlite.pluginBin.stats.StatListeners;
-
+import com.featherlite.pluginBin.utils.InventoryManager;
 import com.featherlite.pluginBin.items.AbilityRegistry;
 import com.featherlite.pluginBin.items.CooldownManager;
 import com.featherlite.pluginBin.items.ItemListeners;
@@ -84,6 +84,10 @@ public class FeatherCore extends JavaPlugin {
     private ChatManager chatManager;
     private GamesManager gamesManager;
     private GamesUI gamesUI;
+
+    private InventoryManager inventoryManager;
+    private InventoryCommands inventoryCommands;
+
     private TeamSelectorBook teamSelectorBook;
 
     private PlayerDataManager playerDataManager;
@@ -131,6 +135,7 @@ public class FeatherCore extends JavaPlugin {
 
         utilManager = new UtilManager();
 
+        inventoryManager = new InventoryManager(this);
 
         // Initialize managers
 
@@ -169,7 +174,7 @@ public class FeatherCore extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(permissionManager), this);
         getServer().getPluginManager().registerEvents(new ItemListeners(abilityRegistry, cooldownManager, this), this);
 
-        getServer().getPluginManager().registerEvents(new PlayerJoinListenerForUtils(playerDataManager, displayPieceManager), this);
+        getServer().getPluginManager().registerEvents(new PlayerJoinListenerForUtils(playerDataManager, displayPieceManager, inventoryManager), this);
 
         getServer().getPluginManager().registerEvents(new WorldBorderListener(worldManager), this);
 
@@ -179,7 +184,6 @@ public class FeatherCore extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new StatListeners(playerStatsManager), this);
 
         getServer().getPluginManager().registerEvents(new MenuListeners(this, instanceManager, teamSelectorBook), this);
-
 
         new IndicatorListener(this, displayPieceManager);
 
@@ -201,6 +205,8 @@ public class FeatherCore extends JavaPlugin {
         adminCommands = new AdminCommands(adminManager);
         messagingCommands = new MessagingCommands(messagingManager);
         utilCommands = new UtilCommands(utilManager, playerDataManager);
+
+        inventoryCommands = new InventoryCommands(inventoryManager);
 
 
         //Set Managers for Placeholders
@@ -225,7 +231,8 @@ public class FeatherCore extends JavaPlugin {
         getCommand("zone").setTabCompleter(zoneCommands);
         getCommand("board").setExecutor(this);
         getCommand("board").setTabCompleter(scoreboardCommands);
-
+        getCommand("inventory").setExecutor(this);
+        getCommand("inv").setExecutor(this);
         getCommand("eco").setExecutor(this);
         getCommand("eco").setTabCompleter(economyCommands);
         getCommand("bal").setExecutor(this);
@@ -480,6 +487,9 @@ public class FeatherCore extends JavaPlugin {
                     return zoneCommands.handleZoneCommands(player, args);
                 case "board":
                     return scoreboardCommands.handleScoreboardCommands(player, args);
+                case "inv":
+                case "inventory":
+                    return inventoryCommands.handleInventoryCommands(player, args);
                 case "eco":
                 case "bal":
                 case "baltop":

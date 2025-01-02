@@ -64,6 +64,19 @@ public class InventoryManager {
         }
     }
 
+
+    /**
+     * Checks if the player has a saved inventory.
+     *
+     * @param player The player to check.
+     * @return True if a saved inventory exists, false otherwise.
+     */
+    public boolean hasStoredInventory(Player player) {
+        UUID uuid = player.getUniqueId();
+        File inventoryFile = new File(storageFolder, uuid.toString() + ".dat");
+        return inventoryFile.exists();
+    }
+
     // Save inventory to file
     private void saveInventoryToFile(UUID uuid, StoredPlayerInventory inventory) {
         File file = new File(storageFolder, uuid.toString() + ".dat");

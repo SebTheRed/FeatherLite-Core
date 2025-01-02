@@ -5,7 +5,7 @@ scoreboard:
   lines:
     - "&dPing: <player_ping>"
     - "&bPlayers: <online_player_count>"
-    - "&eCurrent World: <world_name>"
+    # - "&eCurrent World: <world_name>"
     - "&aBalance: <player_balance>"
     - ""
     - "&7Toggle with /board toggle"
