@@ -351,10 +351,10 @@ public class GamesUI implements Listener {
             meta.setDisplayName(ChatColor.GREEN + instance.getGameName());
             List<String> lore = new ArrayList<>();
             lore.add(ChatColor.GRAY + "World: " + instance.getWorldName());
-            lore.add(ChatColor.GRAY + "Players: " + instance.getTotalPlayerCount() + "/" +
-            instance.getTeamSizes().values().stream()
-                   .mapToInt(sizeMap -> sizeMap.getOrDefault("max", 0)) // Sum up the "max" values
-                   .sum());            lore.add(ChatColor.GRAY + "State: " + instance.getState());
+            lore.add(ChatColor.GRAY + "Players: " + instance.getTotalPlayerCount());
+            // instance.getTeamSizes().values().stream()
+            //        .mapToInt(sizeMap -> sizeMap.getOrDefault("max", 0)) // Sum up the "max" values
+            //        .sum());            lore.add(ChatColor.GRAY + "State: " + instance.getState());
             lore.add("");
             lore.add(ChatColor.YELLOW + "Click to join this game.");
             meta.setLore(lore);

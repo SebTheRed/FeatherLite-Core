@@ -28,7 +28,9 @@ import com.featherlite.pluginBin.items.ItemListeners;
 import com.featherlite.pluginBin.items.ItemManager;
 import com.featherlite.pluginBin.items.UIManager;
 import com.featherlite.pluginBin.lobbies.InstanceManager;
+import com.featherlite.pluginBin.lobbies.MenuListeners;
 import com.featherlite.pluginBin.lobbies.PartyManager;
+import com.featherlite.pluginBin.lobbies.TeamSelectorBook;
 import com.featherlite.pluginBin.particles.ParticleManager;
 import com.featherlite.pluginBin.permissions.PermissionManager;
 import com.featherlite.pluginBin.permissions.PlayerJoinListener;
@@ -82,6 +84,7 @@ public class FeatherCore extends JavaPlugin {
     private ChatManager chatManager;
     private GamesManager gamesManager;
     private GamesUI gamesUI;
+    private TeamSelectorBook teamSelectorBook;
 
     private PlayerDataManager playerDataManager;
     private TeleportationManager teleportationManager;
@@ -146,7 +149,8 @@ public class FeatherCore extends JavaPlugin {
         partyManager = new PartyManager();
         itemManager = new ItemManager(this, abilityRegistry);  // Initialize ItemManager
         uiManager = new UIManager(this, itemManager); // Initialize UIManager with ItemManager
-        instanceManager = new InstanceManager(partyManager, worldManager, this);
+        teamSelectorBook = new TeamSelectorBook(this);
+        instanceManager = new InstanceManager(partyManager, worldManager, this, teamSelectorBook);
         gamesManager = new GamesManager();
         gamesUI = new GamesUI(gamesManager, instanceManager);
         getServer().getPluginManager().registerEvents(gamesUI, this);
@@ -174,6 +178,8 @@ public class FeatherCore extends JavaPlugin {
         playerStatsManager = new PlayerStatsManager(this);
         getServer().getPluginManager().registerEvents(new StatListeners(playerStatsManager), this);
 
+        getServer().getPluginManager().registerEvents(new MenuListeners(this, instanceManager, teamSelectorBook), this);
+
 
         new IndicatorListener(this, displayPieceManager);
 
@@ -181,7 +187,7 @@ public class FeatherCore extends JavaPlugin {
         // Initialize command handlers
         partyCommands = new PartyCommands(partyManager);
         appCommands = new AppCommands(webAppManager, activeSessions);
-        gameCommands = new GameCommands(instanceManager, gamesManager, gamesUI);
+        gameCommands = new GameCommands(instanceManager, gamesManager, gamesUI, teamSelectorBook);
         worldCommands = new WorldCommands(worldManager);
         permissionCommands = new PermissionsCommands(permissionManager);
         itemCommands = new ItemCommands(uiManager, itemManager, this); // Only pass the main plugin instance

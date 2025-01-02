@@ -8,6 +8,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.featherlite.pluginBin.FeatherCore;
 import com.featherlite.pluginBin.worlds.WorldManager;
+import com.featherlite.pluginBin.lobbies.TeamSelectorBook;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,12 +23,14 @@ public class InstanceManager {
     private final Map<UUID, GameInstance> activeInstances = new HashMap<>();
     private final PartyManager partyManager;
     private final WorldManager worldManager;
+    private final TeamSelectorBook teamSelectorBook;
     private int instanceCount = 0; // Track unique instance numbers
 
-    public InstanceManager(PartyManager partyManager, WorldManager worldManager, FeatherCore plugin) {
+    public InstanceManager(PartyManager partyManager, WorldManager worldManager, FeatherCore plugin, TeamSelectorBook teamSelectorBook) {
         this.partyManager = partyManager;
         this.worldManager = worldManager;
         this.plugin = plugin;
+        this.teamSelectorBook = teamSelectorBook;
     }
 
     /**
@@ -48,7 +51,7 @@ public class InstanceManager {
             String gameName,
             String gameType,
             String baseWorldName,
-            Map<String, Map<String, Integer>> teamSizes,
+            Map<String, TeamSize> teamSizes,
             int maxTime,
             List<String> teamNames,
             Map<String, Object> pluginConfig
@@ -68,13 +71,17 @@ public class InstanceManager {
             return null;
         }
 
+        // Generate the instance UUID
+        UUID instanceId = UUID.randomUUID();
+        String instanceWorldName = baseWorldName + "_" + instanceId; // Instance-specific world name
+
         // Resolve spawns and waiting room for the selected map
         Map<String, Map<String, Double>> rawTeamSpawns = mapSpecificTeamSpawns.get(baseWorldName);
         Map<String, Double> rawWaitingRoom = mapSpecificWaitingRooms.get(baseWorldName);
 
-        World instanceWorld = worldManager.createInstanceWorld(baseWorldName, baseWorldName + "_instance");
+        World instanceWorld = worldManager.createInstanceWorld(baseWorldName, instanceWorldName);
         if (instanceWorld == null) {
-            plugin.getLogger().warning("Failed to create instance world: " + baseWorldName + "_instance");
+            plugin.getLogger().warning("Failed to create instance world: " + instanceWorldName);
             return null;
         }
 
@@ -89,10 +96,11 @@ public class InstanceManager {
         // Create and store the GameInstance
         GameInstance instance = new GameInstance(
                 this,
+                instanceId, // Pass the generated UUID to the GameInstance
                 isInstancePublic,
                 gameName,
                 gameType,
-                baseWorldName,
+                instanceWorldName, // Use the unique instance world name
                 teamSizes,
                 maxTime,
                 teamNames,
@@ -101,12 +109,12 @@ public class InstanceManager {
                 pluginConfig
         );
 
-        activeInstances.put(instance.getInstanceId(), instance);
-        startReadinessTimer(instance);
-        // startInstanceTimer(instance);
-        plugin.getLogger().info("Game instance created successfully: " + baseWorldName + "_instance");
-        return instance;
-    }
+    activeInstances.put(instanceId, instance);
+    startReadinessTimer(instance);
+    plugin.getLogger().info("Game instance created successfully: " + instanceWorldName);
+    return instance;
+}
+ 
 
 
     public List<GameInstance> getInstancesByRegisteredGame(String registeredGameName) {
@@ -184,6 +192,32 @@ public class InstanceManager {
 
 
 
+    public void closeInstance(UUID instanceId) {
+        GameInstance instance = activeInstances.remove(instanceId);
+        if (instance == null) {
+            plugin.getLogger().warning("Attempted to close an invalid or non-existent instance with ID: " + instanceId);
+            return;
+        }
+    
+        // Teleport all players safely to the specified lobby
+        teleportPlayersToSafeLocation(instance);
+    
+        // End the game if it's still in progress
+        if (instance.getState() == GameInstance.GameState.IN_PROGRESS) {
+            instance.endGame();
+        }
+    
+        // Unload and delete the instance-specific world
+        String instanceWorldName = instance.getWorldName(); // Instance-specific world name
+
+        try {
+            worldManager.deleteWorld(instanceWorldName);
+        } catch(IllegalArgumentException e) {
+            plugin.getLogger().warning(instanceWorldName + " NOT DELETED!! ");
+        }
+
+    }
+    
 
 
 
@@ -197,27 +231,6 @@ public class InstanceManager {
             plugin.getLogger().warning("Attempted to remove an invalid or non-existent instance with ID: " + instanceId);
         }
     };
-
-    public void closeInstance(UUID instanceId) {
-        GameInstance instance = activeInstances.remove(instanceId);
-        if (instance == null) {
-            plugin.getLogger().warning("Attempted to close an invalid or non-existent instance with ID: " + instanceId);
-            return;
-        }
-
-        // Teleport all players safely to the specified lobby
-        teleportPlayersToSafeLocation(instance);
-
-        // End the game if it's still in progress
-        if (instance.getState() == GameInstance.GameState.IN_PROGRESS) {
-            instance.endGame();
-        }
-
-        // Unload and delete the instance-specific world
-        worldManager.deleteWorld(instance.getWorldName());
-        plugin.getLogger().info("Successfully closed and removed instance: " + instanceId);
-    };
-
     private void teleportPlayersToSafeLocation(GameInstance instance) {
         String lobbyName = "Spawn";
         // Fetch the specified lobby location from the core plugin
@@ -272,50 +285,46 @@ public class InstanceManager {
 
     
 
-    public void addPlayerToInstance(Player player, GameInstance instance, String teamName) {
+    public void addPlayerToInstance(Player player, GameInstance instance) {
+        // Check if the player is already in a party
         Party playerParty = partyManager.getParty(player);
     
-        // If the player is in a party, check the party's presence in other instances
-        if (playerParty != null) {
-            // Ensure the party is not already in another instance
-            if (isPartyInAnotherInstance(playerParty)) {
-                player.sendMessage("Your party is already in another game instance.");
-                return;
-            }
-    
-            // Attempt to add the entire party to a single team
-            boolean success = addPartyToSingleOrMultipleTeams(instance, playerParty);
-            if (!success) {
-                player.sendMessage("Could not fit your party into a single team or multiple teams. Please try again.");
-            }
+        // Ensure the party isn't already in another instance
+        if (playerParty != null && isPartyInAnotherInstance(playerParty)) {
+            player.sendMessage("Your party is already in another game instance.");
             return;
         }
     
-        // If the player is not in a party, assign them to a random team
-        String assignedTeam = teamName != null ? teamName : assignPlayerToRandomTeam(instance);
-        if (assignedTeam == null) {
-            player.sendMessage("No available teams found to join.");
-            return;
-        }
-    
-        // Add the player to the assigned team
+        // Check if the instance is full
         if (instance.isFull()) {
             player.sendMessage("The instance is full. Cannot join.");
             return;
         }
     
-        instance.getTeams().get(assignedTeam).add(player.getUniqueId());
+        // Add the player to the waiting room of the instance
+        instance.getTeams().computeIfAbsent("waiting_room", k -> new ArrayList<>()).add(player.getUniqueId());
     
-        // Teleport the player to the assigned team's spawn location
+        // Teleport the player to the waiting room
         Location waitingRoomLoc = instance.getWaitingRoom();
         if (waitingRoomLoc != null) {
             player.teleport(waitingRoomLoc);
+            player.sendMessage("Welcome to the waiting room! Select your team when you're ready.");
         } else {
-            player.sendMessage("Waiting room location does not exist ? Report this bug to server owner.");
+            player.sendMessage("Waiting room location is unavailable. Please report this issue.");
+            return;
         }
     
-        instance.broadcastToAllPlayers(player.getName() + " has joined the " + assignedTeam + " team!");
-    };
+        // Optionally give the team selector book
+        boolean canChooseTeams = true; // Later make this a configurable option in games.
+        if (canChooseTeams) {
+            teamSelectorBook.giveSelectorBook(player, instance.getInstanceId());
+        }
+    
+        // Notify other players in the waiting room
+        instance.broadcastToAllPlayers(player.getName() + " has joined the waiting room!");
+    }
+    
+    
 
     private boolean addPartyToSingleOrMultipleTeams(GameInstance instance, Party party) {
         List<String> availableTeams = getAvailableTeams(instance, party.getMembers().size());
@@ -330,11 +339,11 @@ public class InstanceManager {
     
         // Distribute party members across multiple teams if needed
         for (UUID memberUUID : party.getMembers()) {
-            String currentTeam = availableTeams.get(teamIndex);
+            String currentTeam = availableTeams.get(teamIndex).toLowerCase();
             instance.getTeams().get(currentTeam).add(memberUUID);
     
             // Check if the current team is now full
-            if (instance.getTeams().get(currentTeam).size() >= instance.getTeamSizes().get(currentTeam).get("max")) {
+            if (instance.getTeams().get(currentTeam).size() >= instance.getTeamSizes().get(currentTeam).getMax()) {
                 teamIndex++; // Move to the next available team
             }
     
@@ -355,10 +364,10 @@ public class InstanceManager {
         List<String> availableTeams = new ArrayList<>();
     
         for (Map.Entry<String, List<UUID>> entry : instance.getTeams().entrySet()) {
-            String teamName = entry.getKey();
+            String teamName = entry.getKey().toLowerCase();
             int currentSize = entry.getValue().size();
-            int maxSize = instance.getTeamSizes().get(teamName).get("max");
-            int minSize = instance.getTeamSizes().get(teamName).get("min");
+            int maxSize = instance.getTeamSizes().get(teamName).getMax();
+            int minSize = instance.getTeamSizes().get(teamName).getMin();
     
             int availableSlots = maxSize - currentSize;
             if (availableSlots >= requiredSlots) {
@@ -394,27 +403,36 @@ public class InstanceManager {
     };
 
     // Assign an individual player to a random team with available slots
-    private String assignPlayerToRandomTeam(GameInstance instance) {
-        List<String> availableTeams = new ArrayList<>();
-    
-        for (Map.Entry<String, List<UUID>> entry : instance.getTeams().entrySet()) {
-            String teamName = entry.getKey();
-            int currentSize = entry.getValue().size();
-            int maxSize = instance.getTeamSizes().get(teamName).get("max");
-            int minSize = instance.getTeamSizes().get(teamName).get("min");
-    
-            if (currentSize < maxSize) {
-                availableTeams.add(teamName); // Add team to the pool if it has available slots
-            }
+    public void assignPlayerToTeam(Player player, GameInstance instance, String teamName) {
+        if (!instance.getTeams().containsKey(teamName)) {
+            player.sendMessage("Invalid team name. Please choose a valid team.");
+            return;
         }
     
-        if (availableTeams.isEmpty()) {
-            return null; // No available teams found
+        // Remove player from the waiting room
+        instance.getTeams().get("waiting_room").remove(player.getUniqueId());
+    
+        // Check if the team has available slots
+        if (instance.getTeams().get(teamName).size() >= instance.getTeamSizes().get(teamName).getMax()) {
+            player.sendMessage("The " + teamName + " team is full. Please choose another team.");
+            return;
         }
     
-        // Pick a random team from available ones
-        return availableTeams.get(new Random().nextInt(availableTeams.size()));
+        // Add player to the selected team
+        instance.getTeams().get(teamName).add(player.getUniqueId());
+    
+        // Teleport player to the team spawn location
+        Location spawnLocation = instance.getTeamSpawns().get(teamName);
+        if (spawnLocation != null) {
+            player.teleport(spawnLocation);
+        } else {
+            player.sendMessage("Team spawn location does not exist. Please report this bug.");
+        }
+    
+        instance.broadcastToAllPlayers(player.getName() + " has joined the " + teamName + " team!");
     }
+    
+    
     
     
     public void handlePlayerLeave(Player player) {

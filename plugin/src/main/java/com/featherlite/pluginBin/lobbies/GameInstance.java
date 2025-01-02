@@ -1,6 +1,5 @@
 package com.featherlite.pluginBin.lobbies;
 
-import com.featherlite.pluginBin.lobbies.InstanceManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -18,12 +17,12 @@ public class GameInstance {
     }
 
     private final InstanceManager instanceManager;
-    private final UUID instanceId;
+    private final UUID instanceUuid;
     private final boolean isInstancePublic;
     private final String gameName; // Name of the minigame
     private final String gameType; // Type of the game (e.g., "Bedwars")
     private String worldName; // Name of the world for this instance
-    private final Map<String, Map<String, Integer>> teamSizes; // A map of teams and their sizes.
+    private final Map<String, TeamSize> teamSizes; // A map of teams and their sizes.
     private final int maxTime; // In minutes
     private final Map<String, List<UUID>> teams; // Maps team names to player UUIDs
     private final Map<String, Location> teamSpawns; // Maps team names to spawn locations
@@ -36,11 +35,12 @@ public class GameInstance {
 
     public GameInstance(
             InstanceManager instanceManager,
+            UUID instanceUuid,
             boolean isInstancePublic,
             String gameName,
             String gameType,
             String worldName,
-            Map<String, Map<String, Integer>> teamSizes,
+            Map<String, TeamSize> teamSizes,
             int maxTime,
             List<String> teamNames,
             Map<String, Location> teamSpawns,
@@ -48,7 +48,7 @@ public class GameInstance {
             Object pluginConfig
     ) {
         this.instanceManager = instanceManager;
-        this.instanceId = UUID.randomUUID();
+        this.instanceUuid = instanceUuid;
         this.isInstancePublic = isInstancePublic;
         this.gameName = gameName;
         this.gameType = gameType;
@@ -70,7 +70,7 @@ public class GameInstance {
 
     // --- Getters ---
     public UUID getInstanceId() {
-        return instanceId;
+        return instanceUuid;
     }
 
     public boolean getIsInstancePublic() {
@@ -94,18 +94,19 @@ public class GameInstance {
         return true;
     }
 
-    public Map<String, Map<String, Integer>> getTeamSizes() {
+    public Map<String, TeamSize> getTeamSizes() {
+        Bukkit.getLogger().info("Current teamSizes: " + teamSizes);
         return teamSizes;
     }
 
-    // Getter for the number of required players
     public int getRequiredPlayers() {
-        return teamSizes.values().stream()
-                .mapToInt(sizeMap -> sizeMap.getOrDefault("min", 0))
-                .sum();
+        return teamSizes.values().stream().mapToInt(TeamSize::getMin).sum();
     }
 
-    // Getter and Setter for the readiness task ID
+    public int getMaximumPlayers() {
+        return teamSizes.values().stream().mapToInt(TeamSize::getMax).sum();
+    }
+
     public int getReadinessTaskId() {
         return readinessTaskId;
     }
@@ -121,7 +122,7 @@ public class GameInstance {
     public int getMaxTime() {
         return maxTime;
     }
-    
+
     public Object getPluginConfig() {
         return pluginConfig;
     }
@@ -138,7 +139,6 @@ public class GameInstance {
         return spectators;
     }
 
-
     public GameState getState() {
         return state;
     }
@@ -154,27 +154,24 @@ public class GameInstance {
     // --- Core Logic ---
     public void startGame() {
         if (state != GameState.WAITING) return;
-    
+
         state = GameState.IN_PROGRESS;
-    
+
         // Distribute players into teams
         assignPlayersToTeams();
-    
+
         // Teleport players to their respective team spawns
         teleportPlayersToTeamSpawns();
-    
+
         // Notify players
         broadcastToAllPlayers("The game has started! Good luck!");
     }
-    
-    
 
     public void endGame() {
         state = GameState.ENDED;
         Bukkit.getPluginManager().callEvent(new GameEndEvent(this));
         broadcastToAllPlayers("The game has ended!");
-        instanceManager.closeInstance(instanceId);
-
+        instanceManager.closeInstance(instanceUuid);
     }
 
     public void addPlayerToTeam(Player player, String teamName) {
@@ -190,7 +187,14 @@ public class GameInstance {
             return;
         }
     
-        if (teams.get(targetTeam).size() >= teamSizes.get(targetTeam).getOrDefault("max", Integer.MAX_VALUE)) {
+        TeamSize size = teamSizes.get(targetTeam);
+        if (size == null) {
+            Bukkit.getLogger().warning("TeamSize for team '" + targetTeam + "' is null. Check your configuration.");
+            player.sendMessage("An error occurred while assigning you to a team. Please report this issue.");
+            return;
+        }
+    
+        if (teams.get(targetTeam).size() >= size.getMax()) {
             player.sendMessage("The " + targetTeam + " team is full.");
             return;
         }
@@ -200,7 +204,7 @@ public class GameInstance {
         broadcastToAllPlayers(player.getName() + " joined the " + targetTeam + " team.");
     }
     
-    
+
     public void teleportPlayersToWaitingRoom() {
         teams.values().forEach(players ->
                 players.forEach(playerUUID -> {
@@ -213,7 +217,6 @@ public class GameInstance {
         );
     }
 
-    // Assign players to teams as evenly as possible
     private void assignPlayersToTeams() {
         List<Player> waitingPlayers = getAllPlayersInWaitingRoom();
         List<String> teamNames = new ArrayList<>(teams.keySet());
@@ -226,7 +229,6 @@ public class GameInstance {
         }
     }
 
-    // Teleport players to their assigned team spawns
     private void teleportPlayersToTeamSpawns() {
         teams.forEach((teamName, playerList) -> {
             Location spawnLocation = teamSpawns.get(teamName);
@@ -240,7 +242,6 @@ public class GameInstance {
         });
     }
 
-
     public void addSpectator(Player player) {
         spectators.add(player.getUniqueId());
         player.sendMessage("You are now spectating this game.");
@@ -248,9 +249,12 @@ public class GameInstance {
 
     public boolean isFull() {
         return teams.entrySet().stream()
-                .allMatch(entry -> entry.getValue().size() >= teamSizes.get(entry.getKey()).getOrDefault("max", Integer.MAX_VALUE));
+                .allMatch(entry -> {
+                    String teamName = entry.getKey();
+                    TeamSize size = teamSizes.get(teamName);
+                    return size != null && entry.getValue().size() >= size.getMax();
+                });
     }
-    
 
     public int getTotalPlayerCount() {
         return teams.values().stream().mapToInt(List::size).sum();
@@ -258,11 +262,20 @@ public class GameInstance {
 
     private String getRandomAvailableTeam() {
         return teams.entrySet().stream()
-                .filter(entry -> entry.getValue().size() < teamSizes.get(entry.getKey()).getOrDefault("max", Integer.MAX_VALUE))
+                .filter(entry -> {
+                    String teamName = entry.getKey();
+                    TeamSize size = teamSizes.get(teamName);
+                    if (size == null) {
+                        Bukkit.getLogger().warning("TeamSize for team '" + teamName + "' is null. Check your configuration.");
+                        return false; // Skip this team if TeamSize is null
+                    }
+                    return entry.getValue().size() < size.getMax(); // Check against max size
+                })
                 .map(Map.Entry::getKey)
                 .findAny()
                 .orElse(null);
     }
+    
 
     public void broadcastToAllPlayers(String message) {
         teams.values().forEach(players ->
@@ -273,7 +286,6 @@ public class GameInstance {
         );
     }
 
-
     private List<Player> getAllPlayersInWaitingRoom() {
         return teams.values().stream()
                 .flatMap(List::stream)
@@ -281,5 +293,4 @@ public class GameInstance {
                 .filter(Objects::nonNull)
                 .toList();
     }
-
 }
