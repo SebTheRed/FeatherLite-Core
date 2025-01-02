@@ -9,6 +9,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.featherlite.pluginBin.FeatherCore;
 import com.featherlite.pluginBin.worlds.WorldManager;
 import com.featherlite.pluginBin.lobbies.TeamSelectorBook;
+import com.featherlite.pluginBin.utils.InventoryManager;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -199,8 +200,27 @@ public class InstanceManager {
             return;
         }
     
-        // Teleport all players safely to the specified lobby
-        teleportPlayersToSafeLocation(instance);
+        // Initialize InventoryManager (replace with actual instance if managed centrally)
+        InventoryManager inventoryManager = new InventoryManager(plugin);
+    
+        // Teleport all players safely to the specified lobby and restore their inventories
+        instance.getTeams().values().forEach(playerList -> playerList.forEach(playerUUID -> {
+            Player player = Bukkit.getPlayer(playerUUID);
+            if (player != null && player.isOnline()) {
+                // Restore inventory
+                inventoryManager.restoreInventory(player);
+                player.sendMessage("§aYour inventory has been restored!");
+    
+                // Teleport to lobby or fallback location
+                Location safeLocation = plugin.getLobbyLocation("Spawn");
+                if (safeLocation != null) {
+                    player.teleport(safeLocation);
+                } else {
+                    player.teleport(Bukkit.getWorld("world").getSpawnLocation());
+                    player.sendMessage("§cUnable to find a safe lobby. Teleported to the world spawn.");
+                }
+            }
+        }));
     
         // End the game if it's still in progress
         if (instance.getState() == GameInstance.GameState.IN_PROGRESS) {
@@ -208,15 +228,16 @@ public class InstanceManager {
         }
     
         // Unload and delete the instance-specific world
-        String instanceWorldName = instance.getWorldName(); // Instance-specific world name
-
+        String instanceWorldName = instance.getWorldName();
         try {
             worldManager.deleteWorld(instanceWorldName);
-        } catch(IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             plugin.getLogger().warning(instanceWorldName + " NOT DELETED!! ");
         }
-
+    
+        plugin.getLogger().info("Closed game instance with ID: " + instanceId);
     }
+    
     
 
 
@@ -285,44 +306,52 @@ public class InstanceManager {
 
     
 
-    public void addPlayerToInstance(Player player, GameInstance instance) {
-        // Check if the player is already in a party
-        Party playerParty = partyManager.getParty(player);
-    
-        // Ensure the party isn't already in another instance
-        if (playerParty != null && isPartyInAnotherInstance(playerParty)) {
-            player.sendMessage("Your party is already in another game instance.");
-            return;
-        }
-    
-        // Check if the instance is full
-        if (instance.isFull()) {
-            player.sendMessage("The instance is full. Cannot join.");
-            return;
-        }
-    
-        // Add the player to the waiting room of the instance
-        instance.getTeams().computeIfAbsent("waiting_room", k -> new ArrayList<>()).add(player.getUniqueId());
-    
-        // Teleport the player to the waiting room
-        Location waitingRoomLoc = instance.getWaitingRoom();
-        if (waitingRoomLoc != null) {
-            player.teleport(waitingRoomLoc);
-            player.sendMessage("Welcome to the waiting room! Select your team when you're ready.");
-        } else {
-            player.sendMessage("Waiting room location is unavailable. Please report this issue.");
-            return;
-        }
-    
-        // Optionally give the team selector book
-        boolean canChooseTeams = true; // Later make this a configurable option in games.
-        if (canChooseTeams) {
-            teamSelectorBook.giveSelectorBook(player, instance.getInstanceId());
-        }
-    
-        // Notify other players in the waiting room
-        instance.broadcastToAllPlayers(player.getName() + " has joined the waiting room!");
+public void addPlayerToInstance(Player player, GameInstance instance) {
+    // Initialize InventoryManager (replace with the actual instance if managed elsewhere)
+    InventoryManager inventoryManager = new InventoryManager(plugin);
+
+    // Check if the player is already in a party
+    Party playerParty = partyManager.getParty(player);
+
+    // Ensure the party isn't already in another instance
+    if (playerParty != null && isPartyInAnotherInstance(playerParty)) {
+        player.sendMessage("Your party is already in another game instance.");
+        return;
     }
+
+    // Check if the instance is full
+    if (instance.isFull()) {
+        player.sendMessage("The instance is full. Cannot join.");
+        return;
+    }
+
+    // Save the player's inventory and clear it
+    inventoryManager.saveInventory(player);
+    player.sendMessage("§aYour inventory has been safely stored for the game.");
+
+    // Add the player to the waiting room of the instance
+    instance.getTeams().computeIfAbsent("waiting_room", k -> new ArrayList<>()).add(player.getUniqueId());
+
+    // Teleport the player to the waiting room
+    Location waitingRoomLoc = instance.getWaitingRoom();
+    if (waitingRoomLoc != null) {
+        player.teleport(waitingRoomLoc);
+        player.sendMessage("Welcome to the waiting room! Select your team when you're ready.");
+    } else {
+        player.sendMessage("Waiting room location is unavailable. Please report this issue.");
+        return;
+    }
+
+    // Optionally give the team selector book
+    boolean canChooseTeams = true; // Later make this a configurable option in games.
+    if (canChooseTeams) {
+        teamSelectorBook.giveSelectorBook(player, instance.getInstanceId());
+    }
+
+    // Notify other players in the waiting room
+    instance.broadcastToAllPlayers(player.getName() + " has joined the waiting room!");
+}
+
     
     
 
@@ -436,16 +465,33 @@ public class InstanceManager {
     
     
     public void handlePlayerLeave(Player player) {
-        for (GameInstance instance : activeInstances.values()) {
-            // Iterate through each team to find and remove the player
-            for (Map.Entry<String, List<UUID>> entry : instance.getTeams().entrySet()) {
-                if (entry.getValue().remove(player.getUniqueId())) {
-                    instance.broadcastToAllPlayers(player.getName() + " has left the game.");
-                    return;
-                }
-            }
+        GameInstance instance = getInstanceForPlayer(player);
+        if (instance == null) {
+            plugin.getLogger().warning("Player " + player.getName() + " attempted to leave, but no instance was found.");
+            return;
         }
-    };
+    
+        // Remove the player from all teams in the instance
+        instance.getTeams().values().forEach(team -> team.remove(player.getUniqueId()));
+    
+        // Restore the player's inventory
+        InventoryManager inventoryManager = new InventoryManager(plugin);
+        inventoryManager.restoreInventory(player);
+        player.sendMessage("§aYour inventory has been restored!");
+    
+        // Teleport the player to a safe location
+        Location safeLocation = plugin.getLobbyLocation("Spawn");
+        if (safeLocation != null) {
+            player.teleport(safeLocation);
+        } else {
+            player.teleport(Bukkit.getWorld("world").getSpawnLocation());
+            player.sendMessage("§cUnable to find a safe lobby. Teleported to the world spawn.");
+        }
+    
+        // Notify others in the instance
+        instance.broadcastToAllPlayers(player.getName() + " has left the game.");
+    }
+    
     
     public void handlePlayerDisconnect(Player player) {
         // Similar to handlePlayerLeave, but you can handle it differently if needed
