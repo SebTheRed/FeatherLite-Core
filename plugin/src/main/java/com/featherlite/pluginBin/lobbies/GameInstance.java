@@ -1,5 +1,7 @@
 package com.featherlite.pluginBin.lobbies;
 
+import com.featherlite.pluginBin.lobbies.GameStartEvent;
+import com.featherlite.pluginBin.lobbies.GameEndEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -157,13 +159,11 @@ public class GameInstance {
 
         state = GameState.IN_PROGRESS;
 
-        // Distribute players into teams
         assignPlayersToTeams();
 
-        // Teleport players to their respective team spawns
         teleportPlayersToTeamSpawns();
+        Bukkit.getPluginManager().callEvent(new GameStartEvent(this));
 
-        // Notify players
         broadcastToAllPlayers("The game has started! Good luck!");
     }
 
@@ -241,6 +241,7 @@ public class GameInstance {
                 Player player = Bukkit.getPlayer(playerId);
                 if (player != null) {
                     try {
+                        player.getInventory().clear();
                         player.teleport(spawnLocation);
                         player.sendMessage("You have been teleported to the " + teamName + " spawn!");
                     } catch (IllegalArgumentException e) {

@@ -14,7 +14,7 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.NamespacedKey;
-
+import org.bukkit.Location;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -108,7 +108,20 @@ public class TeamSelectorBook implements Listener {
         teamMembers.add(playerUuid);
 
         player.sendMessage("§aYou have joined the §b" + teamName + " §ateam!");
-        instance.broadcastToAllPlayers("§a" + player.getName() + " joined the §b" + teamName + " §ateam!");
+        // instance.broadcastToAllPlayers("§a" + player.getName() + " joined the §b" + teamName + " §ateam!");
+
+            // If the game is in progress, teleport the player and set their game mode
+        if (instance.getState() == GameInstance.GameState.IN_PROGRESS) {
+            Location teamSpawn = instance.getTeamSpawns().get(teamName.toLowerCase());
+            if (teamSpawn != null) {
+                player.teleport(teamSpawn);
+                player.setGameMode(org.bukkit.GameMode.SURVIVAL);
+                player.sendMessage("§aYou have been teleported into the game!");
+            } else {
+                player.sendMessage("§cNo spawn location found for your team. Please report this issue.");
+            }
+        }
+
         player.closeInventory();
     }
 

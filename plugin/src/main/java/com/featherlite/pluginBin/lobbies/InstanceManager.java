@@ -56,66 +56,66 @@ public class InstanceManager {
             int maxTime,
             List<String> teamNames,
             Map<String, Object> pluginConfig
-    ) {
-        // Extract map-specific data from pluginConfig
-        @SuppressWarnings("unchecked")
-        Map<String, Map<String, Map<String, Double>>> mapSpecificTeamSpawns =
-                (Map<String, Map<String, Map<String, Double>>>) pluginConfig.get("mapSpecificTeamSpawns");
+        ) {
+            // Extract map-specific data from pluginConfig
+            @SuppressWarnings("unchecked")
+            Map<String, Map<String, Map<String, Double>>> mapSpecificTeamSpawns =
+                    (Map<String, Map<String, Map<String, Double>>>) pluginConfig.get("mapSpecificTeamSpawns");
 
-        @SuppressWarnings("unchecked")
-        Map<String, Map<String, Double>> mapSpecificWaitingRooms =
-                (Map<String, Map<String, Double>>) pluginConfig.get("mapSpecificWaitingRooms");
+            @SuppressWarnings("unchecked")
+            Map<String, Map<String, Double>> mapSpecificWaitingRooms =
+                    (Map<String, Map<String, Double>>) pluginConfig.get("mapSpecificWaitingRooms");
 
-        // Validate that the map exists in the config
-        if (!mapSpecificTeamSpawns.containsKey(baseWorldName) || !mapSpecificWaitingRooms.containsKey(baseWorldName)) {
-            plugin.getLogger().warning("No map data found for the selected map: " + baseWorldName);
-            return null;
-        }
+            // Validate that the map exists in the config
+            if (!mapSpecificTeamSpawns.containsKey(baseWorldName) || !mapSpecificWaitingRooms.containsKey(baseWorldName)) {
+                plugin.getLogger().warning("No map data found for the selected map: " + baseWorldName);
+                return null;
+            }
 
-        // Generate the instance UUID
-        UUID instanceId = UUID.randomUUID();
-        String instanceWorldName = baseWorldName + "_" + instanceId; // Instance-specific world name
+            // Generate the instance UUID
+            UUID instanceId = UUID.randomUUID();
+            String instanceWorldName = baseWorldName + "_" + instanceId; // Instance-specific world name
 
-        // Resolve spawns and waiting room for the selected map
-        Map<String, Map<String, Double>> rawTeamSpawns = mapSpecificTeamSpawns.get(baseWorldName);
-        Map<String, Double> rawWaitingRoom = mapSpecificWaitingRooms.get(baseWorldName);
+            // Resolve spawns and waiting room for the selected map
+            Map<String, Map<String, Double>> rawTeamSpawns = mapSpecificTeamSpawns.get(baseWorldName);
+            Map<String, Double> rawWaitingRoom = mapSpecificWaitingRooms.get(baseWorldName);
 
-        World instanceWorld = worldManager.createInstanceWorld(baseWorldName, instanceWorldName);
-        if (instanceWorld == null) {
-            plugin.getLogger().warning("Failed to create instance world: " + instanceWorldName);
-            return null;
-        }
+            World instanceWorld = worldManager.createInstanceWorld(baseWorldName, instanceWorldName);
+            if (instanceWorld == null) {
+                plugin.getLogger().warning("Failed to create instance world: " + instanceWorldName);
+                return null;
+            }
 
-        Map<String, Location> resolvedTeamSpawns = resolveTeamSpawns(rawTeamSpawns, instanceWorld);
-        Location resolvedWaitingRoom = new Location(
-                instanceWorld,
-                rawWaitingRoom.getOrDefault("x", 0.0),
-                rawWaitingRoom.getOrDefault("y", 64.0), // Default Y level
-                rawWaitingRoom.getOrDefault("z", 0.0)
-        );
+            Map<String, Location> resolvedTeamSpawns = resolveTeamSpawns(rawTeamSpawns, instanceWorld);
+            Location resolvedWaitingRoom = new Location(
+                    instanceWorld,
+                    rawWaitingRoom.getOrDefault("x", 0.0),
+                    rawWaitingRoom.getOrDefault("y", 64.0), // Default Y level
+                    rawWaitingRoom.getOrDefault("z", 0.0)
+            );
 
-        // Create and store the GameInstance
-        GameInstance instance = new GameInstance(
-                this,
-                instanceId, // Pass the generated UUID to the GameInstance
-                isInstancePublic,
-                gameName,
-                gameType,
-                instanceWorldName, // Use the unique instance world name
-                teamSizes,
-                maxTime,
-                teamNames,
-                resolvedTeamSpawns,
-                resolvedWaitingRoom,
-                pluginConfig
-        );
+            // Create and store the GameInstance
+            GameInstance instance = new GameInstance(
+                    this,
+                    instanceId, // Pass the generated UUID to the GameInstance
+                    isInstancePublic,
+                    gameName,
+                    gameType,
+                    instanceWorldName, // Use the unique instance world name
+                    teamSizes,
+                    maxTime,
+                    teamNames,
+                    resolvedTeamSpawns,
+                    resolvedWaitingRoom,
+                    pluginConfig
+            );
 
-    activeInstances.put(instanceId, instance);
-    startReadinessTimer(instance);
-    plugin.getLogger().info("Game instance created successfully: " + instanceWorldName);
-    return instance;
-}
- 
+        activeInstances.put(instanceId, instance);
+        startReadinessTimer(instance);
+        plugin.getLogger().info("Game instance created successfully: " + instanceWorldName);
+        return instance;
+    }
+    
 
 
     public List<GameInstance> getInstancesByRegisteredGame(String registeredGameName) {
@@ -332,10 +332,12 @@ public void addPlayerToInstance(Player player, GameInstance instance) {
 
     // Save the player's inventory and clear it
     inventoryManager.saveInventory(player);
-    player.sendMessage("§aYour inventory has been safely stored for the game.");
+    player.sendMessage("§aYour inventory has been safely stored.");
 
     // Add the player to the waiting room of the instance
     instance.getTeams().computeIfAbsent("waiting_room", k -> new ArrayList<>()).add(player.getUniqueId());
+
+    player.setGameMode(org.bukkit.GameMode.SURVIVAL);
 
     // Teleport the player to the waiting room
     Location waitingRoomLoc = instance.getWaitingRoom();
