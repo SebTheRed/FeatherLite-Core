@@ -20,11 +20,11 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class MenuListeners implements Listener {
+public class LobbyMenuListeners implements Listener {
     private final InstanceManager instanceManager;
     private final TeamSelectorBook teamSelectorBook;
 
-    public MenuListeners(JavaPlugin plugin, InstanceManager instanceManager, TeamSelectorBook teamSelectorBook) {
+    public LobbyMenuListeners(JavaPlugin plugin, InstanceManager instanceManager, TeamSelectorBook teamSelectorBook) {
         this.instanceManager = instanceManager;
         this.teamSelectorBook = teamSelectorBook;
     }

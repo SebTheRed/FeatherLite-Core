@@ -47,6 +47,11 @@ commands:
     aliases: [inv]
     usage: /inventory restore <player-username>
 
+  menu:
+    description: Opens menus.
+    aliases: [menus]
+    usage: /menu <menu_name>
+
   eco:
     description: Use to manipulate player economy balances.
     permission: core.eco

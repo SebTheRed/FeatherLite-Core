@@ -28,9 +28,10 @@ import com.featherlite.pluginBin.items.ItemListeners;
 import com.featherlite.pluginBin.items.ItemManager;
 import com.featherlite.pluginBin.items.UIManager;
 import com.featherlite.pluginBin.lobbies.InstanceManager;
-import com.featherlite.pluginBin.lobbies.MenuListeners;
+import com.featherlite.pluginBin.lobbies.LobbyMenuListeners;
 import com.featherlite.pluginBin.lobbies.PartyManager;
 import com.featherlite.pluginBin.lobbies.TeamSelectorBook;
+import com.featherlite.pluginBin.menus.MenuManager;
 import com.featherlite.pluginBin.particles.ParticleManager;
 import com.featherlite.pluginBin.permissions.PermissionManager;
 import com.featherlite.pluginBin.permissions.PlayerJoinListener;
@@ -42,7 +43,7 @@ import com.featherlite.pluginBin.worlds.WorldManager;
 import com.featherlite.pluginBin.zones.ZoneManager;
 import com.featherlite.pluginBin.chat.ChatControlListener;
 import com.featherlite.pluginBin.chat.ChatManager;
-
+import com.featherlite.pluginBin.menus.MenuListeners;
 import com.featherlite.pluginBin.lobbies.GamesManager;
 import com.featherlite.pluginBin.lobbies.GamesUI;
 import org.bukkit.entity.Entity;
@@ -99,6 +100,8 @@ public class FeatherCore extends JavaPlugin {
     private DisplayPieceManager displayPieceManager;
 
     private ProjectileManager projectileManager;
+
+    private MenuManager menuManager;
     // private AdminManager adminManager;
     // private MessagingManager messagingManager;
     // Command handler instances
@@ -114,6 +117,7 @@ public class FeatherCore extends JavaPlugin {
     private MessagingCommands messagingCommands;
     private AdminCommands adminCommands;
     private UtilCommands utilCommands;
+    private MenuCommands menuCommands;
 
     private TeleportationCommands teleportationCommands;
     private HomeCommands homeCommands;
@@ -165,6 +169,8 @@ public class FeatherCore extends JavaPlugin {
         scoreboardManager = new ScoreboardManager(this);
 
         economyManager = new EconomyManager(this, playerDataManager);
+        menuManager = new MenuManager(this, economyManager);
+        getServer().getPluginManager().registerEvents(new MenuListeners(this, menuManager), this);
 
 
         chatManager = new ChatManager(this);
@@ -183,7 +189,7 @@ public class FeatherCore extends JavaPlugin {
         playerStatsManager = new PlayerStatsManager(this);
         getServer().getPluginManager().registerEvents(new StatListeners(playerStatsManager), this);
 
-        getServer().getPluginManager().registerEvents(new MenuListeners(this, instanceManager, teamSelectorBook), this);
+        getServer().getPluginManager().registerEvents(new LobbyMenuListeners(this, instanceManager, teamSelectorBook), this);
 
         new IndicatorListener(this, displayPieceManager);
 
@@ -198,7 +204,7 @@ public class FeatherCore extends JavaPlugin {
         zoneCommands = new ZonesCommands(zoneManager ,this);
         scoreboardCommands = new ScoreboardCommands(scoreboardManager);
         economyCommands = new EconomyCommands(economyManager, this);
-
+        menuCommands = new MenuCommands(menuManager, this);
         teleportationCommands = new TeleportationCommands(teleportationManager, this);
         homeCommands = new HomeCommands(homeManager, teleportationManager);
 
@@ -233,6 +239,10 @@ public class FeatherCore extends JavaPlugin {
         getCommand("board").setTabCompleter(scoreboardCommands);
         getCommand("inventory").setExecutor(this);
         getCommand("inv").setExecutor(this);
+        getCommand("menu").setExecutor(this);
+        getCommand("menu").setTabCompleter(menuCommands);
+        getCommand("menus").setExecutor(this);
+        getCommand("menus").setTabCompleter(menuCommands);
         getCommand("eco").setExecutor(this);
         getCommand("eco").setTabCompleter(economyCommands);
         getCommand("bal").setExecutor(this);
@@ -490,6 +500,9 @@ public class FeatherCore extends JavaPlugin {
                 case "inv":
                 case "inventory":
                     return inventoryCommands.handleInventoryCommands(player, args);
+                case "menu":
+                case "menus":
+                    return menuCommands.handleMenuCommands(player, command, label, args);
                 case "eco":
                 case "bal":
                 case "baltop":

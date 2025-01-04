@@ -1,0 +1,58 @@
+menu:
+  id: FeatherLite_Menu
+  title: "&aFeatherLite Menu" # The title of menu. Never seen by the player.
+  slots: 27 # Number of inventory slots (must be a multiple of 9)
+  pages:
+    main:
+      title: "&aFeatherLite Help Menu" # The title of the inventory
+      items:
+        0:
+          type: command-button
+          icon:
+            material: COMPASS
+            amount: 1
+          displayName: "&aTeleport to Spawn"
+          lore:
+            - "&7Click to teleport to the spawn point."
+          command: "spawn"
+        1:
+          type: route-button
+          icon:
+            material: BOOK
+            amount: 1
+          displayName: "&eSettings Menu"
+          lore:
+            - "&7Click to open the settings menu."
+          route: "&aFeatherLite Settings Menu"
+        2:
+          type: buy-button
+          icon:
+            material: DIAMOND
+            amount: 2
+          displayName: "&6Buy 2 Diamonds"
+          lore:
+            - "&7Costs 10 Gold Ingots"
+          currency: "GOLD_INGOT" # Alternative to "eco"
+          cost: 10
+          command: "give <player> minecraft:diamond 2"
+    settings:
+      title: "&aFeatherLite Settings Menu" # The title of the inventory
+      items:
+        0:
+          type: route-button
+          icon:
+            material: ARROW
+            amount: 1
+          displayName: "&cBack to Main Menu"
+          lore:
+            - "&7Click to return to the main menu."
+          route: "main"
+        1:
+          type: command-button
+          icon:
+            material: LEVER
+            amount: 1
+          displayName: "&bToggle Feature"
+          lore:
+            - "&7Click to toggle a feature."
+          command: "toggleFeature"
