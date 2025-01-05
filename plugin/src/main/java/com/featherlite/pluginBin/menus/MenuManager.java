@@ -166,49 +166,56 @@ public class MenuManager {
 
     private MenuButton parseButton(ConfigurationSection section) {
         String type = section.getString("type");
+        ColorUtils colorUtils = new ColorUtils();
         String materialName = section.getString("icon.material", "STONE");
         int amount = section.getInt("icon.amount", 1);
-
+    
         // Build ItemStack
         ItemStack icon = new ItemStack(Material.valueOf(materialName.toUpperCase()), amount);
         if (icon.getItemMeta() != null) {
             ItemMeta meta = icon.getItemMeta();
-
+    
             // Set display name
             if (section.contains("displayName")) {
-                meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', section.getString("displayName")));
+                meta.setDisplayName(colorUtils.parseColors(section.getString("displayName")));
             }
-
+    
             // Set lore
             if (section.contains("lore")) {
                 List<String> lore = section.getStringList("lore");
                 List<String> coloredLore = new ArrayList<>();
                 for (String line : lore) {
-                    coloredLore.add(ChatColor.translateAlternateColorCodes('&', line));
+                    coloredLore.add(colorUtils.parseColors(line));
                 }
                 meta.setLore(coloredLore);
             }
-
+    
             icon.setItemMeta(meta);
         }
-
+    
         // Parse button types and return the correct button
         switch (type) {
             case "command-button":
                 return new CommandButton(icon, section.getString("command"));
-    
+
             case "route-button":
                 return new RouteButton(icon, section.getString("route"), this);
-    
+
             case "buy-button":
                 String currency = section.getString("currency");
                 double cost = section.getDouble("cost");
-                String command = section.getString("command");
-                if (command == null || command.isEmpty()) {
-                    plugin.getLogger().warning("BuyButton missing command!");
-                    return null;
-                }
-                return new BuyButton(icon, currency, cost, command, economyManager, plugin);
+    
+                ConfigurationSection giveSection = section.getConfigurationSection("give");
+                String vanillaMaterial = giveSection != null && giveSection.contains("vanilla.material")
+                        ? giveSection.getString("vanilla.material")
+                        : null;
+                int vanillaAmount = giveSection != null && giveSection.contains("vanilla.amount")
+                        ? giveSection.getInt("vanilla.amount", 1)
+                        : 1;
+    
+                String command = giveSection != null ? giveSection.getString("command") : null;
+    
+                return new BuyButton(icon, currency, cost, vanillaMaterial, vanillaAmount, command, economyManager, plugin);
     
             default:
                 plugin.getLogger().warning("Unknown button type: " + type);
@@ -216,9 +223,7 @@ public class MenuManager {
         }
     }
 
-    
 
-    
 
 
 }

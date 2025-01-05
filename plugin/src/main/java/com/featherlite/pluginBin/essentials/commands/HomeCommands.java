@@ -3,7 +3,7 @@ package com.featherlite.pluginBin.essentials.commands;
 import com.featherlite.pluginBin.essentials.teleportation.HomeManager;
 import com.featherlite.pluginBin.essentials.teleportation.TeleportationManager;
 
-import org.bukkit.ChatColor;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -23,7 +23,7 @@ public class HomeCommands implements TabCompleter {
         this.teleportationManager = teleportationManager;
     }
 
-    public boolean handleHomeCommands(CommandSender sender, Command command, String label, String[] args) {
+    public boolean handleHomeCommands(CommandSender sender, Command command, String label, String[] args, boolean isPlayer) {
         if (!(sender instanceof Player)) {
             sender.sendMessage(ChatColor.RED + "Only players can use home commands.");
             return true;

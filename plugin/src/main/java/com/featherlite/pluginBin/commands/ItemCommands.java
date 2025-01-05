@@ -3,6 +3,9 @@ package com.featherlite.pluginBin.commands;
 import com.featherlite.pluginBin.items.ItemManager;
 import com.featherlite.pluginBin.items.UIManager;
 
+import net.md_5.bungee.api.ChatColor;
+
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -17,29 +20,29 @@ public class ItemCommands {
         this.plugin = plugin;
     }
 
-    public boolean handleItemCommands(Player sender, String[] args) {
-        if (!(sender instanceof Player)) {
-            sender.sendMessage("This command can only be used by players.");
-            return true;
-        }
+    public boolean handleItemCommands(CommandSender sender, String[] args, boolean isPlayer, JavaPlugin plugin) {
 
-        Player player = (Player) sender;
+        Player player = (isPlayer ? (Player) sender : null);
 
-        if (!player.hasPermission("feathercore.itemui")) {
-            player.sendMessage("You do not have permission to use this command.");
+        if (player != null && !player.hasPermission("feathercore.itemui")) {
+            sender.sendMessage("You do not have permission to use this command.");
             return true;
         }
 
         if (args.length > 0 && args[0].equalsIgnoreCase("reload")) {
-            if (player.hasPermission("feathercore.itemui.reload")) {  // Separate permission for reloading
-                itemManager.reloadItems(sender, uiManager);
-                player.sendMessage("Items have been reloaded from the configuration.");
+            if (player != null && player.hasPermission("feathercore.itemui.reload")) {  // Separate permission for reloading
+                itemManager.reloadItems(uiManager);
+                sender.sendMessage("Items have been reloaded from the configuration.");
             } else {
-                player.sendMessage("You do not have permission to reload items.");
+                sender.sendMessage("You do not have permission to reload items.");
             }
         } else {
             // Open the Item UI if no arguments are provided
-            uiManager.openItemUI(player);
+            if (isPlayer) {
+                uiManager.openItemUI(player);
+            } else {
+                sender.sendMessage(ChatColor.RED + "Only players can open the /items menu!");
+            }
         }
         return true;
     }

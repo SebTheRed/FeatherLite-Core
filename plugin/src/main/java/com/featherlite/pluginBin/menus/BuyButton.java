@@ -2,25 +2,28 @@ package com.featherlite.pluginBin.menus;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.block.data.type.Cocoa;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
-
 import com.featherlite.pluginBin.economy.EconomyManager;
 
+
 public class BuyButton implements MenuButton {
-    private final ItemStack icon; // Icon displayed in the inventory
-    private final String currency; // e.g., "GOLD_INGOT" or "eco"
+    private final ItemStack icon;
+    private final String currency;
     private final double cost;
-    private final String command; // Command to execute
+    private final String vanillaMaterial;
+    private final int vanillaAmount;
+    private final String command;
     private final EconomyManager economyManager;
     private final JavaPlugin plugin;
 
-    public BuyButton(ItemStack icon, String currency, double cost, String command, EconomyManager economyManager, JavaPlugin plugin) {
+    public BuyButton(ItemStack icon, String currency, double cost, String vanillaMaterial, int vanillaAmount, String command, EconomyManager economyManager, JavaPlugin plugin) {
         this.icon = icon;
         this.currency = currency;
         this.cost = cost;
+        this.vanillaMaterial = vanillaMaterial;
+        this.vanillaAmount = vanillaAmount;
         this.command = command;
         this.economyManager = economyManager;
         this.plugin = plugin;
@@ -28,7 +31,7 @@ public class BuyButton implements MenuButton {
 
     @Override
     public ItemStack getIcon() {
-        return icon; // Return the icon for visual representation
+        return icon;
     }
 
     @Override
@@ -38,11 +41,26 @@ public class BuyButton implements MenuButton {
             return;
         }
 
-        // Execute the command
-        String parsedCommand = command.replace("<player>", player.getName());
-        plugin.getLogger().info("Executing command as console: " + parsedCommand);
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), parsedCommand);
-        player.sendMessage("§aPurchase successful!");
+        // Execute Vanilla Item Giving
+        if (vanillaMaterial != null) {
+            Material material;
+            try {
+                material = Material.valueOf(vanillaMaterial.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                player.sendMessage("§cInvalid material type: " + vanillaMaterial);
+                return;
+            }
+            ItemStack item = new ItemStack(material, vanillaAmount);
+            player.getInventory().addItem(item);
+            player.sendMessage("§aPurchase successful! You received " + vanillaAmount + " " + material.name().toLowerCase() + "!");
+        }
+
+        // Execute Command
+        if (command != null && !command.isEmpty()) {
+            String parsedCommand = command.replace("<player>", player.getName());
+            plugin.getLogger().info("Executing command as console: " + parsedCommand);
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), parsedCommand);
+        }
 
         // Deduct the cost
         deductCurrency(player);
@@ -59,7 +77,6 @@ public class BuyButton implements MenuButton {
                 player.sendMessage("§cInvalid currency type: " + currency);
                 return false;
             }
-
             return countItems(player, currencyMaterial) >= cost;
         }
     }
@@ -102,5 +119,4 @@ public class BuyButton implements MenuButton {
             }
         }
     }
-    
 }

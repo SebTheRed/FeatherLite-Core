@@ -2,7 +2,7 @@ package com.featherlite.pluginBin.essentials.commands;
 
 import com.featherlite.pluginBin.essentials.messaging.MessagingManager;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
@@ -20,7 +20,13 @@ public class MessagingCommands implements TabCompleter {
         this.messagingManager = messagingManager;
     }
 
-    public boolean handleMessagingCommands(CommandSender sender, Command command, String label, String[] args) {
+    public boolean handleMessagingCommands(CommandSender sender, Command command, String label, String[] args, boolean isPlayer) {
+
+        if (label.toLowerCase() == "broadcast") {
+            handleBroadcast(sender, args);
+            return true;
+        }
+
         if (!(sender instanceof Player)) {
             sender.sendMessage(ChatColor.RED + "Only players can use messaging commands.");
             return true;
@@ -33,8 +39,6 @@ public class MessagingCommands implements TabCompleter {
                 return handleMsg(player, args);
             case "r":
                 return handleReply(player, args);
-            case "broadcast":
-                return handleBroadcast(player, args);
             case "msgtoggle":
                 return handleMsgToggle(player);
             case "ignore":
@@ -91,19 +95,19 @@ public class MessagingCommands implements TabCompleter {
         return handleMsg(player, new String[]{target.getName(), String.join(" ", args)});
     }
 
-    private boolean handleBroadcast(Player player, String[] args) {
-        if (!player.hasPermission("core.messaging.broadcast")) {
-            player.sendMessage(ChatColor.RED + "You do not have permission to broadcast messages.");
+    private boolean handleBroadcast(CommandSender sender, String[] args) {
+        if ((sender instanceof Player) && !sender.hasPermission("core.messaging.broadcast")) {
+            sender.sendMessage(ChatColor.RED + "You do not have permission to broadcast messages.");
             return true;
         }
 
         if (args.length < 1) {
-            player.sendMessage(ChatColor.RED + "Usage: /broadcast <message>");
+            sender.sendMessage(ChatColor.RED + "Usage: /broadcast <message>");
             return true;
         }
 
         String message = String.join(" ", args);
-        Bukkit.broadcastMessage(ChatColor.GOLD + "[Broadcast] " + player.getName() + ": " + ChatColor.WHITE + message);
+        Bukkit.broadcastMessage(ChatColor.GOLD + "[Broadcast] " + ChatColor.YELLOW + message);
         return true;
     }
 

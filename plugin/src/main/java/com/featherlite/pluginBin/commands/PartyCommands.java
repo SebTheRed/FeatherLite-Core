@@ -6,6 +6,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,7 +21,11 @@ public class PartyCommands implements TabCompleter {
         this.partyManager = partyManager;
     }
 
-    public boolean handlePartyCommands(Player player, String[] args) {
+    public boolean handlePartyCommands(CommandSender sender, String[] args, boolean isPlayer, JavaPlugin plugin) {
+        Player player = null;
+        if (isPlayer) {
+            player = (Player) sender;
+        }
         if (args.length < 1) {
             player.sendMessage("Usage: /party <create|invite|accept|deny|leave|disband|list>");
             return true;
@@ -28,9 +33,11 @@ public class PartyCommands implements TabCompleter {
 
         switch (args[0].toLowerCase()) {
             case "create":
+                if (player == null) return true;
                 partyManager.handleCreateParty(player);
                 break;
             case "invite":
+                if (player == null) return true;
                 if (args.length < 2) {
                     player.sendMessage("Usage: /party invite <player>");
                     return true;
@@ -38,16 +45,31 @@ public class PartyCommands implements TabCompleter {
                 partyManager.handleInvitePlayer(player, args[1]);
                 break;
             case "accept":
+                if (player == null) return true;
                 partyManager.handleAcceptInvite(player);
                 break;
             case "deny":
+                if (player == null) return true;
                 partyManager.handleDenyInvite(player);
                 break;
             case "leave":
+                if (player == null) return true;
                 partyManager.handleLeaveParty(player);
                 break;
             case "disband":
-                partyManager.handleDisbandParty(player);
+                if (player == null) {
+                    if (args.length < 2) { // If no player name is provided
+                        plugin.getLogger().warning("You must add <player_name> to the end of /party disband <player_name>");
+                        return true; // Stop execution to avoid errors
+                    }
+                    player = Bukkit.getPlayer(args[1]);
+                    if (player == null) {
+                        plugin.getLogger().warning("Player " + args[1] + " is not online or doesn't exist.");
+                        return true; // Stop execution
+                    }
+                } else {
+                    partyManager.handleDisbandParty(player);
+                }
                 break;
             case "list":
                 partyManager.handleListPartyMembers(player);

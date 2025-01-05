@@ -77,7 +77,7 @@ public class ItemManager {
         return loreTemplates.getOrDefault(key, "§7{key}: {value}"); // Default format if not found
     }
 
-    public void reloadItems(Player player, UIManager uiManager) {
+    public void reloadItems(UIManager uiManager) {
         categorizedItems.clear();
         categoryIcons.clear();
         loadLoreTemplates();

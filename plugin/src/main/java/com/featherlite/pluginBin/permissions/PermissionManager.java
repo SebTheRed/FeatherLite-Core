@@ -1,6 +1,8 @@
 package com.featherlite.pluginBin.permissions;
 
 import org.bukkit.Bukkit;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachment;
@@ -28,7 +30,7 @@ public class PermissionManager {
     }
 
     // Add a player to a group
-    public void addPlayerToGroup(String playerName, String groupName, Player sender) {
+    public void addPlayerToGroup(String playerName, String groupName, CommandSender sender) {
         Player target = Bukkit.getPlayer(playerName);
         if (target == null) {
             target.sendMessage("Player not found.");
@@ -51,7 +53,7 @@ public class PermissionManager {
     }
 
     // Remove a player from a group
-    public void removePlayerFromGroup(String playerName, String groupName, Player sender) {
+    public void removePlayerFromGroup(String playerName, String groupName, CommandSender sender) {
         Player target = Bukkit.getPlayer(playerName);
         if (target == null) {
             sender.sendMessage("Player not found.");
@@ -138,7 +140,7 @@ public class PermissionManager {
     }
 
     // Set a specific permission for a player
-    public void setPlayerPermission(String playerName, String permission, boolean value, Player sender) {
+    public void setPlayerPermission(String playerName, String permission, boolean value, CommandSender sender) {
         Player target = Bukkit.getPlayer(playerName);
         if (target == null) {
             sender.sendMessage("Player not found.");

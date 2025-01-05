@@ -2,7 +2,7 @@ package com.featherlite.pluginBin.commands;
 
 import com.featherlite.pluginBin.economy.EconomyManager;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -22,12 +22,12 @@ public class EconomyCommands implements TabCompleter {
         this.economyManager = economyManager;
     }
 
-    public boolean handleEconomyCommands(String label, CommandSender sender, String[] args) {
-        if (label.equalsIgnoreCase("bal")) {
+    public boolean handleEconomyCommands(String label, CommandSender sender, String[] args, boolean isPlayer) {
+        if (isPlayer && label.equalsIgnoreCase("bal")) {
             return handleBalCommand(sender);
             
         }
-        if (label.equalsIgnoreCase("baltop")) {
+        if (isPlayer && label.equalsIgnoreCase("baltop")) {
             return handleBaltopCommand(sender, args);
         }
         if (args.length < 1) {
@@ -37,6 +37,7 @@ public class EconomyCommands implements TabCompleter {
 
         switch (args[0].toLowerCase()) {
             case "bal":
+                if (!isPlayer) {sender.sendMessage(ChatColor.RED + "Only players can enter the command /eco bal."); return true;}
                 return handleBalCommand(sender);
             case "baltop":
                 return handleBaltopCommand(sender, args);

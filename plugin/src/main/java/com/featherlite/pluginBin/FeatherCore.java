@@ -52,6 +52,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -476,37 +477,38 @@ public class FeatherCore extends JavaPlugin {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (sender instanceof Player) {
-            Player player = (Player) sender;
+        if (sender instanceof Player || sender instanceof ConsoleCommandSender) {
+            // Player player = (Player) sender;
+            boolean isPlayer = sender instanceof Player;
             
             switch (command.getName().toLowerCase()) {
                 case "party":
-                    return partyCommands.handlePartyCommands(player, args);
+                    return partyCommands.handlePartyCommands(sender, args, isPlayer, this);
                 case "app":
-                    return appCommands.handleAppCommands(player, args);
+                    return appCommands.handleAppCommands(sender, args, isPlayer, this);
                 case "game":
                 case "games":
-                    return gameCommands.handleGameCommands(player, args);
+                    return gameCommands.handleGameCommands(sender, args, isPlayer, this);
                 case "world":
-                    return worldCommands.handleWorldCommands(player, args);
+                    return worldCommands.handleWorldCommands(sender, args, isPlayer, this);
                 case "perms":
-                    return permissionCommands.handlePermissionsCommands(player, args);
+                    return permissionCommands.handlePermissionsCommands(sender, args, isPlayer);
                 case "items":
-                    return itemCommands.handleItemCommands(player, args);
+                    return itemCommands.handleItemCommands(sender, args, isPlayer, this);
                 case "zone":
-                    return zoneCommands.handleZoneCommands(player, args);
+                    return zoneCommands.handleZoneCommands(sender, args, isPlayer);
                 case "board":
-                    return scoreboardCommands.handleScoreboardCommands(player, args);
+                    return scoreboardCommands.handleScoreboardCommands(sender, args, isPlayer);
                 case "inv":
                 case "inventory":
-                    return inventoryCommands.handleInventoryCommands(player, args);
+                    return inventoryCommands.handleInventoryCommands(sender, args, isPlayer);
                 case "menu":
                 case "menus":
-                    return menuCommands.handleMenuCommands(player, command, label, args);
+                    return menuCommands.handleMenuCommands(sender, command, label, args, isPlayer);
                 case "eco":
                 case "bal":
                 case "baltop":
-                    return economyCommands.handleEconomyCommands(label, player, args);
+                    return economyCommands.handleEconomyCommands(label, sender, args, isPlayer);
 
                 // Essetials cases
                 case "tppos":
@@ -522,12 +524,12 @@ public class FeatherCore extends JavaPlugin {
                 case "tpr":
                 case "spawn":
                 case "setspawn":
-                    return teleportationCommands.handleTeleportCommands(player, command, label, args);
+                    return teleportationCommands.handleTeleportCommands(sender, command, label, args, isPlayer);
                 case "home":
                 case "sethome":
                 case "delhome":
                 case "homes":
-                    return homeCommands.handleHomeCommands(player, command, label, args);
+                    return homeCommands.handleHomeCommands(sender, command, label, args, isPlayer);
                 case "msg":
                 case "message":
                 case "dm":
@@ -538,7 +540,7 @@ public class FeatherCore extends JavaPlugin {
                 case "msgtoggle":
                 case "dmtoggle":
                 case "ignore":
-                    return messagingCommands.handleMessagingCommands(sender, command, label, args);
+                    return messagingCommands.handleMessagingCommands(sender, command, label, args, isPlayer);
                 case "enchant":
                 case "exp":
                 case "give":
@@ -549,7 +551,7 @@ public class FeatherCore extends JavaPlugin {
                 case "weather":
                 case "time":
                 case "god":
-                    return adminCommands.handleAdminCommands(sender, command, label, args);
+                    return adminCommands.handleAdminCommands(sender, command, label, args, isPlayer); // STOPPED HERE - NEEDS LOVE
                 case "fly":
                 case "speed":
                 case "flyspeed":
@@ -585,7 +587,7 @@ public class FeatherCore extends JavaPlugin {
                 case "stonecutter":
                 case "ptime":
                 case "pweather":
-                    return utilCommands.handleUtilCommands(sender, command, label, args);
+                    return utilCommands.handleUtilCommands(sender, command, label, args, isPlayer);
                     
             }
         }

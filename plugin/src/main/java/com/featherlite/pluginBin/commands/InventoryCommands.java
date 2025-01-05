@@ -2,8 +2,6 @@ package com.featherlite.pluginBin.commands;
 
 import com.featherlite.pluginBin.utils.InventoryManager;
 import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -14,7 +12,7 @@ public class InventoryCommands {
         this.inventoryManager = inventoryManager;
     }
 
-    public boolean handleInventoryCommands(Player sender, String[] args) {
+    public boolean handleInventoryCommands(CommandSender sender, String[] args, boolean isPlayer) {
 
         if (args.length == 0) {
             sender.sendMessage("§cUsage: /restoreinventory <player>");

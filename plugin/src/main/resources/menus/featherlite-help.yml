@@ -28,13 +28,28 @@ menu:
           type: buy-button
           icon:
             material: DIAMOND
-            amount: 2
-          displayName: "&6Buy 2 Diamonds"
+            amount: 1
+          displayName: "&6Buy a Diamond"
           lore:
             - "&7Costs 10 Gold Ingots"
-          currency: "GOLD_INGOT" # Alternative to "eco"
+          currency: "GOLD_INGOT"
           cost: 10
-          command: "give <player> minecraft:diamond 2"
+          give:
+            vanilla:
+              material: "DIAMOND"
+              amount: 2
+        3:
+          type: buy-button
+          icon:
+            material: OBSIDIAN
+            amount: 1
+          displayName: "&6Buy a world warp to world_nether"
+          lore:
+            - "&7Costs 10 Gold Ingots"
+          currency: "GOLD_INGOT"
+          cost: 10
+          give:
+            command: "world tp world_nether <player>"
     settings:
       title: "&aFeatherLite Settings Menu" # The title of the inventory
       items:

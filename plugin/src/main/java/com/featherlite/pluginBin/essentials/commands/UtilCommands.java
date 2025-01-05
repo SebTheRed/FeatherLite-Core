@@ -22,7 +22,7 @@ public class UtilCommands implements TabCompleter {
         this.playerDataManager = playerDataManager;
     }
 
-    public boolean handleUtilCommands(CommandSender sender, Command command, String label, String[] args) {
+    public boolean handleUtilCommands(CommandSender sender, Command command, String label, String[] args, boolean isPlayer) {
         if (!(sender instanceof Player)) {
             sender.sendMessage("Only players can use utility commands.");
             return true;

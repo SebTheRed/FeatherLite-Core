@@ -10,6 +10,7 @@ import com.featherlite.pluginBin.lobbies.GamesUI;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.command.Command;
 
 import java.util.*;
@@ -29,42 +30,64 @@ public class GameCommands implements TabCompleter {
         this.teamSelectorBook = teamSelectorBook;
     }
 
-    public boolean handleGameCommands(Player player, String[] args) {
-        if (args.length < 1) {
-            // Default to opening the Games UI
-            gamesUI.openMainMenu(player);
-            return true;
+    public boolean handleGameCommands(CommandSender sender, String[] args, boolean isPlayer, JavaPlugin plugin) {
+        if (!isPlayer) {
+            if (args.length < 1 || !args[0].equalsIgnoreCase("create") && !args[0].equalsIgnoreCase("close")) {
+                plugin.getLogger().warning("The /game command can only be used by players for most subcommands.");
+                return true;
+            }
         }
-
+    
         switch (args[0].toLowerCase()) {
             case "ui":
             case "menu":
-                gamesUI.openMainMenu(player);
+                if (isPlayer) {
+                    gamesUI.openMainMenu((Player) sender);
+                } else {
+                    plugin.getLogger().warning("The /game menu command can only be used by players.");
+                }
                 return true;
-
+    
             case "join":
-                handleJoinCommand(player, args);
+                if (isPlayer) {
+                    handleJoinCommand((Player) sender, args);
+                } else {
+                    plugin.getLogger().warning("The /game join command can only be used by players.");
+                }
                 return true;
-
+    
             case "create":
-                handleCreateCommand(player, args);
+                handleCreateCommand(sender, args);
                 return true;
-
+    
             case "delete":
-                handleDeleteCommand(player, args);
+                if (isPlayer) {
+                    handleDeleteCommand((Player) sender, args);
+                } else {
+                    plugin.getLogger().warning("The /game delete command can only be used by players.");
+                }
                 return true;
-
+    
             case "leave":
-                instanceManager.handlePlayerLeave(player);
-                player.sendMessage("You left the game.");
+                if (isPlayer) {
+                    Player player = (Player) sender;
+                    instanceManager.handlePlayerLeave(player);
+                    player.sendMessage("You left the game.");
+                } else {
+                    plugin.getLogger().warning("The /game leave command can only be used by players.");
+                }
                 return true;
-
+    
             case "close":
-                handleCloseCommand(player, args);
+                handleCloseCommand(sender, args);
                 return true;
-
+    
             default:
-                player.sendMessage("Unknown command. Use /game <ui|menu|join|leave|create|delete|close>");
+                if (isPlayer) {
+                    ((Player) sender).sendMessage("Unknown command. Use /game <ui|menu|join|leave|create|delete|close>");
+                } else {
+                    plugin.getLogger().warning("Unknown /game subcommand.");
+                }
                 return true;
         }
     }
@@ -89,45 +112,49 @@ public class GameCommands implements TabCompleter {
         }
     }
 
-    private void handleCreateCommand(Player player, String[] args) {
-        if (!player.hasPermission("games.create")) {
-            player.sendMessage("You do not have permission to create games.");
-            return;
-        }
-
-        if (args.length < 4) {
-            player.sendMessage("Usage: /game create <public|false> \"<game-name>\"  <world>");
-            return;
-        }
-
-        // Extract quoted game name
-        String gameName = extractQuotedArgument(args, 1);
-        if (gameName == null) {
-            player.sendMessage("Please provide the game name in quotes (e.g., \"Four Team Bedwars - Quads\").");
-            return;
-        }
-
-        // Get world name
-        String worldName = args[args.length - 1];
-        if (worldName.isEmpty()) {
-            player.sendMessage("You must specify a valid world name.");
-            return;
-        }
-
-        // Start the game instance
-        try {
-            GameInstance newGame = gamesManager.startGameInstance(gameName, worldName, true, instanceManager);
-            if (newGame == null) {
-                player.sendMessage("Failed to create game instance. Please check the game name and world.");
-            } else {
-                player.sendMessage("Game instance created successfully with ID: " + newGame.getInstanceId());
+    private void handleCreateCommand(CommandSender sender, String[] args) {
+        if (sender instanceof Player) {
+            Player player = (Player) sender;
+            if (!player.hasPermission("games.create")) {
+                player.sendMessage("You do not have permission to create games.");
+                return;
             }
-        } catch (IllegalArgumentException e) {
-            player.sendMessage("Invalid game name or world. Please check your input and try again.");
-        } catch (Exception e) {
-            player.sendMessage("An error occurred while creating the game instance. Check the server logs.");
-            e.printStackTrace();
+    
+            if (args.length < 4) {
+                player.sendMessage("Usage: /game create <public|false> \"<game-name>\"  <world>");
+                return;
+            }
+    
+            // Extract quoted game name
+            String gameName = extractQuotedArgument(args, 1);
+            if (gameName == null) {
+                player.sendMessage("Please provide the game name in quotes (e.g., \"Four Team Bedwars - Quads\").");
+                return;
+            }
+    
+            // Get world name
+            String worldName = args[args.length - 1];
+            if (worldName.isEmpty()) {
+                player.sendMessage("You must specify a valid world name.");
+                return;
+            }
+    
+            // Start the game instance
+            try {
+                GameInstance newGame = gamesManager.startGameInstance(gameName, worldName, true, instanceManager);
+                if (newGame == null) {
+                    player.sendMessage("Failed to create game instance. Please check the game name and world.");
+                } else {
+                    player.sendMessage("Game instance created successfully with ID: " + newGame.getInstanceId());
+                }
+            } catch (IllegalArgumentException e) {
+                player.sendMessage("Invalid game name or world. Please check your input and try again.");
+            } catch (Exception e) {
+                player.sendMessage("An error occurred while creating the game instance. Check the server logs.");
+                e.printStackTrace();
+            }
         }
+        
     }
 
     private void handleDeleteCommand(Player player, String[] args) {
@@ -145,9 +172,9 @@ public class GameCommands implements TabCompleter {
         }
     }
 
-    private void handleCloseCommand(Player player, String[] args) {
+    private void handleCloseCommand(CommandSender sender, String[] args) {
         if (args.length < 3) {
-            player.sendMessage("Usage: /game close <instanceID> <lobbyName>");
+            sender.sendMessage("Usage: /game close <instanceID> <lobbyName>");
             return;
         }
 
@@ -155,9 +182,9 @@ public class GameCommands implements TabCompleter {
             UUID instanceId = UUID.fromString(args[1]);
             String lobbyName = args[2];
             instanceManager.closeInstance(instanceId);
-            player.sendMessage("Game instance closed successfully and players teleported to " + lobbyName + "!");
+            sender.sendMessage("Game instance closed successfully and players teleported to " + lobbyName + "!");
         } catch (IllegalArgumentException e) {
-            player.sendMessage("Invalid instance ID or lobby name.");
+            sender.sendMessage("Invalid instance ID or lobby name.");
         }
     }
 

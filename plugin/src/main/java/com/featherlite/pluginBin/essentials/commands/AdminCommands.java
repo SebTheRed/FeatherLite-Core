@@ -14,7 +14,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
-import org.bukkit.ChatColor;
+import net.md_5.bungee.api.ChatColor;
 
 public class AdminCommands implements TabCompleter {
     private final AdminManager adminManager;
@@ -23,26 +23,22 @@ public class AdminCommands implements TabCompleter {
         this.adminManager = adminManager;
     }
 
-    public boolean handleAdminCommands(CommandSender sender, Command command, String label, String[] args) {
-        if (!(sender instanceof Player)) {
-            sender.sendMessage("Only players can use admin commands.");
-            return true;
-        }
+    public boolean handleAdminCommands(CommandSender sender, Command command, String label, String[] args, boolean isPlayer) {
 
-        Player player = (Player) sender;
+        Player player = (isPlayer ? (Player) sender : null);
 
         switch (label.toLowerCase()) {
 
             case "enchant":
                 if (args.length < 2) {
-                    player.sendMessage("Usage: /enchant <enchantment> <level>");
+                    sender.sendMessage("Usage: /enchant <enchantment> <level>");
                     return true;
                 }
                 return adminManager.enchantItem(player, args[0], Integer.parseInt(args[1]));
 
             case "exp":
                 if (args.length < 2) {
-                    player.sendMessage("Usage: /exp <give|set|view> <amount>");
+                    sender.sendMessage("Usage: /exp <give|set|view> <amount>");
                     return true;
                 }
                 handleExpCommand(player, args);
@@ -50,33 +46,33 @@ public class AdminCommands implements TabCompleter {
 
             case "give":
                 if (args.length < 2) {
-                    player.sendMessage("Usage: /give <player> <item> [amount]");
+                    sender.sendMessage("Usage: /give <player> <item> [amount]");
                     return true;
                 }
                 return handleGiveCommand(player, args);
 
             case "kill":
                 if (args.length < 1) {
-                    player.sendMessage("Usage: /kill <player>");
+                    sender.sendMessage("Usage: /kill <player>");
                     return true;
                 }
                 Player target = Bukkit.getPlayer(args[0]);
                 if (target == null) {
-                    player.sendMessage("Player not found.");
+                    sender.sendMessage("Player not found.");
                     return true;
                 }
                 adminManager.killPlayer(target);
-                player.sendMessage("Killed " + target.getName());
+                sender.sendMessage("Killed " + target.getName());
                 return true;
 
             case "sudo":
                 if (args.length < 2) {
-                    player.sendMessage("Usage: /sudo <player> <command>");
+                    sender.sendMessage("Usage: /sudo <player> <command>");
                     return true;
                 }
                 Player sudoTarget = Bukkit.getPlayer(args[0]);
                 if (sudoTarget == null) {
-                    player.sendMessage("Player not found.");
+                    sender.sendMessage("Player not found.");
                     return true;
                 }
                 String commandToRun = String.join(" ", args).substring(args[0].length() + 1);
@@ -85,11 +81,11 @@ public class AdminCommands implements TabCompleter {
 
             case "weather":
                 if (args.length < 1) {
-                    player.sendMessage("Usage: /weather <clear|rain|thunder>");
+                    sender.sendMessage("Usage: /weather <clear|rain|thunder>");
                     return true;
                 }
                 adminManager.setWeather(player.getWorld(), args[0]);
-                player.sendMessage("Weather updated to " + args[0]);
+                sender.sendMessage("Weather updated to " + args[0]);
                 return true;
 
             case "god":
@@ -101,7 +97,7 @@ public class AdminCommands implements TabCompleter {
                 
             case "time":
                 if (args.length < 2) {
-                    player.sendMessage(ChatColor.RED + "Usage: /time <set|add> <value>");
+                    sender.sendMessage(ChatColor.RED + "Usage: /time <set|add> <value>");
                     return true;
                 }
             
@@ -112,7 +108,7 @@ public class AdminCommands implements TabCompleter {
                     switch (action) {
                         case "set":
                             adminManager.setTime(player.getWorld(), value);
-                            player.sendMessage(ChatColor.GREEN + "Time set to " + value + ".");
+                            sender.sendMessage(ChatColor.GREEN + "Time set to " + value + ".");
                             break;
             
                         case "add":
@@ -120,28 +116,28 @@ public class AdminCommands implements TabCompleter {
                             long additionalTicks = Long.parseLong(value);
                             long newTime = (player.getWorld().getTime() + additionalTicks) % 24000;
                             adminManager.setTime(player.getWorld(), String.valueOf(newTime));
-                            player.sendMessage(ChatColor.GREEN + "Added " + additionalTicks + " ticks. Current time: " + newTime);
+                            sender.sendMessage(ChatColor.GREEN + "Added " + additionalTicks + " ticks. Current time: " + newTime);
                             break;
             
                         default:
-                            player.sendMessage(ChatColor.RED + "Invalid action. Use 'set' or 'add'.");
+                            sender.sendMessage(ChatColor.RED + "Invalid action. Use 'set' or 'add'.");
                             break;
                     }
                 } catch (IllegalArgumentException e) {
-                    player.sendMessage(ChatColor.RED + e.getMessage());
+                    sender.sendMessage(ChatColor.RED + e.getMessage());
                 }
             
                 return true;
             
             case "killall":
             case "remove":
-                if (!player.hasPermission("core.killall")) {
-                    player.sendMessage(ChatColor.RED + "You don't have permission to use this command.");
+                if (player != null && !player.hasPermission("core.killall")) {
+                    sender.sendMessage(ChatColor.RED + "You don't have permission to use this command.");
                     return true;
                 }
             
                 if (args.length < 1) {
-                    player.sendMessage(ChatColor.RED + "Usage: /killall <monsters|entities|boats|minecarts|players|drops|arrows|mobs> [radius|world]");
+                    sender.sendMessage(ChatColor.RED + "Usage: /killall <monsters|entities|boats|minecarts|players|drops|arrows|mobs> [radius|world]");
                     return true;
                 }
             
@@ -151,7 +147,7 @@ public class AdminCommands implements TabCompleter {
                 adminManager.killAll(player, targetType, scope);
                 return true;
             default:
-                player.sendMessage("Unknown admin command.");
+                sender.sendMessage("Unknown admin command.");
                 return true;
         }
     }

@@ -23,7 +23,7 @@ public class MenuCommands implements TabCompleter {
         this.plugin = plugin;
     }
 
-    public boolean handleMenuCommands(CommandSender sender, Command command, String label, String[] args) {
+    public boolean handleMenuCommands(CommandSender sender, Command command, String label, String[] args, boolean isPlayer) {
         if (!(sender instanceof Player)) {
             sender.sendMessage("§cOnly players can use this command.");
             return true;

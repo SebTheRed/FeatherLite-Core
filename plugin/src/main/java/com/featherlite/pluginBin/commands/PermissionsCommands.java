@@ -20,13 +20,9 @@ public class PermissionsCommands implements TabCompleter {
         this.permissionManager = permissionManager;
     }
 
-    public boolean handlePermissionsCommands(CommandSender sender, String[] args) {
-        if (!(sender instanceof Player)) {
-            sender.sendMessage("This command can only be run by a player.");
-            return true;
-        }
+    public boolean handlePermissionsCommands(CommandSender sender, String[] args, boolean isPlayer) {
 
-        Player player = (Player) sender;
+        Player player = (isPlayer ? (Player) sender : null);
 
         if (args.length < 1) {
             player.sendMessage("Usage: /permissions <reload|addgroup|removegroup|setperm|me>");
@@ -35,25 +31,27 @@ public class PermissionsCommands implements TabCompleter {
 
         switch (args[0].toLowerCase()) {
             case "showall":
-                if (player.hasPermission("feathercore.permissions.showall")) {
+                if (isPlayer && player.hasPermission("feathercore.permissions.showall")) {
                     permissionManager.showAllServerPermissions(player);
+                } else {
+                    sender.sendMessage("You do not have permission to check your permissions.");
                 }
             case "reload":
-                if (player.hasPermission("feathercore.permissions.reload")) {
+                if (player != null && player.hasPermission("feathercore.permissions.reload")) {
                     permissionManager.reloadConfig();
-                    player.sendMessage("Permissions configuration reloaded.");
+                    sender.sendMessage("Permissions configuration reloaded.");
                 } else {
-                    player.sendMessage("You do not have permission to reload the configuration.");
+                    sender.sendMessage("You do not have permission to reload the configuration.");
                 }
                 break;
 
             case "addgroup":
                 if (args.length < 3) {
-                    player.sendMessage("Usage: /permissions addgroup <playerName> <groupName>");
+                    sender.sendMessage("Usage: /permissions addgroup <playerName> <groupName>");
                     return true;
                 }
-                if (player.hasPermission("feathercore.permissions.manage.groups")) {
-                    permissionManager.addPlayerToGroup(args[1], args[2], player);
+                if (player != null && player.hasPermission("feathercore.permissions.manage.groups")) {
+                    permissionManager.addPlayerToGroup(args[1], args[2], sender);
                 } else {
                     player.sendMessage("You do not have permission to manage groups.");
                 }
@@ -64,8 +62,8 @@ public class PermissionsCommands implements TabCompleter {
                     player.sendMessage("Usage: /permissions removegroup <playerName> <groupName>");
                     return true;
                 }
-                if (player.hasPermission("feathercore.permissions.manage.groups")) {
-                    permissionManager.removePlayerFromGroup(args[1], args[2], player);
+                if (player != null && player.hasPermission("feathercore.permissions.manage.groups")) {
+                    permissionManager.removePlayerFromGroup(args[1], args[2], sender);
                 } else {
                     player.sendMessage("You do not have permission to manage groups.");
                 }
@@ -76,38 +74,42 @@ public class PermissionsCommands implements TabCompleter {
                     player.sendMessage("Usage: /permissions setperm <playerName> <permission> <true|false>");
                     return true;
                 }
-                if (player.hasPermission("feathercore.permissions.manage.permissions")) {
+                if (player != null && player.hasPermission("feathercore.permissions.manage.permissions")) {
                     boolean value = Boolean.parseBoolean(args[3]);
-                    permissionManager.setPlayerPermission(args[1], args[2], value, player);
+                    permissionManager.setPlayerPermission(args[1], args[2], value, sender);
                 } else {
                     player.sendMessage("You do not have permission to manage individual permissions.");
                 }
                 break;
 
             case "my":
-                if (player.hasPermission("feathercore.permissions.view")) {
-                    if (args[1].equalsIgnoreCase("groups") || args[1].equalsIgnoreCase("group")) {
-                        List<String> activeGroups = permissionManager.getPlayerGroups(player);
-                        player.sendMessage("Your active groups:");
-                        for (String group : activeGroups) {
-                            player.sendMessage("- " + group);
+                if (isPlayer) {
+                    if (player.hasPermission("feathercore.permissions.view")) {
+                        if (args[1].equalsIgnoreCase("groups") || args[1].equalsIgnoreCase("group")) {
+                            List<String> activeGroups = permissionManager.getPlayerGroups(player);
+                            player.sendMessage("Your active groups:");
+                            for (String group : activeGroups) {
+                                player.sendMessage("- " + group);
+                            }
+                        } 
+                        if (args[1].equalsIgnoreCase("permissions") || args[1].equalsIgnoreCase("perms")) {
+                            List<String> activePermissions = permissionManager.getPlayerEffectivePermissions(player);
+                            player.sendMessage("Your active permissions:");
+                            for (String perm : activePermissions) {
+                                player.sendMessage("- " + perm);
+                            }
                         }
-                    } 
-                    if (args[1].equalsIgnoreCase("permissions") || args[1].equalsIgnoreCase("perms")) {
-                        List<String> activePermissions = permissionManager.getPlayerEffectivePermissions(player);
-                        player.sendMessage("Your active permissions:");
-                        for (String perm : activePermissions) {
-                            player.sendMessage("- " + perm);
-                        }
-                    }
 
+                    } else {
+                        player.sendMessage("You do not have permission to view your active permissions.");
+                    }
                 } else {
-                    player.sendMessage("You do not have permission to view your active permissions.");
+                    sender.sendMessage("Only players can check their perms.");
                 }
                 break;
 
             default:
-                player.sendMessage("Unknown command. Use /perms <reload | addgroup | removegroup | setperm | my>");
+                sender.sendMessage("Unknown command. Use /perms <reload | addgroup | removegroup | setperm | my>");
         }
         return true;
     }
@@ -116,7 +118,6 @@ public class PermissionsCommands implements TabCompleter {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (!(sender instanceof Player)) return Collections.emptyList();
-        Player player = (Player) sender;
 
         if (args.length == 1) {
             return Arrays.asList("reload", "addgroup", "removegroup", "setperm", "my");

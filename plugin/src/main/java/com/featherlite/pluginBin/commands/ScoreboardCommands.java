@@ -1,6 +1,9 @@
 package com.featherlite.pluginBin.commands;
 
 import com.featherlite.pluginBin.scoreboards.ScoreboardManager;
+
+import net.md_5.bungee.api.ChatColor;
+
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
@@ -17,49 +20,45 @@ public class ScoreboardCommands implements TabCompleter {
         this.scoreboardManager = scoreboardManager;
     }
 
-    public boolean handleScoreboardCommands(CommandSender sender, String[] args) {
-        if (!(sender instanceof Player)) {
-            sender.sendMessage("Only players can use scoreboard commands.");
-            return true;
-        }
-
-        Player player = (Player) sender;
+    public boolean handleScoreboardCommands(CommandSender sender, String[] args, boolean isPlayer) {
+        Player player = (isPlayer ? (Player) sender : null);
 
         if (args.length == 0) {
-            player.sendMessage("Usage: /scoreboard <toggle|[name]>");
+            sender.sendMessage("Usage: /scoreboard <toggle|[name]>");
             return true;
         }
 
         switch (args[0].toLowerCase()) {
             case "toggle":
+                if (!isPlayer) {sender.sendMessage(ChatColor.RED + "This command (/board toggle) can only be typed by players."); return true;}
                 scoreboardManager.toggleScoreboard(player);
                 return true;
             case "reload":
-                if (!player.hasPermission("core.board.reload"))
-                {
-                    player.sendMessage("You don't have permission to reload scoreboards.");
+                if (player != null && !player.hasPermission("core.board.reload")) {
+                    sender.sendMessage("You don't have permission to reload scoreboards.");
                     return true;
                 }
                 scoreboardManager.reloadScoreboards();
-                player.sendMessage("Scoreboards reloaded successfully.");
+                sender.sendMessage("Scoreboards reloaded successfully.");
                 return true;
             case "list":
                 List<String> activeScoreboards = scoreboardManager.getActiveScoreboards();
                 if (activeScoreboards.isEmpty()) {
-                    player.sendMessage("No active scoreboards at the moment.");
+                    sender.sendMessage("No active scoreboards at the moment.");
                 } else {
-                    player.sendMessage("Active Scoreboards:");
+                    sender.sendMessage("Active Scoreboards:");
                     for (String scoreboard : activeScoreboards) {
-                        player.sendMessage(" - " + scoreboard);
+                        sender.sendMessage(" - " + scoreboard);
                     }
                 }
                 return true;
             default:
+                if (!isPlayer) {sender.sendMessage(ChatColor.RED + "This command (/board <name>) can only be typed by players."); return true;}
                 String scoreboardName = args[0];
                 if (scoreboardManager.renderScoreboard(player, scoreboardName)) {
-                    player.sendMessage("Switched to scoreboard: " + scoreboardName);
+                    sender.sendMessage("Switched to scoreboard: " + scoreboardName);
                 } else {
-                    player.sendMessage("Scoreboard not found: " + scoreboardName);
+                    sender.sendMessage("Scoreboard not found: " + scoreboardName);
                 }
                 return true;
         }

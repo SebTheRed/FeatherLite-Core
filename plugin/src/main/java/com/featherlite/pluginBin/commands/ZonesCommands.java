@@ -2,7 +2,10 @@ package com.featherlite.pluginBin.commands;
 
 import com.featherlite.pluginBin.zones.Zone;
 import com.featherlite.pluginBin.zones.ZoneManager;
-import org.bukkit.ChatColor;
+
+import io.papermc.paper.command.brigadier.Commands;
+
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -33,33 +36,34 @@ public class ZonesCommands implements TabCompleter {
         this.plugin = plugin;
     }
 
-    public boolean handleZoneCommands(Player player, String[] args) {
-        if (args.length == 0) {
-            player.sendMessage(ChatColor.RED + "Usage: /zone <create|delete|list|info|reload|pos1|pos2> [arguments]");
-            return true;
-        }
+    public boolean handleZoneCommands(CommandSender sender, String[] args, boolean isPlayer) {
+
+        Player player = (isPlayer ? (Player) sender : null);
 
         String subCommand = args[0].toLowerCase();
 
         switch (subCommand) {
             case "create":
+                if (!isPlayer) {sender.sendMessage("You can only create zones in-game as a player!"); return true;}
                 return handleCreateZone(player, args);
             case "pos1":
+                if (!isPlayer) {sender.sendMessage("You can only create zones in-game as a player!"); return true;}
                 return handleSetPos1(player);
             case "pos2":
+                if (!isPlayer) {sender.sendMessage("You can only create zones in-game as a player!"); return true;}
                 return handleSetPos2(player);
             case "delete":
-                return handleDeleteZone(player, args);
+                return handleDeleteZone(sender, args);
             case "list":
-                return handleListZones(player);
+                return handleListZones(sender);
             case "info":
-                return handleZoneInfo(player, args);
+                return handleZoneInfo(sender, args);
             case "reload":
-                return handleReloadZones(player);
+                return handleReloadZones(sender);
             case "rule":
-                return handleSetRule(player, args);
+                return handleSetRule(sender, args);
             default:
-                player.sendMessage(ChatColor.RED + "Unknown command. Usage: /zone <create|delete|list|info|reload|pos1|pos2>");
+                sender.sendMessage(ChatColor.RED + "Unknown command. Usage: /zone <create|delete|list|info|reload|pos1|pos2>");
                 return true;
         }
     }
@@ -121,59 +125,59 @@ public class ZonesCommands implements TabCompleter {
         return true;
     }
 
-    private boolean handleDeleteZone(Player player, String[] args) {
+    private boolean handleDeleteZone(CommandSender sender, String[] args) {
         if (args.length < 2) {
-            player.sendMessage(ChatColor.RED + "Usage: /zone delete <name>");
+            sender.sendMessage(ChatColor.RED + "Usage: /zone delete <name>");
             return true;
         }
         String zoneName = args[1];
         boolean success = zoneManager.deleteZone(zoneName);
         if (success) {
-            player.sendMessage(ChatColor.GREEN + "Zone " + zoneName + " deleted successfully!");
+            sender.sendMessage(ChatColor.GREEN + "Zone " + zoneName + " deleted successfully!");
         } else {
-            player.sendMessage(ChatColor.RED + "Failed to delete zone " + zoneName + ". It may not exist.");
+            sender.sendMessage(ChatColor.RED + "Failed to delete zone " + zoneName + ". It may not exist.");
         }
         return true;
     }
 
-    private boolean handleListZones(Player player) {
-        player.sendMessage(ChatColor.GOLD + "Zones:");
+    private boolean handleListZones(CommandSender sender) {
+        sender.sendMessage(ChatColor.GOLD + "Zones:");
         for (String zoneName : zoneManager.getZones().keySet()) {
-            player.sendMessage(ChatColor.YELLOW + "- " + zoneName);
+            sender.sendMessage(ChatColor.YELLOW + "- " + zoneName);
         }
         return true;
     }
 
-    private boolean handleZoneInfo(Player player, String[] args) {
+    private boolean handleZoneInfo(CommandSender sender, String[] args) {
         if (args.length < 2) {
-            player.sendMessage(ChatColor.RED + "Usage: /zone info <name>");
+            sender.sendMessage(ChatColor.RED + "Usage: /zone info <name>");
             return true;
         }
         String zoneName = args[1];
         Zone zone = zoneManager.getZone(zoneName);
         if (zone != null) {
-            player.sendMessage(ChatColor.GOLD + "Zone Info: " + zoneName);
-            player.sendMessage(ChatColor.YELLOW + "Description: " + zone.getDescription());
-            player.sendMessage(ChatColor.YELLOW + "World: " + zone.getWorld());
-            player.sendMessage(ChatColor.YELLOW + "Entry Message: " + zone.getEntryMessage());
-            player.sendMessage(ChatColor.YELLOW + "Exit Message: " + zone.getExitMessage());
+            sender.sendMessage(ChatColor.GOLD + "Zone Info: " + zoneName);
+            sender.sendMessage(ChatColor.YELLOW + "Description: " + zone.getDescription());
+            sender.sendMessage(ChatColor.YELLOW + "World: " + zone.getWorld());
+            sender.sendMessage(ChatColor.YELLOW + "Entry Message: " + zone.getEntryMessage());
+            sender.sendMessage(ChatColor.YELLOW + "Exit Message: " + zone.getExitMessage());
         } else {
-            player.sendMessage(ChatColor.RED + "Zone " + zoneName + " does not exist.");
+            sender.sendMessage(ChatColor.RED + "Zone " + zoneName + " does not exist.");
         }
         return true;
     }
 
-    private boolean handleReloadZones(Player player) {
+    private boolean handleReloadZones(CommandSender sender) {
         zoneManager.reloadAllZones();
-        player.sendMessage(ChatColor.GREEN + "All zones reloaded successfully!");
+        sender.sendMessage(ChatColor.GREEN + "All zones reloaded successfully!");
         return true;
     }
 
 
 
-    private boolean handleSetRule(Player player, String[] args) {
+    private boolean handleSetRule(CommandSender sender, String[] args) {
         if (args.length < 4) {
-            player.sendMessage(ChatColor.RED + "Usage: /zone rule <name> <rule_name> <rule_value>");
+            sender.sendMessage(ChatColor.RED + "Usage: /zone rule <name> <rule_name> <rule_value>");
             return true;
         }
     
@@ -183,7 +187,7 @@ public class ZonesCommands implements TabCompleter {
     
         Zone zone = zoneManager.getZone(zoneName);
         if (zone == null) {
-            player.sendMessage(ChatColor.RED + "Zone " + zoneName + " does not exist.");
+            sender.sendMessage(ChatColor.RED + "Zone " + zoneName + " does not exist.");
             return true;
         }
     
@@ -191,9 +195,9 @@ public class ZonesCommands implements TabCompleter {
         boolean success = setZoneRule(zone, rule, value);
     
         if (success) {
-            player.sendMessage(ChatColor.GREEN + "Rule " + rule + " set to " + value + " for zone " + zoneName);
+            sender.sendMessage(ChatColor.GREEN + "Rule " + rule + " set to " + value + " for zone " + zoneName);
         } else {
-            player.sendMessage(ChatColor.RED + "Failed to set rule " + rule + ". Please check the rule name and value.");
+            sender.sendMessage(ChatColor.RED + "Failed to set rule " + rule + ". Please check the rule name and value.");
         }
     
         return true;

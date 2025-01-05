@@ -24,13 +24,14 @@ public class TeleportationCommands implements TabCompleter {
         this.plugin = plugin;
     }
 
-    public boolean handleTeleportCommands(CommandSender sender, Command command, String label, String[] args) {
+    public boolean handleTeleportCommands(CommandSender sender, Command command, String label, String[] args, boolean isPlayer) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(ChatColor.RED + "Only players can use teleport commands.");
+            sender.sendMessage(ChatColor.RED + "Only players can use teleport commands. Not console!");
             return true;
         }
 
-        Player player = (Player) sender;
+        Player player = (isPlayer ? (Player) sender : null);
+
 
         // if (args.length == 0) {
         //     player.sendMessage(ChatColor.RED + "Usage: /<command> [args]");
