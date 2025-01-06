@@ -167,11 +167,11 @@ commands:
   enchant:
     description: Enchants the item in the player's hand.
     permission: core.enchant
-    usage: /enchant <enchantment_name> <level>
+    usage: /enchant <enchantment_name>  <level>
   exp:
     description: Gives the player in-game exp.
     permission: core.exp
-    usage: /exp <give|set> <amount>
+    usage: /exp <give|set> <player> <amount>
   give:
     description: Gives the player a vanilla item.
     permission: core.give
@@ -179,12 +179,12 @@ commands:
   kill:
     description: Dead on the spot.
     permission: core.kill
-    usage: /kill <player_name>\
+    usage: /kill <player_name>
   killall:
     description: Kills all sorts of things.
     permission: core.killall
     aliases: [remove]
-    usage: /killall <monsters|entities|boats|minecarts|players|drops|arrows|mobs [type]> [radius|world]
+    usage: /killall <monsters|entities|boats|minecarts|players|drops|arrows|mobs [type]> [world_name]
   sudo:
     description: Runs a command as the player. Very useful for development.
     permission: core.sudo
@@ -192,11 +192,11 @@ commands:
   weather:
     description: Changes the weather in the world.
     permission: core.weather
-    usage: /weather <clear|rain|thunder>
+    usage: /weather <clear|rain|thunder> [world_name]
   time:
     description: Changes the time in the world.
     permission: core.time
-    usage: /time <set|add> <value>
+    usage: /time <set|add> <value> [world_name]
   god:
     description: Sets the player to god-mode.
     permission: core.god
@@ -205,44 +205,44 @@ commands:
   fly:
     description: Toggles flight for the player.
     permission: core.fly
-    usage: /fly
+    usage: /fly [player_name]
   speed:
     description: Changes the player's walking speed.
     permission: core.speed
-    usage: /speed <integer>
+    usage: /speed <integer> [player_name]
   flyspeed:
     description: Changes the player's flying speed.
     permission: core.flyspeed
-    usage: /flyspeed <integer>
+    usage: /flyspeed <integer> [player_name]
   gamemode:
     description: Changes the player's gamemode.
     permission: core.gamemode
-    usage: /gamemode <survival|creative|spectator>
+    usage: /gamemode <survival|creative|spectator> [player]
     aliases: [gm]
   heal:
     description: Heals the player to full health.
     permission: core.heal
-    usage: /heal
+    usage: /heal [player_name]
   feed:
     description: Fully feeds the player.
     permission: core.feed
-    usage: /feed
+    usage: /feed [player_name]
   rest:
     description: Fully rests the player.
     permission: core.rest
-    usage: /rest
+    usage: /rest [player_name]
   repair:
     description: Fully repairs the item in hand.
     permission: core.repair
-    usage: /repair
+    usage: /repair [player_name]
   afk:
     description: Sets the player to afk status.
     permission: core.afk
-    usage: /afk
+    usage: /afk [player_name]
   enderchest:
     description: Opens the player's enderchest.
     permission: core.enderchest
-    usage: /enderchest
+    usage: /enderchest [player_name]
     aliases: [ec]
   trash:
     description: Opens a menu that when closed, disposes of all items within.
@@ -259,7 +259,7 @@ commands:
   nick:
     description: Changes the user's display name in chat.
     permission: core.nick
-    usage: /nick <desired_name>
+    usage: /nick <desired_name> [player_name]
     aliases: [nickname]
   realname:
     description: Shows the real username of a player.
@@ -276,15 +276,25 @@ commands:
   getpos:
     description: Gives the X,Y,Z coordinates of the player's current position.
     permission: core.getpos
-    usage: /getpos
+    usage: /getpos [player_name]
   ping:
     description: Shows the player's ping.
     permission: core.ping
-    usage: /ping
+    usage: /ping [player_name]
   seen:
     description: Shows the last time the player was online.
     permission: core.seen
     usage: /seen <player_name>
+
+  ptime:
+    description: Changes the player's own relative time.
+    permission: core.ptime
+    usage: /ptime <morning|noon|night|{ticks_integer}>
+  pweather:
+    description: Changes the player's own relative weather.
+    permission: core.pweather
+    usage: /pweather <clear|storm|thunder>
+
 
   workbench:
     description: Opens up the crafting table.
@@ -316,14 +326,15 @@ commands:
     description: Opens up a stonecutter.
     permission: core.stonecutter
     usage: /stonecutter
-  ptime:
-    description: Changes the player's own relative time.
-    permission: core.ptime
-    usage: /ptime <morning|noon|night|{ticks_integer}>
-  pweather:
-    description: Changes the player's own relative weather.
-    permission: core.pweather
-    usage: /pweather <clear|storm|thunder>
+
+
+
+
+
+
+
+
+
 
 
 permissions:

@@ -560,7 +560,7 @@ public class FeatherCore extends JavaPlugin {
                 case "weather":
                 case "time":
                 case "god":
-                    return adminCommands.handleAdminCommands(sender, command, label, args, isPlayer); // STOPPED HERE - NEEDS LOVE
+                    return adminCommands.handleAdminCommands(sender, command, label, args, isPlayer);
                 case "fly":
                 case "speed":
                 case "flyspeed":

@@ -3,6 +3,7 @@ package com.featherlite.pluginBin.essentials.commands;
 import com.featherlite.pluginBin.essentials.util.UtilManager;
 import com.featherlite.pluginBin.essentials.PlayerDataManager;
 import org.bukkit.Bukkit;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
@@ -23,125 +24,142 @@ public class UtilCommands implements TabCompleter {
     }
 
     public boolean handleUtilCommands(CommandSender sender, Command command, String label, String[] args, boolean isPlayer) {
-        if (!(sender instanceof Player)) {
-            sender.sendMessage("Only players can use utility commands.");
-            return true;
+        Player executor = isPlayer ? (Player) sender : null;
+    
+        // Get the target player (if specified)
+        Player target = null;
+        if (args.length > 0) {
+            target = Bukkit.getPlayer(args[0]);
+            if (target == null && args.length > 0) {
+                sender.sendMessage(ChatColor.RED + "Player not found: " + args[0]);
+                return true;
+            }
         }
-
-        Player player = (Player) sender;
-
+    
         switch (label.toLowerCase()) {
             case "fly":
-                return utilManager.toggleFlight(player);
-
+                return utilManager.toggleFlight(target != null ? target : executor);
             case "speed":
                 if (args.length < 1) {
-                    player.sendMessage("Usage: /speed <value>");
+                    sender.sendMessage("Usage: /speed <value> [player_name]");
                     return true;
                 }
-                return utilManager.setWalkSpeed(player, args[0]);
-
+                return utilManager.setWalkSpeed(target != null ? target : executor, args[0]);
             case "flyspeed":
                 if (args.length < 1) {
-                    player.sendMessage("Usage: /flyspeed <value>");
+                    sender.sendMessage("Usage: /flyspeed <value> [player_name]");
                     return true;
                 }
-                return utilManager.setFlySpeed(player, args[0]);
-
+                return utilManager.setFlySpeed(target != null ? target : executor, args[0]);
             case "gamemode":
             case "gm":
                 if (args.length < 1) {
-                    player.sendMessage("Usage: /gamemode <survival|creative|spectator>");
+                    sender.sendMessage("Usage: /gamemode <survival|creative|spectator> [player_name]");
                     return true;
                 }
-                return utilManager.setGameMode(player, args[0]);
-
+                return utilManager.setGameMode(target != null ? target : executor, args[0]);
             case "heal":
-                return utilManager.healPlayer(player, args);
-
+                return utilManager.healPlayer(target != null ? target : executor, sender);
             case "feed":
-                return utilManager.feedPlayer(player, args);
-
+                return utilManager.feedPlayer(target != null ? target : executor, sender);
             case "rest":
-                return utilManager.restPlayer(player, args);
-
+                return utilManager.restPlayer(target != null ? target : executor, sender);
             case "repair":
-                return utilManager.repairItem(player);
-
+                if (!isPlayer) {sender.sendMessage(ChatColor.RED + "Only players can /repair their own gear!"); return true;}
+                return utilManager.repairItem(executor); // Repair remains executor-specific
             case "afk":
-                return utilManager.toggleAFK(player);
-            
+                return utilManager.toggleAFK(target != null ? target : executor, sender);
             case "enderchest":
             case "ec":
-                return utilManager.openEnderChest(player);
-            
+                if (!isPlayer) {sender.sendMessage(ChatColor.RED + "Only players can use /ec in game!"); return true;}
+                return utilManager.openEnderChest(target != null ? target : executor, sender);
             case "trash":
-                return utilManager.openTrash(player);
-            
+                if (!isPlayer) {sender.sendMessage(ChatColor.RED + "Only players can use /trash in game!"); return true;}
+                return utilManager.openTrash(executor); // Trash remains executor-specific
             case "top":
-                return utilManager.teleportToTop(player);
-            
+                if (!isPlayer) {sender.sendMessage(ChatColor.RED + "Only players can use /top in game!"); return true;}
+                return utilManager.teleportToTop(executor); // Top remains executor-specific
             case "hat":
-                return utilManager.wearHat(player);
-            
+                if (!isPlayer) {sender.sendMessage(ChatColor.RED + "Only players can use /hat in game!"); return true;}
+                return utilManager.wearHat(executor); // Hat remains executor-specific
             case "nick":
             case "nickname":
-                return utilManager.setNickname(player, args, playerDataManager);
-            
+                if (args.length < 1) {
+                    sender.sendMessage("Usage: /nick <desired_name> [player_name]");
+                    return true;
+                }
+                return utilManager.setNickname(target != null ? target : executor, args, sender, playerDataManager);
             case "realname":
-                return utilManager.getRealName(player, args);
-            
+                if (args.length < 1) {
+                    sender.sendMessage("Usage: /realname <player_nickname>");
+                    return true;
+                }
+                return utilManager.getRealName(executor, args);
             case "list":
-                return utilManager.listPlayers(player);
-            
+                return utilManager.listPlayers(sender);
             case "near":
-                return utilManager.nearPlayers(player, args);
-            
+                if (!isPlayer) {sender.sendMessage(ChatColor.RED + "Only players can use /near in game!"); return true;}
+                if (args.length < 1) {
+                    sender.sendMessage("Usage: /near <radius>");
+                    return true;
+                }
+                return utilManager.nearPlayers(executor, args);
             case "getpos":
-                return utilManager.getPlayerPosition(player, args);
-            
+                return utilManager.getPlayerPosition(target != null ? target : executor, args, isPlayer);
             case "ping":
-                return utilManager.pingPlayer(player);
-            
+                return utilManager.pingPlayer(target != null ? target : executor, sender);
             case "seen":
-                return utilManager.seenPlayer(player, args);
-            
+                if (args.length < 1) {
+                    sender.sendMessage("Usage: /seen <player_name>");
+                    return true;
+                }
+                return utilManager.seenPlayer(sender, args);
+    
             case "workbench":
             case "wb":
             case "craft":
-                return utilManager.openWorkbench(player);
+                if (!isPlayer) {sender.sendMessage(ChatColor.RED + "Only players can use /craft in game!"); return true;}
+                return utilManager.openWorkbench(executor); // Workbench remains executor-specific
 
             case "anvil":
-                return utilManager.openAnvil(player);
+                if (!isPlayer) {sender.sendMessage(ChatColor.RED + "Only players can use /anvil in game!"); return true;}
+                return utilManager.openAnvil(executor); // Anvil remains executor-specific
 
             case "cartographytable":
-                return utilManager.openCartographyTable(player);
+                if (!isPlayer) {sender.sendMessage(ChatColor.RED + "Only players can use /cartographytable in game!"); return true;}
+                return utilManager.openCartographyTable(executor); // Cartography remains executor-specific
 
             case "grindstone":
-                return utilManager.openGrindstone(player);
+                if (!isPlayer) {sender.sendMessage(ChatColor.RED + "Only players can use /grindstone in game!"); return true;}
+                return utilManager.openGrindstone(executor); // Grindstone remains executor-specific
 
             case "loom":
-                return utilManager.openLoom(player);
-
+                if (!isPlayer) {sender.sendMessage(ChatColor.RED + "Only players can use /loom in game!"); return true;}
+                return utilManager.openLoom(executor); // Loom remains executor-specific
+    
             case "smithingtable":
             case "smithing":
-                return utilManager.openSmithingTable(player);
-
+                if (!isPlayer) {sender.sendMessage(ChatColor.RED + "Only players can use /smithingtable in game!"); return true;}
+                return utilManager.openSmithingTable(executor); // Smithing remains executor-specific
+    
             case "stonecutter":
-                return utilManager.openStonecutter(player);
-
+                if (!isPlayer) {sender.sendMessage(ChatColor.RED + "Only players can use /stonecutter in game!"); return true;}
+                return utilManager.openStonecutter(executor); // Stonecutter remains executor-specific
+    
             case "ptime":
-                return utilManager.setPlayerTime(player, args);
-
+                if (!isPlayer) {sender.sendMessage(ChatColor.RED + "Only players can use /ptime in game!"); return true;}
+                return utilManager.setPlayerTime(target != null ? target : executor, args);
+    
             case "pweather":
-                return utilManager.setPlayerWeather(player, args);
-
-
+                if (!isPlayer) {sender.sendMessage(ChatColor.RED + "Only players can use /pweather in game!"); return true;}
+                return utilManager.setPlayerWeather(target != null ? target : executor, args);
+    
             default:
-                player.sendMessage("Unknown utility command.");
+                sender.sendMessage("Unknown utility command.");
                 return true;
         }
     }
+    
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {

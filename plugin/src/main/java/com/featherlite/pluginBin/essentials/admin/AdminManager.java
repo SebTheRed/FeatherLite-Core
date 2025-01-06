@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -80,8 +81,11 @@ public class AdminManager {
                 world.setStorm(true);
                 world.setThundering(true);
                 break;
+            default:
+                throw new IllegalArgumentException("Invalid weather type. Use 'clear', 'rain', or 'thunder'.");
         }
     }
+    
 
     public void setTime(World world, String timeArg) {
         long time;
@@ -110,7 +114,9 @@ public class AdminManager {
                         throw new NumberFormatException("Invalid tick range"); // Custom exception for bad range
                     }
                 } catch (NumberFormatException e) {
+                    Bukkit.getLogger().warning("Error parsing number in command: " + e.getMessage());
                     throw new IllegalArgumentException("Invalid time. Use 'morning', 'day' 'noon', 'night', or a tick value (0-24000).");
+                    
                 }
         }
     
@@ -141,8 +147,13 @@ public class AdminManager {
 
 
 
-    public void killAll(Player player, String targetType, String scope) {
-        World world = player.getWorld();
+    public void killAll(CommandSender sender, String targetType, String scope, boolean isPlayer) {
+        World world = Bukkit.getServer().getWorld(scope);
+        if (world == null) {
+            sender.sendMessage(ChatColor.RED + "Invalid world name: " + scope);
+            return;
+        }
+        Player player = isPlayer ? (Player)sender : null;
         int count = 0;
     
         switch (targetType.toLowerCase()) {
@@ -156,12 +167,11 @@ public class AdminManager {
                         }
                     }
                 });
+                break;
             case "monsters":
                 count = world.getEntitiesByClass(org.bukkit.entity.Monster.class).size();
                 world.getEntitiesByClass(org.bukkit.entity.Monster.class).forEach(entity -> {
-                    if (scope.equalsIgnoreCase("world") || player.getLocation().distance(entity.getLocation()) <= parseRadius(scope)) {
                         entity.remove();
-                    }
                 });
                 break;
             case "entities":
@@ -170,50 +180,46 @@ public class AdminManager {
                         // Skip players since they can't be removed this way
                         continue;
                     }
-                    if (scope.equalsIgnoreCase("world") || player.getLocation().distance(entity.getLocation()) <= parseRadius(scope)) {
                         entity.remove();
                         count++;
-                    }
                 }
                 break;
             case "boats":
                 count = world.getEntitiesByClass(org.bukkit.entity.Boat.class).size();
                 world.getEntitiesByClass(org.bukkit.entity.Boat.class).forEach(entity -> {
-                    if (scope.equalsIgnoreCase("world") || player.getLocation().distance(entity.getLocation()) <= parseRadius(scope)) {
                         entity.remove();
-                    }
                 });
                 break;
             case "minecarts":
                 count = world.getEntitiesByClass(org.bukkit.entity.Minecart.class).size();
                 world.getEntitiesByClass(org.bukkit.entity.Minecart.class).forEach(entity -> {
-                    if (scope.equalsIgnoreCase("world") || player.getLocation().distance(entity.getLocation()) <= parseRadius(scope)) {
                         entity.remove();
-                    }
                 });
                 break;
             case "players":
-                Bukkit.getOnlinePlayers().forEach(target -> {
-                    if (!target.equals(player) && (scope.equalsIgnoreCase("world") || player.getLocation().distance(target.getLocation()) <= parseRadius(scope))) {
-                        target.setHealth(0); // Kills the player
-                    }
-                });
-                count = Bukkit.getOnlinePlayers().size() - 1; // Exclude the sender
+                if (!(sender instanceof Player)) {
+                    Bukkit.getOnlinePlayers().forEach(target -> {
+                            target.setHealth(0); // Kills the player
+                    });
+                    count = Bukkit.getOnlinePlayers().size(); // Exclude the sender
+                } else {
+                    Bukkit.getOnlinePlayers().forEach(target -> {
+                            target.setHealth(0); // Kills the player
+                    });
+                    count = Bukkit.getOnlinePlayers().size() - 1; // Exclude the sender
+                }
+
                 break;
             case "drops":
                 count = world.getEntitiesByClass(org.bukkit.entity.Item.class).size();
                 world.getEntitiesByClass(org.bukkit.entity.Item.class).forEach(entity -> {
-                    if (scope.equalsIgnoreCase("world") || player.getLocation().distance(entity.getLocation()) <= parseRadius(scope)) {
                         entity.remove();
-                    }
                 });
                 break;
             case "arrows":
                 count = world.getEntitiesByClass(org.bukkit.entity.Arrow.class).size();
                 world.getEntitiesByClass(org.bukkit.entity.Arrow.class).forEach(entity -> {
-                    if (scope.equalsIgnoreCase("world") || player.getLocation().distance(entity.getLocation()) <= parseRadius(scope)) {
                         entity.remove();
-                    }
                 });
                 break;
             case "mobs":
@@ -222,28 +228,18 @@ public class AdminManager {
                         // Skip players when targeting mobs
                         continue;
                     }
-                    if (scope.equalsIgnoreCase("world") || player.getLocation().distance(entity.getLocation()) <= parseRadius(scope)) {
                         entity.remove();
                         count++;
-                    }
                 }
                 break;
             default:
-                player.sendMessage(ChatColor.RED + "Invalid type. Use /killall <monsters|entities|boats|minecarts|players|drops|arrows|mobs> [radius|world].");
-                return;
+                player.sendMessage(ChatColor.RED + "Invalid type. Use /killall <monsters|entities|boats|minecarts|players|drops|arrows|mobs> [world_name].");
+                break;
         }
     
         player.sendMessage(ChatColor.GREEN + "Removed " + count + " " + targetType + ".");
     }
     
-    // Helper method to parse radius
-    private double parseRadius(String scope) {
-        try {
-            return Double.parseDouble(scope);
-        } catch (NumberFormatException e) {
-            return 0; // If invalid radius, default to 0
-        }
-    }
     
 
 

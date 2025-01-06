@@ -7,7 +7,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
+import net.md_5.bungee.api.ChatColor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.GameMode;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.WeatherType;
@@ -24,6 +25,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.meta.Damageable;
 
 import com.featherlite.pluginBin.essentials.PlayerDataManager;
+
+import io.papermc.paper.command.brigadier.Commands;
 
 public class UtilManager {
 
@@ -90,66 +93,63 @@ public class UtilManager {
         return true;
     }
 
-    public boolean healPlayer(Player player, String[] args) {
+    public boolean healPlayer(Player player, CommandSender sender) {
         // Read cooldown from config
         int cooldown = Bukkit.getPluginManager().getPlugin("FeatherLite-Core")
                               .getConfig().getInt("command-cooldowns.heal", 60);
     
         // Check if the player is on cooldown
-        if (isOnCooldown(player, "heal", cooldown)) return true;
+        if (isOnCooldown(sender, player, "heal", cooldown)) return true;
     
-        Player target = args.length > 0 ? Bukkit.getPlayer(args[0]) : player;
-        if (target == null) {
-            player.sendMessage(ChatColor.RED + "Player not found.");
+        if (player == null) {
+            sender.sendMessage(ChatColor.RED + "Player not found.");
             return true;
         }
-        double maxHealth = target.getAttribute(Attribute.GENERIC_MAX_HEALTH).getDefaultValue();
-        target.setHealth(maxHealth);
-        player.sendMessage(ChatColor.GREEN + target.getName() + " has been healed.");
+        double maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getDefaultValue();
+        player.setHealth(maxHealth);
+        sender.sendMessage(ChatColor.GREEN + player.getName() + " has been healed.");
         return true;
     }
     
 
-    public boolean feedPlayer(Player player, String[] args) {
+    public boolean feedPlayer(Player player, CommandSender sender) {
         // Read cooldown from config
         int cooldown = Bukkit.getPluginManager().getPlugin("FeatherLite-Core")
                               .getConfig().getInt("command-cooldowns.feed", 60);
     
         // Check if the player is on cooldown
-        if (isOnCooldown(player, "feed", cooldown)) return true;
-    
-        Player target = args.length > 0 ? Bukkit.getPlayer(args[0]) : player;
-        if (target == null) {
-            player.sendMessage(ChatColor.RED + "Player not found.");
+        if (isOnCooldown(sender, player, "feed", cooldown)) return true;
+
+        if (player == null) {
+            sender.sendMessage(ChatColor.RED + "Player not found.");
             return true;
         }
     
         // Set food level and max out saturation
-        target.setFoodLevel(20); // Max food level
-        target.setSaturation(20.0f); // Max saturation level
-        player.sendMessage(ChatColor.GREEN + target.getName() + " has been fed and their saturation maxed out.");
+        player.setFoodLevel(20); // Max food level
+        player.setSaturation(20.0f); // Max saturation level
+        sender.sendMessage(ChatColor.GREEN + player.getName() + " has been fed and their saturation maxed out.");
         return true;
     }
     
     
 
-    public boolean restPlayer(Player player, String[] args) {
+    public boolean restPlayer(Player player, CommandSender sender) {
         // Read cooldown from config
         int cooldown = Bukkit.getPluginManager().getPlugin("FeatherLite-Core")
                               .getConfig().getInt("command-cooldowns.rest", 60);
     
         // Check if the player is on cooldown
-        if (isOnCooldown(player, "rest", cooldown)) return true;
+        if (isOnCooldown(sender, player, "rest", cooldown)) return true;
     
-        Player target = args.length > 0 ? Bukkit.getPlayer(args[0]) : player;
-        if (target == null) {
-            player.sendMessage(ChatColor.RED + "Player not found.");
+        if (player == null) {
+            sender.sendMessage(ChatColor.RED + "Player not found.");
             return true;
         }
-        double maxHealth = target.getAttribute(Attribute.GENERIC_MAX_HEALTH).getDefaultValue();
-        target.setHealth(maxHealth);
-        target.setFoodLevel(20);
-        player.sendMessage(ChatColor.GREEN + target.getName() + " is now rested.");
+        double maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getDefaultValue();
+        player.setHealth(maxHealth);
+        player.setFoodLevel(20);
+        sender.sendMessage(ChatColor.GREEN + player.getName() + " is now rested.");
         return true;
     }
     
@@ -180,7 +180,7 @@ public class UtilManager {
         return true;
     }
 
-    public boolean toggleAFK(Player player) {
+    public boolean toggleAFK(Player player, CommandSender sender) {
         // No cooldown for AFK toggle as per the current design, but could be added later
         boolean isAFK = afkPlayers.getOrDefault(player.getUniqueId(), false);
     
@@ -194,9 +194,9 @@ public class UtilManager {
         return true;
     }
 
-    public boolean openEnderChest(Player player) {
+    public boolean openEnderChest(Player player, CommandSender sender) {
         player.openInventory(player.getEnderChest());
-        player.sendMessage(ChatColor.GREEN + "Opened your Ender Chest.");
+        sender.sendMessage(ChatColor.GREEN + "Opened " + player + "'s Enderchest." );
         return true;
     }
 
@@ -228,9 +228,10 @@ public class UtilManager {
         return true;
     }
 
-    public boolean setNickname(Player player, String[] args, PlayerDataManager playerDataManager) {
+    public boolean setNickname(Player player, String[] args, CommandSender sender, PlayerDataManager playerDataManager) {
+        if (player == null) {sender.sendMessage(ChatColor.RED + "Player not found!"); return true;}
         if (args.length < 1) {
-            player.sendMessage(ChatColor.RED + "Usage: /nick <new nickname>");
+            sender.sendMessage(ChatColor.RED + "Usage: /nick <new nickname>");
             return true;
         }
     
@@ -241,7 +242,7 @@ public class UtilManager {
         // Apply the nickname to the player
         player.setDisplayName(formattedNickname);
         player.setPlayerListName(formattedNickname);
-        player.sendMessage(ChatColor.GREEN + "Nickname set to " + formattedNickname);
+        sender.sendMessage(ChatColor.GREEN + "Nickname set to " + formattedNickname);
     
         // Save the nickname to the player's data file as plain text
         FileConfiguration playerData = playerDataManager.getPlayerData(player);
@@ -251,70 +252,94 @@ public class UtilManager {
         return true;
     }
 
-    public boolean getRealName(Player player, String[] args) {
+    public boolean getRealName(CommandSender sender, String[] args) {
         if (args.length < 1) {
-            player.sendMessage(ChatColor.RED + "Usage: /realname <nickname>");
+            sender.sendMessage(ChatColor.RED + "Usage: /realname <nickname>");
             return true;
         }
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
             if (onlinePlayer.getDisplayName().equalsIgnoreCase(args[0])) {
-                player.sendMessage(ChatColor.GREEN + args[0] + "'s real name is " + onlinePlayer.getName());
+                sender.sendMessage(ChatColor.GREEN + args[0] + "'s real name is " + onlinePlayer.getName());
                 return true;
             }
         }
-        player.sendMessage(ChatColor.RED + "No player with that nickname was found.");
+        sender.sendMessage(ChatColor.RED + "No player with that nickname was found.");
         return true;
     }
+    
 
-    public boolean listPlayers(Player player) {
+    public boolean listPlayers(CommandSender sender) {
         String playerList = Bukkit.getOnlinePlayers().stream()
                 .map(Player::getName)
                 .reduce((a, b) -> a + ", " + b)
                 .orElse("No players online.");
-        player.sendMessage(ChatColor.GREEN + "Online players: " + playerList);
+        sender.sendMessage(ChatColor.WHITE + "Online players: " + playerList);
         return true;
     }
 
     public boolean nearPlayers(Player player, String[] args) {
-        double radius = args.length > 0 ? Double.parseDouble(args[0]) : 50; // Default radius is 50
+        double radius;
+        try {
+            radius = args.length > 0 ? Double.parseDouble(args[0]) : 50; // Default radius
+        } catch (NumberFormatException e) {
+            player.sendMessage(ChatColor.RED + "Invalid radius. Please enter a valid number.");
+            return true;
+        }
+    
         List<String> nearbyPlayers = new ArrayList<>();
         for (Player target : Bukkit.getOnlinePlayers()) {
             if (target != player && player.getLocation().distance(target.getLocation()) <= radius) {
-                nearbyPlayers.add(target.getName());
+                double distance = player.getLocation().distance(target.getLocation());
+                nearbyPlayers.add(target.getName() + " (" + String.format("%.2f", distance) + " blocks)");
             }
         }
-        player.sendMessage(ChatColor.GREEN + "Nearby players: " + String.join(", ", nearbyPlayers));
+    
+        if (nearbyPlayers.isEmpty()) {
+            player.sendMessage(ChatColor.YELLOW + "No players found within " + radius + " blocks.");
+        } else {
+            player.sendMessage(ChatColor.GREEN + "Nearby players (" + radius + " blocks):");
+            for (String nearbyPlayer : nearbyPlayers) {
+                player.sendMessage(ChatColor.GRAY + "- " + nearbyPlayer);
+            }
+        }
+    
         return true;
     }
+    
+    
 
-    public boolean getPlayerPosition(Player player, String[] args) {
-        Player target = args.length > 0 ? Bukkit.getPlayer(args[0]) : player;
+    public boolean getPlayerPosition(CommandSender sender, String[] args, boolean isPlayer) {
+        Player target = args.length > 0 ? Bukkit.getPlayer(args[0]) : (isPlayer ? (Player) sender : null);
         if (target == null) {
-            player.sendMessage(ChatColor.RED + "Player not found.");
+            sender.sendMessage(ChatColor.RED + "Player not found. Or command typed from console.");
             return true;
         }
         Location loc = target.getLocation();
-        player.sendMessage(ChatColor.GREEN + target.getName() + "'s position: X=" + loc.getBlockX() + ", Y=" + loc.getBlockY() + ", Z=" + loc.getBlockZ());
+        sender.sendMessage(ChatColor.GREEN + target.getName() + "'s position: X=" + loc.getBlockX() + ", Y=" + loc.getBlockY() + ", Z=" + loc.getBlockZ());
         return true;
     }
 
-    public boolean pingPlayer(Player player) {
-        player.sendMessage(ChatColor.GREEN + "Your ping is " + player.getPing() + "ms.");
+    public boolean pingPlayer(Player player, CommandSender sender) {
+        if (player == null) {
+            sender.sendMessage(ChatColor.RED + "Player not found.");
+            return true;
+        }
+        sender.sendMessage(ChatColor.GREEN + "Your ping is " + player.getPing() + "ms.");
         return true;
     }
 
-    public boolean seenPlayer(Player player, String[] args) {
+    public boolean seenPlayer(CommandSender sender, String[] args) {
         if (args.length < 1) {
-            player.sendMessage(ChatColor.RED + "Usage: /seen <playername>");
+            sender.sendMessage(ChatColor.RED + "Usage: /seen <playername>");
             return true;
         }
         OfflinePlayer target = Bukkit.getOfflinePlayer(args[0]);
         if (!target.hasPlayedBefore()) {
-            player.sendMessage(ChatColor.RED + "Player not found.");
+            sender.sendMessage(ChatColor.RED + "Player not found.");
             return true;
         }
         long lastSeen = target.getLastPlayed();
-        player.sendMessage(ChatColor.GREEN + target.getName() + " was last seen on " + new java.util.Date(lastSeen).toString());
+        sender.sendMessage(ChatColor.GREEN + target.getName() + " was last seen on " + new java.util.Date(lastSeen).toString());
         return true;
     }
 
@@ -419,7 +444,7 @@ public class UtilManager {
     }
 
 
-    public boolean isOnCooldown(Player player, String command, int cooldownSeconds) {
+    public boolean isOnCooldown(CommandSender sender, Player player, String command, int cooldownSeconds) {
         if (player.isOp()) return false; // Skip cooldown for OPs
     
         Map<String, Long> playerCooldowns = cooldowns.getOrDefault(player.getUniqueId(), new HashMap<>());
@@ -428,7 +453,7 @@ public class UtilManager {
     
         if (currentTime < cooldownEndTime) {
             long remainingTime = (cooldownEndTime - currentTime) / 1000;
-            player.sendMessage(ChatColor.RED + "You must wait " + remainingTime + " seconds to use /" + command + " again.");
+            sender.sendMessage(ChatColor.RED + "You must wait " + remainingTime + " seconds to use /" + command + " again.");
             return true;
         }
     
