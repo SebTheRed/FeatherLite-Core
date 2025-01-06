@@ -416,8 +416,16 @@ public class FeatherCore extends JavaPlugin {
         return itemManager;
     }
 
+    public AbilityRegistry getAbilityRegistry() {
+        return abilityRegistry;
+    }
+
     public ParticleManager getParticleManager() {
         return particleManager;
+    }
+    
+    public ProjectileManager getProjectileManager() {
+        return projectileManager;
     }
 
     public EconomyManager getEconomyManager() {
@@ -471,6 +479,7 @@ public class FeatherCore extends JavaPlugin {
     public DisplayPieceManager getDisplayPieceManager() {
         return displayPieceManager;
     }
+
 
 
 
