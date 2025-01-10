@@ -28,14 +28,20 @@ public class UtilCommands implements TabCompleter {
     
         // Get the target player (if specified)
         Player target = null;
+        // Determine the target player
         if (args.length > 0) {
-            target = Bukkit.getPlayer(args[0]);
-            if (target == null && args.length > 0) {
-                sender.sendMessage(ChatColor.RED + "Player not found: " + args[0]);
+            target = Bukkit.getPlayer(args[args.length - 1]); // Last argument might be a player name
+            if (target == null && !isPlayer) {
+                sender.sendMessage(ChatColor.RED + "Console must specify a valid target player.");
                 return true;
             }
         }
-    
+
+        // If no target specified, default to the executor (if they're a player)
+        if (target == null) {
+            target = executor;
+        }
+        
         switch (label.toLowerCase()) {
             case "fly":
                 return utilManager.toggleFlight(target != null ? target : executor);
@@ -163,7 +169,6 @@ public class UtilCommands implements TabCompleter {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        if (!(sender instanceof Player)) return Collections.emptyList();
 
         List<String> suggestions = new ArrayList<>();
         switch (alias.toLowerCase()) {

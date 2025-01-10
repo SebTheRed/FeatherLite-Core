@@ -44,12 +44,13 @@ public class UtilManager {
 
     public boolean setWalkSpeed(Player player, String speedArg) {
         try {
-            float speed = Float.parseFloat(speedArg);
-            if (speed < 0 || speed > 1) {
-                player.sendMessage(ChatColor.RED + "Speed must be between 0 and 1.");
+            int speed = Integer.parseInt(speedArg);
+            if (speed <= 0 || speed > 10) {
+                player.sendMessage(ChatColor.RED + "Speed must be between 0 and 10.");
                 return true;
             }
-            player.setWalkSpeed(speed);
+            Float speedFloat = speed / 10.00f;
+            player.setWalkSpeed(speedFloat);
             player.sendMessage(ChatColor.GREEN + "Walk speed set to " + speed + ".");
         } catch (NumberFormatException e) {
             player.sendMessage(ChatColor.RED + "Invalid speed value.");
@@ -59,12 +60,13 @@ public class UtilManager {
 
     public boolean setFlySpeed(Player player, String speedArg) {
         try {
-            float speed = Float.parseFloat(speedArg);
-            if (speed < 0 || speed > 1) {
-                player.sendMessage(ChatColor.RED + "Fly speed must be between 0 and 1.");
+            int speed = Integer.parseInt(speedArg);
+            if (speed <= 0 || speed > 10) {
+                player.sendMessage(ChatColor.RED + "Fly speed must be between 0 and 10.");
                 return true;
             }
-            player.setFlySpeed(speed);
+            Float speedFloat = speed / 10.00f;
+            player.setFlySpeed(speedFloat);
             player.sendMessage(ChatColor.GREEN + "Fly speed set to " + speed + ".");
         } catch (NumberFormatException e) {
             player.sendMessage(ChatColor.RED + "Invalid fly speed value.");

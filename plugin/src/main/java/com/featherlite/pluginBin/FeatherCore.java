@@ -238,8 +238,8 @@ public class FeatherCore extends JavaPlugin {
         getCommand("zone").setTabCompleter(zoneCommands);
         getCommand("board").setExecutor(this);
         getCommand("board").setTabCompleter(scoreboardCommands);
-        getCommand("inventory").setExecutor(this);
-        getCommand("inv").setExecutor(this);
+        getCommand("restoreinventory").setExecutor(this);
+        getCommand("restoreinv").setExecutor(this);
         getCommand("menu").setExecutor(this);
         getCommand("menu").setTabCompleter(menuCommands);
         getCommand("menus").setExecutor(this);
@@ -509,7 +509,8 @@ public class FeatherCore extends JavaPlugin {
                 case "board":
                     return scoreboardCommands.handleScoreboardCommands(sender, args, isPlayer);
                 case "inv":
-                case "inventory":
+                case "restoreinventory":
+                case "restoreinv":
                     return inventoryCommands.handleInventoryCommands(sender, args, isPlayer);
                 case "menu":
                 case "menus":

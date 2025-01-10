@@ -60,10 +60,10 @@ public class EconomyCommands implements TabCompleter {
         }
 
         Player player = (Player) sender;
-        if (!player.hasPermission("core.eco.bal")) {
-            player.sendMessage(ChatColor.RED + "You do not have permission to check your balance.");
-            return true;
-        }
+        // if (!player.hasPermission("core.eco.bal")) {
+        //     player.sendMessage(ChatColor.RED + "You do not have permission to check your balance.");
+        //     return true;
+        // }
 
         double balance = economyManager.getBalance(player.getUniqueId());
         String prefix = economyManager.getCurrencyPrefix();
@@ -75,10 +75,10 @@ public class EconomyCommands implements TabCompleter {
     private boolean handleBaltopCommand(CommandSender sender, String[] args) {
         int page = 1; // Default to the first page
 
-        if (!sender.hasPermission("core.eco.baltop")) {
-            sender.sendMessage(ChatColor.RED + "You do not have permission to view the balance leaderboard.");
-            return true;
-        }
+        // if (!sender.hasPermission("core.eco.baltop")) {
+        //     sender.sendMessage(ChatColor.RED + "You do not have permission to view the balance leaderboard.");
+        //     return true;
+        // }
 
         if (args.length > 1) {
             try {
@@ -101,10 +101,10 @@ public class EconomyCommands implements TabCompleter {
             return true;
         }
 
-        if (!sender.hasPermission("core.eco.pay")) {
-            sender.sendMessage(ChatColor.RED + "You do not have permission to pay other players.");
-            return true;
-        }
+        // if (!sender.hasPermission("core.eco.pay")) {
+        //     sender.sendMessage(ChatColor.RED + "You do not have permission to pay other players.");
+        //     return true;
+        // }
 
         if (args.length < 3) {
             sender.sendMessage(ChatColor.RED + "Usage: /eco pay <playername> <amount>");

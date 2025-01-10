@@ -42,10 +42,10 @@ commands:
     aliases: [sb,b]
     usage: /board <toggle|{board_name}|reload>
 
-  inventory:
+  restoreinventory:
     description: Controls inventory back-ups.
-    aliases: [inv]
-    usage: /inventory restore <player-username>
+    aliases: [restoreinv]
+    usage: /restoreinventory <player-username>
 
   menu:
     description: Opens menus.

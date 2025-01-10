@@ -116,22 +116,39 @@ public class EconomyManager {
     // Get a leaderboard of top balances (baltop)
     public List<Map.Entry<OfflinePlayer, Double>> getTopBalances(String currency) {
         Map<OfflinePlayer, Double> balances = new HashMap<>();
-
+    
         for (File file : playerDataFolder.listFiles()) {
             if (file.getName().endsWith(".yml")) {
-                FileConfiguration data = YamlConfiguration.loadConfiguration(file);
-                UUID playerId = UUID.fromString(file.getName().replace(".yml", ""));
-                OfflinePlayer player = Bukkit.getOfflinePlayer(playerId);
-                double balance = data.getDouble("balances." + currency, 0.0);
-                balances.put(player, balance);
+                try {
+                    // Load the file's content
+                    FileConfiguration data = YamlConfiguration.loadConfiguration(file);
+                    
+                    // Retrieve the UUID from the file
+                    String uuidString = data.getString("user-stats.UUID");
+                    if (uuidString == null) {
+                        Bukkit.getLogger().warning("Missing UUID in file: " + file.getName());
+                        continue;
+                    }
+    
+                    UUID playerId = UUID.fromString(uuidString); // Safely parse the UUID
+                    OfflinePlayer player = Bukkit.getOfflinePlayer(playerId);
+    
+                    // Retrieve the balance for the specified currency
+                    double balance = data.getDouble("balances." + currency, 0.0);
+                    balances.put(player, balance);
+                } catch (IllegalArgumentException e) {
+                    Bukkit.getLogger().warning("Invalid UUID in file: " + file.getName());
+                }
             }
         }
-
+    
         // Sort by balance in descending order
         return balances.entrySet().stream()
                 .sorted(Map.Entry.<OfflinePlayer, Double>comparingByValue().reversed())
                 .collect(Collectors.toList());
     }
+    
+    
 
     // // File Handling
     // private FileConfiguration getPlayerData(UUID playerId) {

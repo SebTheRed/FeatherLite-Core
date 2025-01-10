@@ -96,52 +96,44 @@ public class WorldCommands implements TabCompleter {
                 break;
 
                 case "tp":
-                    if (player != null && !player.hasPermission("feathercore.world.tp")) {
-                        sender.sendMessage(ChatColor.RED + "You don't have permission to teleport to worlds.");
+                if (args.length < 2) {
+                    sender.sendMessage(ChatColor.YELLOW + "Usage: /world tp <worldName> [playerName]");
+                    return true;
+                }
+            
+                String targetWorldName = args[1];
+                World targetWorld = Bukkit.getWorld(targetWorldName);
+            
+                if (targetWorld == null) {
+                    sender.sendMessage(ChatColor.RED + "World not found or not loaded.");
+                    return true;
+                }
+            
+                Player targetPlayer;
+            
+                if (args.length > 2) {
+                    // Teleporting another player
+                    if (player != null && !player.hasPermission("feathercore.world.tp.others")) {
+                        sender.sendMessage(ChatColor.RED + "You don't have permission to teleport other players.");
                         return true;
                     }
-                
-                    if (args.length < 2) {
-                        sender.sendMessage(ChatColor.YELLOW + "Usage: /world tp <worldName> [playerName]");
+            
+                    targetPlayer = Bukkit.getPlayer(args[2]);
+                    if (targetPlayer == null) {
+                        sender.sendMessage(ChatColor.RED + "Player not found or not online.");
                         return true;
                     }
-                
-                    String targetWorldName = args[1];
-                    World targetWorld = Bukkit.getWorld(targetWorldName);
-                
-                    if (targetWorld == null) {
-                        sender.sendMessage(ChatColor.RED + "World not found or not loaded.");
-                        return true;
-                    }
-                
-                    // Determine the target player
-                    Player targetPlayer = null;
-                
-                    if (args.length > 2) {
-                        // Specifying another player to teleport
-                        if (player != null && !player.hasPermission("feathercore.world.tp.others")) {
-                            sender.sendMessage(ChatColor.RED + "You don't have permission to teleport other players.");
-                            return true;
-                        }
-                
-                        targetPlayer = Bukkit.getPlayer(args[2]);
-                        if (targetPlayer == null) {
-                            sender.sendMessage(ChatColor.RED + "Player not found or not online.");
-                            return true;
-                        }
-                    } else {
-                        // No player specified; use the sender if they are a player
-                        if (sender instanceof Player) {
-                            targetPlayer = (Player) sender;
-                        } else {
-                            sender.sendMessage(ChatColor.RED + "You must specify a player when using this command from the console.");
-                            return true;
-                        }
-                    }
-                
-                    // Teleport the target player to the world's spawn location
-                    Location spawnLocation = targetWorld.getSpawnLocation();
-                    worldManager.teleportPlayer(targetPlayer, spawnLocation);
+                } else if (isPlayer) {
+                    // Teleporting the command sender
+                    targetPlayer = player;
+                } else {
+                    sender.sendMessage(ChatColor.RED + "You must specify a player when using this command from the console.");
+                    return true;
+                }
+            
+                // Teleport the target player to the world's spawn location
+                Location spawnLocation = targetWorld.getSpawnLocation();
+                worldManager.teleportPlayer(targetPlayer, spawnLocation);
             
                 if (targetPlayer.equals(player)) {
                     sender.sendMessage(ChatColor.GREEN + "Teleported to the spawn of world: " + targetWorldName);
@@ -150,6 +142,7 @@ public class WorldCommands implements TabCompleter {
                     targetPlayer.sendMessage(ChatColor.GREEN + "You have been teleported to the spawn of world: " + targetWorldName);
                 }
                 break;
+            
             
             case "import":
                 if (args.length < 2) {

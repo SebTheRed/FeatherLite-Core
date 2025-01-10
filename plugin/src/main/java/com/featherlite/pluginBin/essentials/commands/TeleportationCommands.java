@@ -30,49 +30,64 @@ public class TeleportationCommands implements TabCompleter {
             return true;
         }
 
-        Player player = (isPlayer ? (Player) sender : null);
-
-
-        // if (args.length == 0) {
-        //     player.sendMessage(ChatColor.RED + "Usage: /<command> [args]");
-        //     return true;
-        // }
-
+        Player executor = isPlayer ? (Player) sender : null;
+        Player target = null;
+        // Determine the target player
+        if (args.length > 0) {
+            target = Bukkit.getPlayer(args[args.length - 1]); // Last argument might be a player name
+            if (target == null && !isPlayer) {
+                sender.sendMessage(ChatColor.RED + "Console must specify a valid target player.");
+                return true;
+            }
+        }
+        if (target == null) {
+            target = executor;
+        }
         switch (label.toLowerCase()) {
             case "tppos":
-                return handleTppos(player, args);
+                return handleTppos(target, args);
             case "tp":
-                return handleTp(player, args);
+                return handleTp(target, args);
             case "tphere":
-                return handleTphere(player, args);
+                if (!isPlayer) {sender.sendMessage("You can't teleport people to the console!");}
+                return handleTphere(target, args);
             case "tpall":
-                return handleTpAll(player);
+                if (!isPlayer) {sender.sendMessage("You cannot tp everyone to the console!");}
+                return handleTpAll(target);
             case "tpa":
-                return handleTpa(player, args);
+                if (!isPlayer) {sender.sendMessage("You can't send /tpa from the console!");}
+                return handleTpa(target, args);
             case "tpahere":
-                return handleTpahere(player, args);
+                if (!isPlayer) {sender.sendMessage("You can't send /tpahere from the console!");}
+                return handleTpahere(target, args);
             case "tpaccept":
-                return teleportationManager.acceptTeleport(player);
+                if (!isPlayer) {sender.sendMessage("You can't send /tpaccept from the console!");}
+                return teleportationManager.acceptTeleport(target);
             case "tpadeny":
-                return teleportationManager.denyTeleport(player);
+                if (!isPlayer) {sender.sendMessage("You can't send /tpadeny from the console!");}
+                return teleportationManager.denyTeleport(target);
             case "tpacancel":
-                return teleportationManager.cancelTeleport(player);            
+                if (!isPlayer) {sender.sendMessage("You can't send /tpacancel from the console!");}
+                return teleportationManager.cancelTeleport(target);            
             case "back":
-                return teleportationManager.teleportBack(player);
+                if (!isPlayer) {sender.sendMessage("You can't send /back from the console!");}
+                return teleportationManager.teleportBack(target);
             case "tpr":
             case "rtp":
-                return handleTpr(player);
+                if (!isPlayer) {sender.sendMessage("You can't send /rtp from the console!");}
+                return handleTpr(target);
             case "spawn":
-                return teleportationManager.teleportToSpawn(player);
+                return teleportationManager.teleportToSpawn(target);
             case "setspawn":
-                if (!player.hasPermission("feathercore.setspawn")) {
-                    player.sendMessage(ChatColor.RED + "You don't have permission to set the server spawn.");
+                if (!isPlayer) {sender.sendMessage("You can't set /setspawn from console.");}
+                if (!target.hasPermission("feathercore.setspawn")) {
+                    target.sendMessage(ChatColor.RED + "You don't have permission to set the server spawn.");
                     return true;
                 }
-                Location location = player.getLocation();
-                return teleportationManager.setServerSpawn(player, location);
+                Location location = target.getLocation();
+                return teleportationManager.setServerSpawn(target, location);
             default:
-                player.sendMessage(ChatColor.RED + "Unknown command.");
+                target.sendMessage(ChatColor.RED + "Unknown command.");
                 return true;
         }
     }
