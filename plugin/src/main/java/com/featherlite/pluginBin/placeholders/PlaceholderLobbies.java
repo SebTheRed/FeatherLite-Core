@@ -41,7 +41,7 @@ public class PlaceholderLobbies {
     // Placeholder: <game_world>
     public static String getGameWorld(Player player) {
         GameInstance instance = getGameInstanceForPlayer(player);
-        return instance != null ? instance.getWorldName() : "No World";
+        return instance != null ? instance.getBaseWorldName() : "No World";
     }
 
     // Utility: Get the GameInstance for the player

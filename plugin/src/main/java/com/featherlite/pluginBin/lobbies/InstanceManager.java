@@ -102,6 +102,7 @@ public class InstanceManager {
                     gameName,
                     gameType,
                     instanceWorldName, // Use the unique instance world name
+                    baseWorldName,
                     teamSizes,
                     maxTime,
                     teamNames,
@@ -233,7 +234,7 @@ public class InstanceManager {
         }
     
         // Unload and delete the instance-specific world
-        String instanceWorldName = instance.getWorldName();
+        String instanceWorldName = instance.getInstanceWorldName();
         try {
             worldManager.deleteWorld(instanceWorldName);
         } catch (IllegalArgumentException e) {
@@ -251,8 +252,8 @@ public class InstanceManager {
         GameInstance instance = activeInstances.remove(instanceId);
         if (instance != null) {
             // Unload and delete the instance-specific world
-            worldManager.deleteWorld(instance.getWorldName());
-            plugin.getLogger().info("Successfully removed and deleted instance world: " + instance.getWorldName());
+            worldManager.deleteWorld(instance.getInstanceWorldName());
+            plugin.getLogger().info("Successfully removed and deleted instance world: " + instance.getInstanceWorldName());
         } else {
             plugin.getLogger().warning("Attempted to remove an invalid or non-existent instance with ID: " + instanceId);
         }

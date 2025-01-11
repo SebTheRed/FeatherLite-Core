@@ -1,7 +1,7 @@
 package com.featherlite.pluginBin.lobbies;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -350,7 +350,7 @@ public class GamesUI implements Listener {
         if (meta != null) {
             meta.setDisplayName(ChatColor.GREEN + instance.getGameName());
             List<String> lore = new ArrayList<>();
-            lore.add(ChatColor.GRAY + "World: " + instance.getWorldName());
+            lore.add(ChatColor.GRAY + "World: " + instance.getBaseWorldName());
             lore.add(ChatColor.GRAY + "Players: " + instance.getTotalPlayerCount());
             // instance.getTeamSizes().values().stream()
             //        .mapToInt(sizeMap -> sizeMap.getOrDefault("max", 0)) // Sum up the "max" values

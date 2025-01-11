@@ -1,5 +1,19 @@
 {
 
+    "test":{
+        "/pay": false,
+        "": false
+    },
+
+
+
+
+
+
+
+
+
+
     "core tier":{
         "items":{
             "testing extrenal items": false,

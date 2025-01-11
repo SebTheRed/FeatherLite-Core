@@ -23,7 +23,8 @@ public class GameInstance {
     private final boolean isInstancePublic;
     private final String gameName; // Name of the minigame
     private final String gameType; // Type of the game (e.g., "Bedwars")
-    private String worldName; // Name of the world for this instance
+    private String instanceWorldName; // Name of the world for this instance
+    private String baseWorldName;
     private final Map<String, TeamSize> teamSizes; // A map of teams and their sizes.
     private final int maxTime; // In minutes
     private final Map<String, List<UUID>> teams; // Maps team names to player UUIDs
@@ -41,7 +42,8 @@ public class GameInstance {
             boolean isInstancePublic,
             String gameName,
             String gameType,
-            String worldName,
+            String instanceWorldName,
+            String baseWorldName,
             Map<String, TeamSize> teamSizes,
             int maxTime,
             List<String> teamNames,
@@ -54,7 +56,8 @@ public class GameInstance {
         this.isInstancePublic = isInstancePublic;
         this.gameName = gameName;
         this.gameType = gameType;
-        this.worldName = worldName;
+        this.instanceWorldName = instanceWorldName;
+        this.baseWorldName = baseWorldName;
         this.teamSizes = teamSizes;
         this.maxTime = maxTime;
         this.teams = new HashMap<>();
@@ -87,13 +90,12 @@ public class GameInstance {
         return gameType;
     }
 
-    public String getWorldName() {
-        return worldName;
+    public String getInstanceWorldName() {
+        return instanceWorldName;
     }
 
-    public boolean setWorldName(String newName) {
-        worldName = newName;
-        return true;
+    public String getBaseWorldName() {
+        return baseWorldName;
     }
 
     public Map<String, TeamSize> getTeamSizes() {
