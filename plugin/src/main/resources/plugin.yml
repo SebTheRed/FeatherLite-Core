@@ -31,6 +31,10 @@ commands:
     description: Opens the Item UI.
     permission: core.items
     usage: /items [reload]
+  item:
+    description: Operates multiple item based commands.
+    permission: core.item
+    usage: /item give <category> <item_name> [player_name]
   zone:
     description: Controls a Zone.
     permission: core.zone

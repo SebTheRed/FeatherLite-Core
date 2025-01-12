@@ -44,6 +44,16 @@ public class ItemManager {
 
     }
 
+
+    // Retrieve an ItemStack by category and item name
+    public ItemStack getItem(String category, String itemName) {
+        Map<String, ItemStack> itemsInCategory = categorizedItems.get(category);
+        if (itemsInCategory != null) {
+            return itemsInCategory.get(itemName);
+        }
+        return null; // Return null if the category or item is not found
+    }
+
     // Load lore templates from config.yml into the map
     private void loadLoreTemplates() {
         // Define the file path

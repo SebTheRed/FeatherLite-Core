@@ -234,6 +234,9 @@ public class FeatherCore extends JavaPlugin {
         getCommand("perms").setExecutor(this);
         getCommand("perms").setTabCompleter(permissionCommands);
         getCommand("items").setExecutor(this);
+        getCommand("items").setTabCompleter(itemCommands);
+        getCommand("item").setExecutor(this);
+        getCommand("item").setTabCompleter(itemCommands);
         getCommand("zone").setExecutor(this);
         getCommand("zone").setTabCompleter(zoneCommands);
         getCommand("board").setExecutor(this);
@@ -503,6 +506,7 @@ public class FeatherCore extends JavaPlugin {
                 case "perms":
                     return permissionCommands.handlePermissionsCommands(sender, args, isPlayer);
                 case "items":
+                case "item":
                     return itemCommands.handleItemCommands(sender, args, isPlayer, this);
                 case "zone":
                     return zoneCommands.handleZoneCommands(sender, args, isPlayer);
