@@ -58,6 +58,12 @@ public class ZonesCommands implements TabCompleter {
                 return handleListZones(sender);
             case "info":
                 return handleZoneInfo(sender, args);
+            case "here":
+                if (!isPlayer) {sender.sendMessage("Only players can check the zone they are inside."); return true;}
+                Location loc = player.getLocation(); 
+                Zone zoneAt = zoneManager.getZoneAtLocation(loc);
+                handleZoneInfoWithZone(sender, zoneAt, args);
+                return true;
             case "reload":
                 return handleReloadZones(sender);
             case "rule":
@@ -161,11 +167,33 @@ public class ZonesCommands implements TabCompleter {
             sender.sendMessage(ChatColor.YELLOW + "World: " + zone.getWorld());
             sender.sendMessage(ChatColor.YELLOW + "Entry Message: " + zone.getEntryMessage());
             sender.sendMessage(ChatColor.YELLOW + "Exit Message: " + zone.getExitMessage());
+            sender.sendMessage(ChatColor.WHITE + "Debug: " + zone.getDebugInfo());
         } else {
             sender.sendMessage(ChatColor.RED + "Zone " + zoneName + " does not exist.");
         }
         return true;
     }
+
+
+    private boolean handleZoneInfoWithZone(CommandSender sender, Zone zone, String[] args) {
+        if (args.length < 1) {
+            sender.sendMessage(ChatColor.RED + "Usage: /zone here");
+            return true;
+        }
+        if (zone != null) {
+            sender.sendMessage(ChatColor.GOLD + "Zone Info: " + zone.getName());
+            sender.sendMessage(ChatColor.YELLOW + "Description: " + zone.getDescription());
+            sender.sendMessage(ChatColor.YELLOW + "World: " + zone.getWorld());
+            sender.sendMessage(ChatColor.YELLOW + "Entry Message: " + zone.getEntryMessage());
+            sender.sendMessage(ChatColor.YELLOW + "Exit Message: " + zone.getExitMessage());
+            sender.sendMessage(ChatColor.WHITE + "Debug: " + zone.getDebugInfo());
+        } else {
+            sender.sendMessage(ChatColor.RED + "You are not inside of a zone!");
+        }
+
+        return true;
+    }
+
 
     private boolean handleReloadZones(CommandSender sender) {
         zoneManager.reloadAllZones();

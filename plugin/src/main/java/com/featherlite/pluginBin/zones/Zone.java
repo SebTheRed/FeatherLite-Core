@@ -13,59 +13,64 @@ import java.util.List;
 import java.util.Set;
 
 public class Zone {
-    private final String name;
-    private final String description;
+    private String name;
+    private String description;
 
-    private final FileConfiguration config;
-    private final File configFile;
+    private FileConfiguration config;
+    private File configFile;
     private String world; // New field for the world
 
-    private final boolean isGameZone;
-    private final boolean gameOverrideSpawnPoint;
+    private boolean isGameZone;
+    private boolean gameOverrideSpawnPoint;
     
     // Coordinates
-    private final Location spawnPoint;
-    private final Location teleportPoint;
-    private final Location cornerOne;
-    private final Location cornerTwo;
+    private Location spawnPoint;
+    private Location teleportPoint;
+    private Location cornerOne;
+    private Location cornerTwo;
 
     // Natural rules
-    private final boolean lavaIgnite, lightningStrike, waterFlow, lavaFlow, snowFall, snowMelt,
+    private boolean lavaIgnite, lightningStrike, waterFlow, lavaFlow, snowFall, snowMelt,
             iceMelt, mushroomGrowth, leafDecay, grassGrowth, myceliumSpread, vineGrowth, rockGrowth,
             sculkGrowth, cropGrowth, soilDry;
 
     // Mob rules
-    private final boolean creeperExplosion, enderDragonBreak, ghastFireballBreak, endermanBreak, snowmanTrails,
+    private boolean creeperExplosion, enderDragonBreak, ghastFireballBreak, endermanBreak, snowmanTrails,
             ravagerBreak, mobDamage, mobDestroyPaintings, mobDestroyItemFrames, witherBreak;
-    private final Set<String> hostileMobSpawnList = new HashSet<>();
-    private final Set<String> passiveMobSpawnList = new HashSet<>();
-    private final boolean allowCustomMobs;
+    private Set<String> hostileMobSpawnList = new HashSet<>();
+    private Set<String> passiveMobSpawnList = new HashSet<>();
+    private boolean allowCustomMobs;
 
     // Protection rules
-    private final boolean fireSpread, interact, mount, chestAccess,
+    private boolean fireSpread, interact, mount, chestAccess,
             pvp, sleep, respawnAnchors, tnt, vehiclePlace, vehicleDestroy, ignite, trampling,
             frostWalker, itemFrameRotation, stationInteract;
-    private final Set<String> buildList = new HashSet<>();
-    private final Set<String> breakList = new HashSet<>();
-    private final Set<String> explosionProofBlocks = new HashSet<>();
+    private Set<String> buildList = new HashSet<>();
+    private Set<String> breakList = new HashSet<>();
+    private Set<String> explosionProofBlocks = new HashSet<>();
 
     // Player rules
-    private final String entryMessage, exitMessage;
-    private final Set<String> entryList = new HashSet<>();
-    private final Set<String> exitList = new HashSet<>();
-    private final boolean enderpearl, chorusFruit;
+    private String entryMessage, exitMessage;
+    private Set<String> entryList = new HashSet<>();
+    private Set<String> exitList = new HashSet<>();
+    private boolean enderpearl, chorusFruit;
 
     // Map rules
-    private final boolean itemPickup, itemDrop, expDrop, fallDamage, weatherLock, naturalHealthRegen, naturalHungerDrain;
-    private final Set<String> blockedCommands = new HashSet<>();
+    private boolean itemPickup, itemDrop, expDrop, fallDamage, weatherLock, naturalHealthRegen, naturalHungerDrain;
+    private Set<String> blockedCommands = new HashSet<>();
 
     public Zone(String name, File configFile) {
 
         this.configFile = configFile;
         this.config = YamlConfiguration.loadConfiguration(configFile);
-
         this.name = name;
         this.world = config.getString("information.world"); // Load world from config
+
+        setupZoneFromConfig();
+    }
+
+
+    public void setupZoneFromConfig() {
 
         this.description = config.getString("information.description");
         this.isGameZone = config.getBoolean("information.is-game-zone", false);
@@ -151,13 +156,14 @@ public class Zone {
         loadList(config, "map-rules.blocked-commands", blockedCommands);
     }
 
+
+
     private Location parseLocation(FileConfiguration config, String path) {
         if (!config.isConfigurationSection(path)) return null;
         double x = config.getDouble(path + ".x");
         double y = config.getDouble(path + ".y");
         double z = config.getDouble(path + ".z");
-        String worldName = config.getString("world");
-        return new Location(org.bukkit.Bukkit.getWorld(worldName), x, y, z);
+        return new Location(org.bukkit.Bukkit.getWorld(world), x, y, z);
     }
 
     private void loadList(FileConfiguration config, String path, Set<String> list) {
@@ -382,6 +388,113 @@ public class Zone {
     public void setExitMessage(String exitMessage) {
         setConfigString("player-rules.exit-message", exitMessage);
     }
+
+
+    
+    public String getDebugInfo() {
+        StringBuilder debugInfo = new StringBuilder();
+    
+        debugInfo.append("Zone Name: ").append(name).append("\n");
+        debugInfo.append("Description: ").append(description).append("\n");
+        debugInfo.append("World: ").append(world).append("\n");
+        debugInfo.append("Is Game Zone: ").append(isGameZone).append("\n");
+        debugInfo.append("Game Override Spawn Point: ").append(gameOverrideSpawnPoint).append("\n");
+    
+        // Coordinates
+        debugInfo.append("Spawn Point: ").append(formatLocation(spawnPoint)).append("\n");
+        debugInfo.append("Teleport Point: ").append(formatLocation(teleportPoint)).append("\n");
+        debugInfo.append("Corner One: ").append(formatLocation(cornerOne)).append("\n");
+        debugInfo.append("Corner Two: ").append(formatLocation(cornerTwo)).append("\n");
+    
+        // Natural Rules
+        debugInfo.append("Natural Rules:").append("\n");
+        debugInfo.append("  Lava Ignite: ").append(lavaIgnite).append("\n");
+        debugInfo.append("  Lightning Strike: ").append(lightningStrike).append("\n");
+        debugInfo.append("  Water Flow: ").append(waterFlow).append("\n");
+        debugInfo.append("  Lava Flow: ").append(lavaFlow).append("\n");
+        debugInfo.append("  Snow Fall: ").append(snowFall).append("\n");
+        debugInfo.append("  Snow Melt: ").append(snowMelt).append("\n");
+        debugInfo.append("  Ice Melt: ").append(iceMelt).append("\n");
+        debugInfo.append("  Mushroom Growth: ").append(mushroomGrowth).append("\n");
+        debugInfo.append("  Leaf Decay: ").append(leafDecay).append("\n");
+        debugInfo.append("  Grass Growth: ").append(grassGrowth).append("\n");
+        debugInfo.append("  Mycelium Spread: ").append(myceliumSpread).append("\n");
+        debugInfo.append("  Vine Growth: ").append(vineGrowth).append("\n");
+        debugInfo.append("  Rock Growth: ").append(rockGrowth).append("\n");
+        debugInfo.append("  Sculk Growth: ").append(sculkGrowth).append("\n");
+        debugInfo.append("  Crop Growth: ").append(cropGrowth).append("\n");
+        debugInfo.append("  Soil Dry: ").append(soilDry).append("\n");
+    
+        // Mob Rules
+        debugInfo.append("Mob Rules:").append("\n");
+        debugInfo.append("  Creeper Explosion: ").append(creeperExplosion).append("\n");
+        debugInfo.append("  Ender Dragon Break: ").append(enderDragonBreak).append("\n");
+        debugInfo.append("  Ghast Fireball Break: ").append(ghastFireballBreak).append("\n");
+        debugInfo.append("  Enderman Break: ").append(endermanBreak).append("\n");
+        debugInfo.append("  Snowman Trails: ").append(snowmanTrails).append("\n");
+        debugInfo.append("  Ravager Break: ").append(ravagerBreak).append("\n");
+        debugInfo.append("  Mob Damage: ").append(mobDamage).append("\n");
+        debugInfo.append("  Mob Destroy Paintings: ").append(mobDestroyPaintings).append("\n");
+        debugInfo.append("  Mob Destroy Item Frames: ").append(mobDestroyItemFrames).append("\n");
+        debugInfo.append("  Wither Break: ").append(witherBreak).append("\n");
+        debugInfo.append("  Hostile Mob Spawn List: ").append(hostileMobSpawnList).append("\n");
+        debugInfo.append("  Passive Mob Spawn List: ").append(passiveMobSpawnList).append("\n");
+        debugInfo.append("  Allow Custom Mobs: ").append(allowCustomMobs).append("\n");
+    
+        // Protection Rules
+        debugInfo.append("Protection Rules:").append("\n");
+        debugInfo.append("  Fire Spread: ").append(fireSpread).append("\n");
+        debugInfo.append("  Interact: ").append(interact).append("\n");
+        debugInfo.append("  Mount: ").append(mount).append("\n");
+        debugInfo.append("  Chest Access: ").append(chestAccess).append("\n");
+        debugInfo.append("  PvP: ").append(pvp).append("\n");
+        debugInfo.append("  Sleep: ").append(sleep).append("\n");
+        debugInfo.append("  Respawn Anchors: ").append(respawnAnchors).append("\n");
+        debugInfo.append("  TNT: ").append(tnt).append("\n");
+        debugInfo.append("  Vehicle Place: ").append(vehiclePlace).append("\n");
+        debugInfo.append("  Vehicle Destroy: ").append(vehicleDestroy).append("\n");
+        debugInfo.append("  Ignite: ").append(ignite).append("\n");
+        debugInfo.append("  Trampling: ").append(trampling).append("\n");
+        debugInfo.append("  Frost Walker: ").append(frostWalker).append("\n");
+        debugInfo.append("  Item Frame Rotation: ").append(itemFrameRotation).append("\n");
+        debugInfo.append("  Station Interact: ").append(stationInteract).append("\n");
+        debugInfo.append("  Build List: ").append(buildList).append("\n");
+        debugInfo.append("  Break List: ").append(breakList).append("\n");
+        debugInfo.append("  Explosion Proof Blocks: ").append(explosionProofBlocks).append("\n");
+    
+        // Player Rules
+        debugInfo.append("Player Rules:").append("\n");
+        debugInfo.append("  Entry Message: ").append(entryMessage).append("\n");
+        debugInfo.append("  Exit Message: ").append(exitMessage).append("\n");
+        debugInfo.append("  Entry List: ").append(entryList).append("\n");
+        debugInfo.append("  Exit List: ").append(exitList).append("\n");
+        debugInfo.append("  Enderpearl: ").append(enderpearl).append("\n");
+        debugInfo.append("  Chorus Fruit: ").append(chorusFruit).append("\n");
+    
+        // Map Rules
+        debugInfo.append("Map Rules:").append("\n");
+        debugInfo.append("  Item Pickup: ").append(itemPickup).append("\n");
+        debugInfo.append("  Item Drop: ").append(itemDrop).append("\n");
+        debugInfo.append("  EXP Drop: ").append(expDrop).append("\n");
+        debugInfo.append("  Fall Damage: ").append(fallDamage).append("\n");
+        debugInfo.append("  Weather Lock: ").append(weatherLock).append("\n");
+        debugInfo.append("  Natural Health Regen: ").append(naturalHealthRegen).append("\n");
+        debugInfo.append("  Natural Hunger Drain: ").append(naturalHungerDrain).append("\n");
+        debugInfo.append("  Blocked Commands: ").append(blockedCommands).append("\n");
+    
+        return debugInfo.toString();
+    }
+    
+    private String formatLocation(Location location) {
+        if (location == null) return "null";
+        return "World: " + location.getWorld().getName() + ", X: " + location.getX() + ", Y: " + location.getY() + ", Z: " + location.getZ();
+    }
+
+
+
+
+
+
 
  // Natural rule getters and setters
     public boolean isLavaIgnite() { return lavaIgnite; }

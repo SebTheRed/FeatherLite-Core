@@ -40,6 +40,7 @@ import com.featherlite.pluginBin.scoreboards.ScoreboardManager;
 import com.featherlite.pluginBin.webapp.WebAppManager;
 import com.featherlite.pluginBin.worlds.WorldBorderListener;
 import com.featherlite.pluginBin.worlds.WorldManager;
+import com.featherlite.pluginBin.zones.ZoneListeners;
 import com.featherlite.pluginBin.zones.ZoneManager;
 import com.featherlite.pluginBin.chat.ChatControlListener;
 import com.featherlite.pluginBin.chat.ChatManager;
@@ -167,6 +168,8 @@ public class FeatherCore extends JavaPlugin {
 
         permissionManager = new PermissionManager(this, playerDataManager); // Initialize the permission manager
         zoneManager = new ZoneManager(this);
+        getServer().getPluginManager().registerEvents(new ZoneListeners(zoneManager, this), this);
+
         scoreboardManager = new ScoreboardManager(this);
 
         economyManager = new EconomyManager(this, playerDataManager);

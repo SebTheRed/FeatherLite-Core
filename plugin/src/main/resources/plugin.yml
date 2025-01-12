@@ -48,6 +48,7 @@ commands:
 
   restoreinventory:
     description: Controls inventory back-ups.
+    permission: core.restoreinventory
     aliases: [restoreinv]
     usage: /restoreinventory <player-username>
 
@@ -360,6 +361,11 @@ permissions:
   core.zone:
     description: Allows the player to manage zones.
     default: op
+
+  core.restoreinventory:
+    description: Allows the player to restore other players inventories.
+    default: false
+
   core.board.*:
     description: Allows the player to manage scoreboards.
     default: false
