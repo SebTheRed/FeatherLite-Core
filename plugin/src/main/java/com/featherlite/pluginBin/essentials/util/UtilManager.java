@@ -78,12 +78,15 @@ public class UtilManager {
         GameMode gameMode;
         switch (mode.toLowerCase()) {
             case "survival":
+            case "0":
                 gameMode = GameMode.SURVIVAL;
                 break;
             case "creative":
+            case "1":
                 gameMode = GameMode.CREATIVE;
                 break;
             case "spectator":
+            case "2":
                 gameMode = GameMode.SPECTATOR;
                 break;
             default:
