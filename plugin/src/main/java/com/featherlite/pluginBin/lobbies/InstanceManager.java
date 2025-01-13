@@ -3,6 +3,7 @@ package com.featherlite.pluginBin.lobbies;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -26,12 +27,15 @@ public class InstanceManager {
     private final WorldManager worldManager;
     private final TeamSelectorBook teamSelectorBook;
     private int instanceCount = 0; // Track unique instance numbers
+    // private Map<String, Location> lobbyLocations = new HashMap<>();
+
 
     public InstanceManager(PartyManager partyManager, WorldManager worldManager, FeatherCore plugin, TeamSelectorBook teamSelectorBook) {
         this.partyManager = partyManager;
         this.worldManager = worldManager;
         this.plugin = plugin;
         this.teamSelectorBook = teamSelectorBook;
+        // loadLobbyLocations();
     }
 
     /**
@@ -124,6 +128,33 @@ public class InstanceManager {
             .filter(instance -> instance.getGameName().equalsIgnoreCase(registeredGameName))
             .toList();
     }
+
+
+    // private void loadLobbyLocations() {
+    //     if (getConfig().isConfigurationSection("lobbyLocations")) {
+    //         ConfigurationSection section = getConfig().getConfigurationSection("lobbyLocations");
+
+    //         for (String name : section.getKeys(false)) {
+    //             String worldName = section.getString(name + ".world");
+    //             double x = section.getDouble(name + ".x");
+    //             double y = section.getDouble(name + ".y");
+    //             double z = section.getDouble(name + ".z");
+
+    //             if (Bukkit.getWorld(worldName) == null) {
+    //                 plugin.getLogger().warning("World " + worldName + " for lobby " + name + " does not exist!");
+    //                 continue;
+    //             }
+
+    //             Location location = new Location(Bukkit.getWorld(worldName), x, y, z);
+    //             lobbyLocations.put(name, location);
+    //         }
+    //     } else {
+    //         plugin.getLogger().warning("No 'lobbyLocations' section found in config.yml!");
+    //     }
+    // }
+
+
+
 
     /**
      * Resolves raw team spawns into actual Location objects using the instance world.
@@ -218,7 +249,7 @@ public class InstanceManager {
                 player.sendMessage("§aYour inventory has been restored!");
     
                 // Teleport to lobby or fallback location
-                Location safeLocation = plugin.getLobbyLocation("Spawn");
+                Location safeLocation = Bukkit.getWorld("world").getSpawnLocation();
                 if (safeLocation != null) {
                     player.teleport(safeLocation);
                 } else {
@@ -261,7 +292,7 @@ public class InstanceManager {
     private void teleportPlayersToSafeLocation(GameInstance instance) {
         String lobbyName = "Spawn";
         // Fetch the specified lobby location from the core plugin
-        final Location safeLocation = plugin.getLobbyLocation(lobbyName);
+        final Location safeLocation = Bukkit.getWorld("world").getSpawnLocation();
         Location backupLocation = Bukkit.getWorld("world").getSpawnLocation();
     
         // Iterate through all teams and teleport their members to the safe location
@@ -488,7 +519,7 @@ public void addPlayerToInstance(Player player, GameInstance instance) {
         player.sendMessage("§aYour inventory has been restored!");
     
         // Teleport the player to a safe location
-        Location safeLocation = plugin.getLobbyLocation("Spawn");
+        Location safeLocation = Bukkit.getWorld("world").getSpawnLocation();
         if (safeLocation != null) {
             player.teleport(safeLocation);
         } else {

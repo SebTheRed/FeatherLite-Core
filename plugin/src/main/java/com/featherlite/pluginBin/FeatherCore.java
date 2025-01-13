@@ -74,7 +74,6 @@ public class FeatherCore extends JavaPlugin {
     private UIManager uiManager;
     private ItemManager itemManager;
     private Map<UUID, String> activeSessions = new HashMap<>();
-    private Map<String, Location> lobbyLocations = new HashMap<>();
     private AbilityRegistry abilityRegistry; // Add the AbilityRegistry here
     private CooldownManager cooldownManager;
     private ZoneManager zoneManager;
@@ -129,7 +128,6 @@ public class FeatherCore extends JavaPlugin {
     @Override
     public void onEnable() {
         saveDefaultConfig();
-        loadLobbyLocations();
         getLogger().info("FeatherCore Plugin Enabled!");
 
         playerDataManager = new PlayerDataManager(this, "player_data");
@@ -378,35 +376,6 @@ public class FeatherCore extends JavaPlugin {
             }
         });
 
-    }
-
-
-
-    private void loadLobbyLocations() {
-        if (getConfig().isConfigurationSection("lobbyLocations")) {
-            ConfigurationSection section = getConfig().getConfigurationSection("lobbyLocations");
-
-            for (String name : section.getKeys(false)) {
-                String worldName = section.getString(name + ".world");
-                double x = section.getDouble(name + ".x");
-                double y = section.getDouble(name + ".y");
-                double z = section.getDouble(name + ".z");
-
-                if (Bukkit.getWorld(worldName) == null) {
-                    getLogger().warning("World " + worldName + " for lobby " + name + " does not exist!");
-                    continue;
-                }
-
-                Location location = new Location(Bukkit.getWorld(worldName), x, y, z);
-                lobbyLocations.put(name, location);
-            }
-        } else {
-            getLogger().warning("No 'lobbyLocations' section found in config.yml!");
-        }
-    }
-
-    public Location getLobbyLocation(String name) {
-        return lobbyLocations.get(name);
     }
 
     /*
