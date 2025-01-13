@@ -59,6 +59,12 @@ public class WorldCommands implements TabCompleter {
                 WorldType type = args.length > 3 ? WorldType.valueOf(args[3].toUpperCase()) : WorldType.NORMAL;
                 worldManager.createNewWorld(worldName, environment, type);
                 sender.sendMessage(ChatColor.GREEN + "World created: " + worldName);
+                boolean worldImport = worldManager.importWorld(worldName, environment);
+                if (worldImport) {
+                    sender.sendMessage(ChatColor.GREEN + worldName + " registered successfully");
+                } else {
+                    sender.sendMessage(ChatColor.RED + worldName + " failed to register!!");
+                }
                 break;
 
             case "copy":

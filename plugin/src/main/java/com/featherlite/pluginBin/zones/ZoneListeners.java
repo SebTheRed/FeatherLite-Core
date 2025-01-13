@@ -288,17 +288,6 @@ public class ZoneListeners implements Listener {
         }
     }
 
-    // @EventHandler
-    // public void onPlayerInteract(PlayerInteractEvent event) {
-    //     Player player = event.getPlayer();
-    //     Zone zone = zoneManager.getZoneAtLocation(player.getLocation());
-
-    //     if (zone != null && !zone.isInteract() && (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR)) {
-    //         event.setCancelled(true);
-    //         player.sendMessage(ChatColor.RED + "You cannot interact with items or blocks in this zone.");
-    //     }
-    // }
-
     @EventHandler
     public void onEntityMount(EntityMountEvent event) {
         if (event.getEntity() instanceof Player) {
@@ -313,19 +302,102 @@ public class ZoneListeners implements Listener {
     }
 
 
+    // @EventHandler
+    // public void onPlayerAction(PlayerInteractEvent event) {
+    //     Player player = event.getPlayer();
+    //     Zone zone = zoneManager.getZoneAtLocation(player.getLocation());
+    
+    //     if (zone == null) return;
+    
+    //     // Only process if player is right-clicking a block or air
+    //     if (event.getAction() != Action.RIGHT_CLICK_BLOCK && event.getAction() != Action.RIGHT_CLICK_AIR) return;
+    
+    //     Material clickedBlockType = event.getClickedBlock() != null ? event.getClickedBlock().getType() : null;
+    //     Material itemType = event.getItem() != null ? event.getItem().getType() : null;
+    
+    //     // 1. Ender Pearl and Chorus Fruit Usage
+    //     if (itemType == Material.ENDER_PEARL && !zone.isEnderpearl()) {
+    //         event.setCancelled(true);
+    //         player.sendMessage(ChatColor.RED + "Ender pearl usage is not allowed in this zone.");
+    //         return;
+    //     } else if (itemType == Material.CHORUS_FRUIT && !zone.isChorusFruit()) {
+    //         event.setCancelled(true);
+    //         player.sendMessage(ChatColor.RED + "Chorus fruit usage is not allowed in this zone.");
+    //         return;
+    //     }
+    
+    //     // 2. Vehicle Placement Check
+    //     boolean isBoat = itemType == Material.OAK_BOAT || itemType == Material.SPRUCE_BOAT ||
+    //                      itemType == Material.BIRCH_BOAT || itemType == Material.JUNGLE_BOAT ||
+    //                      itemType == Material.DARK_OAK_BOAT || itemType == Material.ACACIA_BOAT ||
+    //                      itemType == Material.MANGROVE_BOAT || itemType == Material.BAMBOO_RAFT;
+    //     boolean isMinecart = itemType == Material.MINECART || itemType == Material.CHEST_MINECART ||
+    //                          itemType == Material.FURNACE_MINECART || itemType == Material.HOPPER_MINECART ||
+    //                          itemType == Material.TNT_MINECART;
+        
+    //     if ((isBoat || isMinecart) && !zone.isVehiclePlace()) {
+    //         event.setCancelled(true);
+    //         player.sendMessage(ChatColor.RED + "Vehicle placement is disabled in this zone.");
+    //         return;
+    //     }
+    
+    //     // 3. Interactables Check
+    //     if (!zone.isInteract()) {
+    //         // List of general interactable blocks
+    //         if (clickedBlockType != null && (clickedBlockType == Material.OAK_DOOR || clickedBlockType == Material.SPRUCE_DOOR ||
+    //                                          clickedBlockType == Material.BIRCH_DOOR || clickedBlockType == Material.JUNGLE_DOOR ||
+    //                                          clickedBlockType == Material.ACACIA_DOOR || clickedBlockType == Material.DARK_OAK_DOOR ||
+    //                                          clickedBlockType == Material.MANGROVE_DOOR || clickedBlockType == Material.BAMBOO_DOOR ||
+    //                                          clickedBlockType == Material.IRON_DOOR || clickedBlockType == Material.OAK_TRAPDOOR || 
+    //                                          clickedBlockType == Material.SPRUCE_TRAPDOOR ||
+    //                                          clickedBlockType == Material.BIRCH_TRAPDOOR || clickedBlockType == Material.JUNGLE_TRAPDOOR ||
+    //                                          clickedBlockType == Material.ACACIA_TRAPDOOR || clickedBlockType == Material.DARK_OAK_TRAPDOOR ||
+    //                                          clickedBlockType == Material.MANGROVE_TRAPDOOR || clickedBlockType == Material.BAMBOO_TRAPDOOR ||
+    //                                          clickedBlockType == Material.IRON_TRAPDOOR ||
+                                             
+    //                                          clickedBlockType == Material.LEVER || clickedBlockType == Material.STONE_BUTTON || clickedBlockType == Material.OAK_BUTTON ||
+    //                                          clickedBlockType == Material.SPRUCE_BUTTON || clickedBlockType == Material.BIRCH_BUTTON ||
+    //                                          clickedBlockType == Material.JUNGLE_BUTTON || clickedBlockType == Material.ACACIA_BUTTON ||
+    //                                          clickedBlockType == Material.DARK_OAK_BUTTON || clickedBlockType == Material.MANGROVE_BUTTON ||
+    //                                          clickedBlockType == Material.BAMBOO_BUTTON || clickedBlockType == Material.POLISHED_BLACKSTONE_BUTTON ||
+    //                                          clickedBlockType == Material.CAULDRON ||
+    //                                          clickedBlockType == Material.COMPOSTER || clickedBlockType == Material.NOTE_BLOCK ||
+    //                                          clickedBlockType == Material.ITEM_FRAME)) {
+    //             event.setCancelled(true);
+    //             player.sendMessage(ChatColor.RED + "You cannot interact with this block in this zone.");
+    //             return;
+    //         }
+    //     }
+    
+    //     // 4. Station Interact Check
+    //     if (!zone.isStationInteract()) {
+    //         // List of station blocks that open an inventory interface
+    //         if (clickedBlockType != null && (clickedBlockType == Material.CRAFTING_TABLE || clickedBlockType == Material.ENCHANTING_TABLE ||
+    //                                          clickedBlockType == Material.SMITHING_TABLE || clickedBlockType == Material.CARTOGRAPHY_TABLE ||
+    //                                          clickedBlockType == Material.BREWING_STAND || clickedBlockType == Material.GRINDSTONE ||
+    //                                          clickedBlockType == Material.LOOM || clickedBlockType == Material.STONECUTTER)) {
+    //             event.setCancelled(true);
+    //             player.sendMessage(ChatColor.RED + "Station interaction is disabled in this zone.");
+    //             return;
+    //         }
+    //     }
+    // }
+
+
+
     @EventHandler
-    public void onPlayerAction(PlayerInteractEvent event) {
+    public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         Zone zone = zoneManager.getZoneAtLocation(player.getLocation());
-    
-        if (zone == null) return;
-    
-        // Only process if player is right-clicking a block or air
-        if (event.getAction() != Action.RIGHT_CLICK_BLOCK && event.getAction() != Action.RIGHT_CLICK_AIR) return;
-    
+
+        // Exit early if no zone or invalid action
+        if (zone == null || (event.getAction() != Action.RIGHT_CLICK_BLOCK && event.getAction() != Action.RIGHT_CLICK_AIR)) {
+            return;
+        }
+
         Material clickedBlockType = event.getClickedBlock() != null ? event.getClickedBlock().getType() : null;
         Material itemType = event.getItem() != null ? event.getItem().getType() : null;
-    
+
         // 1. Ender Pearl and Chorus Fruit Usage
         if (itemType == Material.ENDER_PEARL && !zone.isEnderpearl()) {
             event.setCancelled(true);
@@ -336,63 +408,71 @@ public class ZoneListeners implements Listener {
             player.sendMessage(ChatColor.RED + "Chorus fruit usage is not allowed in this zone.");
             return;
         }
-    
+
         // 2. Vehicle Placement Check
         boolean isBoat = itemType == Material.OAK_BOAT || itemType == Material.SPRUCE_BOAT ||
-                         itemType == Material.BIRCH_BOAT || itemType == Material.JUNGLE_BOAT ||
-                         itemType == Material.DARK_OAK_BOAT || itemType == Material.ACACIA_BOAT ||
-                         itemType == Material.MANGROVE_BOAT || itemType == Material.BAMBOO_RAFT;
+                        itemType == Material.BIRCH_BOAT || itemType == Material.JUNGLE_BOAT ||
+                        itemType == Material.DARK_OAK_BOAT || itemType == Material.ACACIA_BOAT ||
+                        itemType == Material.MANGROVE_BOAT || itemType == Material.BAMBOO_RAFT;
         boolean isMinecart = itemType == Material.MINECART || itemType == Material.CHEST_MINECART ||
-                             itemType == Material.FURNACE_MINECART || itemType == Material.HOPPER_MINECART ||
-                             itemType == Material.TNT_MINECART;
-        
+                            itemType == Material.FURNACE_MINECART || itemType == Material.HOPPER_MINECART ||
+                            itemType == Material.TNT_MINECART;
+
         if ((isBoat || isMinecart) && !zone.isVehiclePlace()) {
             event.setCancelled(true);
             player.sendMessage(ChatColor.RED + "Vehicle placement is disabled in this zone.");
             return;
         }
-    
+
         // 3. Interactables Check
-        if (!zone.isInteract()) {
-            // List of general interactable blocks
-            if (clickedBlockType != null && (clickedBlockType == Material.OAK_DOOR || clickedBlockType == Material.SPRUCE_DOOR ||
-                                             clickedBlockType == Material.BIRCH_DOOR || clickedBlockType == Material.JUNGLE_DOOR ||
-                                             clickedBlockType == Material.ACACIA_DOOR || clickedBlockType == Material.DARK_OAK_DOOR ||
-                                             clickedBlockType == Material.MANGROVE_DOOR || clickedBlockType == Material.BAMBOO_DOOR ||
-                                             clickedBlockType == Material.IRON_DOOR || clickedBlockType == Material.OAK_TRAPDOOR || 
-                                             clickedBlockType == Material.SPRUCE_TRAPDOOR ||
-                                             clickedBlockType == Material.BIRCH_TRAPDOOR || clickedBlockType == Material.JUNGLE_TRAPDOOR ||
-                                             clickedBlockType == Material.ACACIA_TRAPDOOR || clickedBlockType == Material.DARK_OAK_TRAPDOOR ||
-                                             clickedBlockType == Material.MANGROVE_TRAPDOOR || clickedBlockType == Material.BAMBOO_TRAPDOOR ||
-                                             clickedBlockType == Material.IRON_TRAPDOOR ||
-                                             
-                                             clickedBlockType == Material.LEVER || clickedBlockType == Material.STONE_BUTTON || clickedBlockType == Material.OAK_BUTTON ||
-                                             clickedBlockType == Material.SPRUCE_BUTTON || clickedBlockType == Material.BIRCH_BUTTON ||
-                                             clickedBlockType == Material.JUNGLE_BUTTON || clickedBlockType == Material.ACACIA_BUTTON ||
-                                             clickedBlockType == Material.DARK_OAK_BUTTON || clickedBlockType == Material.MANGROVE_BUTTON ||
-                                             clickedBlockType == Material.BAMBOO_BUTTON || clickedBlockType == Material.POLISHED_BLACKSTONE_BUTTON ||
-                                             clickedBlockType == Material.CAULDRON ||
-                                             clickedBlockType == Material.COMPOSTER || clickedBlockType == Material.NOTE_BLOCK ||
-                                             clickedBlockType == Material.ITEM_FRAME)) {
+        if (!zone.isInteract() && clickedBlockType != null) {
+            if (clickedBlockType == Material.OAK_DOOR || clickedBlockType == Material.SPRUCE_DOOR ||
+                clickedBlockType == Material.BIRCH_DOOR || clickedBlockType == Material.JUNGLE_DOOR ||
+                clickedBlockType == Material.ACACIA_DOOR || clickedBlockType == Material.DARK_OAK_DOOR ||
+                clickedBlockType == Material.MANGROVE_DOOR || clickedBlockType == Material.BAMBOO_DOOR ||
+                clickedBlockType == Material.IRON_DOOR || clickedBlockType == Material.OAK_TRAPDOOR ||
+                clickedBlockType == Material.SPRUCE_TRAPDOOR || clickedBlockType == Material.BIRCH_TRAPDOOR ||
+                clickedBlockType == Material.JUNGLE_TRAPDOOR || clickedBlockType == Material.ACACIA_TRAPDOOR ||
+                clickedBlockType == Material.DARK_OAK_TRAPDOOR || clickedBlockType == Material.MANGROVE_TRAPDOOR ||
+                clickedBlockType == Material.BAMBOO_TRAPDOOR || clickedBlockType == Material.IRON_TRAPDOOR ||
+                clickedBlockType == Material.LEVER || clickedBlockType == Material.STONE_BUTTON || 
+                clickedBlockType == Material.OAK_BUTTON || clickedBlockType == Material.SPRUCE_BUTTON ||
+                clickedBlockType == Material.BIRCH_BUTTON || clickedBlockType == Material.JUNGLE_BUTTON ||
+                clickedBlockType == Material.ACACIA_BUTTON || clickedBlockType == Material.DARK_OAK_BUTTON ||
+                clickedBlockType == Material.MANGROVE_BUTTON || clickedBlockType == Material.BAMBOO_BUTTON ||
+                clickedBlockType == Material.POLISHED_BLACKSTONE_BUTTON || clickedBlockType == Material.CAULDRON ||
+                clickedBlockType == Material.COMPOSTER || clickedBlockType == Material.NOTE_BLOCK ||
+                clickedBlockType == Material.ITEM_FRAME) {
                 event.setCancelled(true);
                 player.sendMessage(ChatColor.RED + "You cannot interact with this block in this zone.");
                 return;
             }
         }
-    
+
         // 4. Station Interact Check
-        if (!zone.isStationInteract()) {
-            // List of station blocks that open an inventory interface
-            if (clickedBlockType != null && (clickedBlockType == Material.CRAFTING_TABLE || clickedBlockType == Material.ENCHANTING_TABLE ||
-                                             clickedBlockType == Material.SMITHING_TABLE || clickedBlockType == Material.CARTOGRAPHY_TABLE ||
-                                             clickedBlockType == Material.BREWING_STAND || clickedBlockType == Material.GRINDSTONE ||
-                                             clickedBlockType == Material.LOOM || clickedBlockType == Material.STONECUTTER)) {
+        if (!zone.isStationInteract() && clickedBlockType != null) {
+            if (clickedBlockType == Material.CRAFTING_TABLE || clickedBlockType == Material.ENCHANTING_TABLE ||
+                clickedBlockType == Material.SMITHING_TABLE || clickedBlockType == Material.CARTOGRAPHY_TABLE ||
+                clickedBlockType == Material.BREWING_STAND || clickedBlockType == Material.GRINDSTONE ||
+                clickedBlockType == Material.LOOM || clickedBlockType == Material.STONECUTTER) {
                 event.setCancelled(true);
                 player.sendMessage(ChatColor.RED + "Station interaction is disabled in this zone.");
                 return;
             }
         }
+
+        // 5. Bucket Placement Check
+        if (itemType == Material.WATER_BUCKET && !zone.isWaterBucket()) {
+            event.setCancelled(true);
+            player.sendMessage(ChatColor.RED + "Placing water with a bucket is not allowed in this zone.");
+            return;
+        } else if (itemType == Material.LAVA_BUCKET && !zone.isLavaBucket()) {
+            event.setCancelled(true);
+            player.sendMessage(ChatColor.RED + "Placing lava with a bucket is not allowed in this zone.");
+            return;
+        }
     }
+
     
 
     @EventHandler
@@ -409,34 +489,6 @@ public class ZoneListeners implements Listener {
     }
 
 
-
-    // // Block ender pearl usage if restricted
-    // @EventHandler
-    // public void onEnderPearlUse(PlayerTeleportEvent event) {
-    //     if (event.getCause() == PlayerTeleportEvent.TeleportCause.ENDER_PEARL) {
-    //         Player player = event.getPlayer();
-    //         Zone zone = zoneManager.getZoneAtLocation(player.getLocation());
-
-    //         if (zone != null && !zone.isEnderpearl()) {
-    //             event.setCancelled(true);
-    //             player.sendMessage(ChatColor.RED + "Ender pearl usage is not allowed in this zone.");
-    //         }
-    //     }
-    // }
-
-    // // Block chorus fruit usage if restricted
-    // @EventHandler
-    // public void onChorusFruitConsume(PlayerItemConsumeEvent event) {
-    //     if (event.getItem().getType() == Material.CHORUS_FRUIT) {
-    //         Player player = event.getPlayer();
-    //         Zone zone = zoneManager.getZoneAtLocation(player.getLocation());
-
-    //         if (zone != null && !zone.isChorusFruit()) {
-    //             event.setCancelled(true);
-    //             player.sendMessage(ChatColor.RED + "Chorus fruit usage is not allowed in this zone.");
-    //         }
-    //     }
-    // }
 
     @EventHandler
     public void onPlayerSleep(PlayerBedEnterEvent event) {
@@ -516,27 +568,27 @@ public class ZoneListeners implements Listener {
         }
     }
 
-    @EventHandler
-    public void onVehiclePlace(PlayerInteractEvent event) {
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            Material itemType = event.getPlayer().getInventory().getItemInMainHand().getType();
-            boolean isBoat = itemType == Material.OAK_BOAT || itemType == Material.SPRUCE_BOAT ||
-                             itemType == Material.BIRCH_BOAT || itemType == Material.JUNGLE_BOAT ||
-                             itemType == Material.DARK_OAK_BOAT || itemType == Material.ACACIA_BOAT ||
-                             itemType == Material.MANGROVE_BOAT || itemType == Material.BAMBOO_RAFT;
-            boolean isMinecart = itemType == Material.MINECART || itemType == Material.CHEST_MINECART ||
-                                 itemType == Material.FURNACE_MINECART || itemType == Material.HOPPER_MINECART ||
-                                 itemType == Material.TNT_MINECART;
+    // @EventHandler
+    // public void onVehiclePlace(PlayerInteractEvent event) {
+    //     if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+    //         Material itemType = event.getPlayer().getInventory().getItemInMainHand().getType();
+    //         boolean isBoat = itemType == Material.OAK_BOAT || itemType == Material.SPRUCE_BOAT ||
+    //                          itemType == Material.BIRCH_BOAT || itemType == Material.JUNGLE_BOAT ||
+    //                          itemType == Material.DARK_OAK_BOAT || itemType == Material.ACACIA_BOAT ||
+    //                          itemType == Material.MANGROVE_BOAT || itemType == Material.BAMBOO_RAFT;
+    //         boolean isMinecart = itemType == Material.MINECART || itemType == Material.CHEST_MINECART ||
+    //                              itemType == Material.FURNACE_MINECART || itemType == Material.HOPPER_MINECART ||
+    //                              itemType == Material.TNT_MINECART;
     
-            if (isBoat || isMinecart) {
-                Zone zone = zoneManager.getZoneAtLocation(event.getClickedBlock().getLocation());
-                if (zone != null && !zone.isVehiclePlace()) {
-                    event.setCancelled(true);
-                    event.getPlayer().sendMessage(ChatColor.RED + "Vehicle placement is disabled in this zone.");
-                }
-            }
-        }
-    }
+    //         if (isBoat || isMinecart) {
+    //             Zone zone = zoneManager.getZoneAtLocation(event.getClickedBlock().getLocation());
+    //             if (zone != null && !zone.isVehiclePlace()) {
+    //                 event.setCancelled(true);
+    //                 event.getPlayer().sendMessage(ChatColor.RED + "Vehicle placement is disabled in this zone.");
+    //             }
+    //         }
+    //     }
+    // }
 
     @EventHandler
     public void onVehicleDestroy(VehicleDestroyEvent event) {

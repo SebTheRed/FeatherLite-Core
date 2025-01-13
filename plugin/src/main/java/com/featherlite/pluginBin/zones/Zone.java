@@ -44,7 +44,7 @@ public class Zone {
     // Protection rules
     private boolean fireSpread, interact, mount, chestAccess,
             pvp, sleep, respawnAnchors, tnt, vehiclePlace, vehicleDestroy, ignite, trampling,
-            frostWalker, itemFrameRotation, stationInteract;
+            frostWalker, itemFrameRotation, stationInteract, waterBucket, lavaBucket;
     private Set<String> buildList = new HashSet<>();
     private Set<String> breakList = new HashSet<>();
     private Set<String> explosionProofBlocks = new HashSet<>();
@@ -132,6 +132,9 @@ public class Zone {
         this.frostWalker = config.getBoolean("protection-rules.frost-walker", false);
         this.itemFrameRotation = config.getBoolean("protection-rules.item-frame-rotation", false);
         this.stationInteract = config.getBoolean("protection-rules.station-interact", false);
+        this.lavaBucket = config.getBoolean("protection-rules.use-lava-bucket", false);
+        this.waterBucket = config.getBoolean("protection-rules.use-water-bucket", false);
+
         this.allowCustomMobs = config.getBoolean("mob-rules.allow-custom-mobs", true);
         loadList(config, "protection-rules.build-list", buildList);
         loadList(config, "protection-rules.break-list", breakList);
@@ -461,6 +464,8 @@ public class Zone {
         debugInfo.append("  Build List: ").append(buildList).append("\n");
         debugInfo.append("  Break List: ").append(breakList).append("\n");
         debugInfo.append("  Explosion Proof Blocks: ").append(explosionProofBlocks).append("\n");
+        debugInfo.append("  Use Water Bucket: ").append(waterBucket).append("\n");
+        debugInfo.append("  Use Lava Bucket: ").append(lavaBucket).append("\n");
     
         // Player Rules
         debugInfo.append("Player Rules:").append("\n");
@@ -632,6 +637,12 @@ public class Zone {
     public boolean isStationInteract() { return stationInteract; }
     public void setIsStationInteract(boolean stationInteract) { setConfigBoolean("protection-rules.station-interact", stationInteract); }
 
+    public boolean isLavaBucket() { return lavaBucket; };
+    public void setLavaBucket(boolean lavaBucket) { setConfigBoolean("protection-rules.use-lava-bucket", lavaBucket); }
+
+    public boolean isWaterBucket() { return waterBucket; };
+    public void setWaterBucket(boolean waterBucket) { setConfigBoolean("protection-rules.use-water-bucket", waterBucket); }
+
     // Player rule getters and setters
     public boolean isEnderpearl() { return enderpearl; }
     public void setEnderpearl(boolean enderpearl) { setConfigBoolean("player-rules.enderpearl", enderpearl); }
@@ -660,6 +671,8 @@ public class Zone {
 
     public boolean isNaturalHungerDrain() { return naturalHungerDrain; };
     public void setNaturalHungerDrain(boolean naturalHungerDrain) { setConfigBoolean("map-rules.natural-hunger-drain", naturalHungerDrain); };
+
+
 
     public boolean isWithinBounds(Location location) {
         if (cornerOne == null || cornerTwo == null || location.getWorld() == null) {

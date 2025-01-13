@@ -383,6 +383,12 @@ public class ZonesCommands implements TabCompleter {
                 case "explosionproofblocks":
                     zone.setExplosionProofBlocks(parseList(value));
                     break;
+                case "waterBucket":
+                    zone.setWaterBucket(Boolean.parseBoolean(value));
+                    break;
+                case "lavaBucket":
+                    zone.setLavaBucket(Boolean.parseBoolean(value));
+                    break;
     
                 // Player Rules (Booleans, Strings, and Lists)
                 case "entrymessage":
@@ -513,7 +519,7 @@ public class ZonesCommands implements TabCompleter {
                     // Protection Rules
                     "firespread", "interact", "mount", "chestaccess", "pvp", "sleep", "respawnanchors", "tnt",
                     "vehicleplace", "vehicledestroy", "ignite", "trampling", "frostwalker", "itemframerotation",
-                    "stationinteract", "buildlist", "breaklist", "explosionproofblocks",
+                    "stationinteract", "buildlist", "breaklist", "explosionproofblocks", "lavaBucket", "waterBucket",
                     
                     // Player Rules
                     "entrymessage", "exitmessage", "entrylist", "exitlist", "enderpearl", "chorusfruit",

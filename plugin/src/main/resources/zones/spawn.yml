@@ -70,6 +70,8 @@ protection-rules:
   frost-walker: false
   item-frame-rotation: false
   station-interact: false
+  use-water-bucket: false
+  use-lava-bucket: false
   build-list:
     - "NONE"
   break-list:
