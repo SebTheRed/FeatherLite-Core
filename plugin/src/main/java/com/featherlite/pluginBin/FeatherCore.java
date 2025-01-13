@@ -159,7 +159,7 @@ public class FeatherCore extends JavaPlugin {
         itemManager = new ItemManager(this, abilityRegistry);  // Initialize ItemManager
         uiManager = new UIManager(this, itemManager); // Initialize UIManager with ItemManager
         teamSelectorBook = new TeamSelectorBook(this);
-        instanceManager = new InstanceManager(partyManager, worldManager, this, teamSelectorBook);
+        instanceManager = new InstanceManager(partyManager, worldManager, this, teamSelectorBook, teleportationManager);
         gamesManager = new GamesManager();
         gamesUI = new GamesUI(gamesManager, instanceManager);
         getServer().getPluginManager().registerEvents(gamesUI, this);

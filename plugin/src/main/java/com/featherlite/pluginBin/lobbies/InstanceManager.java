@@ -11,6 +11,7 @@ import com.featherlite.pluginBin.FeatherCore;
 import com.featherlite.pluginBin.worlds.WorldManager;
 import com.featherlite.pluginBin.lobbies.TeamSelectorBook;
 import com.featherlite.pluginBin.utils.InventoryManager;
+import com.featherlite.pluginBin.essentials.teleportation.TeleportationManager;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,14 +28,16 @@ public class InstanceManager {
     private final WorldManager worldManager;
     private final TeamSelectorBook teamSelectorBook;
     private int instanceCount = 0; // Track unique instance numbers
+    private final Location serverSpawn;
     // private Map<String, Location> lobbyLocations = new HashMap<>();
 
 
-    public InstanceManager(PartyManager partyManager, WorldManager worldManager, FeatherCore plugin, TeamSelectorBook teamSelectorBook) {
+    public InstanceManager(PartyManager partyManager, WorldManager worldManager, FeatherCore plugin, TeamSelectorBook teamSelectorBook, TeleportationManager teleportationManager) {
         this.partyManager = partyManager;
         this.worldManager = worldManager;
         this.plugin = plugin;
         this.teamSelectorBook = teamSelectorBook;
+        this.serverSpawn = teleportationManager.getServerSpawn();
         // loadLobbyLocations();
     }
 
@@ -249,12 +252,12 @@ public class InstanceManager {
                 player.sendMessage("§aYour inventory has been restored!");
     
                 // Teleport to lobby or fallback location
-                Location safeLocation = Bukkit.getWorld("world").getSpawnLocation();
+                Location safeLocation = serverSpawn;
                 if (safeLocation != null) {
                     player.teleport(safeLocation);
                 } else {
                     player.teleport(Bukkit.getWorld("world").getSpawnLocation());
-                    player.sendMessage("§cUnable to find a safe lobby. Teleported to the world spawn.");
+                    // player.sendMessage("§cUnable to find a safe lobby. Teleported to the world spawn.");
                 }
             }
         }));
@@ -292,15 +295,14 @@ public class InstanceManager {
     private void teleportPlayersToSafeLocation(GameInstance instance) {
         String lobbyName = "Spawn";
         // Fetch the specified lobby location from the core plugin
-        final Location safeLocation = Bukkit.getWorld("world").getSpawnLocation();
-        Location backupLocation = Bukkit.getWorld("world").getSpawnLocation();
+        final Location safeLocation = serverSpawn;
     
         // Iterate through all teams and teleport their members to the safe location
         instance.getTeams().values().forEach(playerList -> playerList.forEach(playerUUID -> {
             Player player = Bukkit.getPlayer(playerUUID);
             if (player != null && player.isOnline()) {
                 if (safeLocation == null) {
-                    player.teleport(backupLocation);
+                    player.teleport(Bukkit.getWorld("world").getSpawnLocation());
                 } else {
                     player.teleport(safeLocation);
                 }
@@ -313,7 +315,7 @@ public class InstanceManager {
             Player spectator = Bukkit.getPlayer(spectatorUUID);
             if (spectator != null && spectator.isOnline()) {
                 if (safeLocation == null) {
-                    spectator.teleport(backupLocation);
+                    spectator.teleport(Bukkit.getWorld("world").getSpawnLocation());
                 } else {
                     spectator.teleport(safeLocation);
                 }
@@ -519,7 +521,7 @@ public void addPlayerToInstance(Player player, GameInstance instance) {
         player.sendMessage("§aYour inventory has been restored!");
     
         // Teleport the player to a safe location
-        Location safeLocation = Bukkit.getWorld("world").getSpawnLocation();
+        Location safeLocation = serverSpawn;
         if (safeLocation != null) {
             player.teleport(safeLocation);
         } else {
