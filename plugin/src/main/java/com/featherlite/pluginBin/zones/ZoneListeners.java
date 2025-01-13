@@ -1,7 +1,7 @@
 package com.featherlite.pluginBin.zones;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -108,7 +108,8 @@ public class ZoneListeners implements Listener {
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
         Player player = event.getPlayer();
-        Zone zone = zoneManager.getZoneAtLocation(player.getLocation());
+        Location blockLocation = event.getBlock().getLocation();
+        Zone zone = zoneManager.getZoneAtLocation(blockLocation);
 
         if (zone != null && !zone.canBreak(event.getBlock().getType().name())) {
             event.setCancelled(true);
@@ -119,7 +120,8 @@ public class ZoneListeners implements Listener {
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
         Player player = event.getPlayer();
-        Zone zone = zoneManager.getZoneAtLocation(player.getLocation());
+        Location blockLocation = event.getBlockPlaced().getLocation();
+        Zone zone = zoneManager.getZoneAtLocation(blockLocation);
 
         if (zone != null && !zone.canBuild(event.getBlock().getType().name())) {
             event.setCancelled(true);
@@ -149,6 +151,10 @@ public class ZoneListeners implements Listener {
                             if (!zone.isPvp()) {
                                 event.setCancelled(true);
                                 attacker.sendMessage(ChatColor.RED + "PvP is not allowed in this zone.");
+                            }
+                        } else {
+                            if (!zone.isMobDamage()) {
+                                event.setCancelled(true);
                             }
                         }
                     }
@@ -679,14 +685,37 @@ public class ZoneListeners implements Listener {
     // }
 
     @EventHandler
-    public void onSnowMelt(BlockFadeEvent event) {
-        if (event.getBlock().getType() == Material.SNOW) {
-            Zone zone = zoneManager.getZoneAtLocation(event.getBlock().getLocation());
-            if (zone != null && !zone.isSnowMelt()) {
-                event.setCancelled(true);
-            }
+    public void onBlockFade(BlockFadeEvent event) {
+        Material blockType = event.getBlock().getType();
+        Zone zone = zoneManager.getZoneAtLocation(event.getBlock().getLocation());
+    
+        if (zone == null) {
+            return;
+        }
+    
+        switch (blockType) {
+            case SNOW:
+                if (!zone.isSnowMelt()) {
+                    event.setCancelled(true);
+                }
+                break;
+                
+            case ICE:
+                if (!zone.isIceMelt()) {
+                    event.setCancelled(true);
+                }
+                break;
+    
+            case FARMLAND:
+                if (!zone.isSoilDry()) {
+                    event.setCancelled(true);
+                }
+                break;
+    
+            // Add more cases as needed for other fade types
         }
     }
+    
 
     @EventHandler
     public void onSnowFall(BlockFormEvent event) {

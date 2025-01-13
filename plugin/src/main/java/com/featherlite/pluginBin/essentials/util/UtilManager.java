@@ -107,7 +107,7 @@ public class UtilManager {
             sender.sendMessage(ChatColor.RED + "Player not found.");
             return true;
         }
-        double maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getDefaultValue();
+        double maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
         player.setHealth(maxHealth);
         sender.sendMessage(ChatColor.GREEN + player.getName() + " has been healed.");
         return true;

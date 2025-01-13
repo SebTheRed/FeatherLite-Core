@@ -21,9 +21,11 @@ public class ZoneManager {
     public ZoneManager(FeatherCore plugin) {
         this.plugin = plugin;
         loadZones();
+        saveDefaultSpawnFile();
         loadZonesFromOtherPlugins();  // New method to load zones from other plugins
     }
     
+
 
     private void loadZones() {
         File zonesFolder = new File(plugin.getDataFolder(), "zones");
@@ -54,6 +56,29 @@ public class ZoneManager {
             }
         }
     }
+
+    private void saveDefaultSpawnFile() {
+        String folderName = "zones";
+        String resourceFile = "spawn.yml";
+    
+        // Ensure the zones folder exists
+        File zonesFolder = new File(plugin.getDataFolder(), folderName);
+        if (!zonesFolder.exists()) {
+            zonesFolder.mkdirs();
+            plugin.getLogger().info(folderName + " directory did not exist. Created the directory.");
+        }
+    
+        // Check if the spawn.yml file exists
+        File spawnFile = new File(zonesFolder, resourceFile);
+        if (!spawnFile.exists()) {
+            plugin.getLogger().info(resourceFile + " not found! Saving default " + resourceFile + " to " + folderName + " directory...");
+            plugin.saveResource(folderName + "/" + resourceFile, false);
+            plugin.getLogger().info(resourceFile + " has been created successfully.");
+        } else {
+            plugin.getLogger().info(resourceFile + " already exists in " + folderName + ". Skipping save.");
+        }
+    }
+    
 
     public void reloadAllZones() {
         zones.clear();  // Clear current zones

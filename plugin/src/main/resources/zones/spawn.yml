@@ -1,0 +1,97 @@
+information:
+  name: "Spawn Zone"
+  world: "world"
+  description: "Zone that controls the spawn zone."
+  is-game-zone: false
+  game-override-spawn-point: false
+coordinates:
+  spawn-point:
+    x: 0
+    y: 64
+    z: 0
+  teleport-point:
+    x: 0
+    y: 64
+    z: 0
+  corner-one:
+    x: 32
+    y: -64
+    z: 32
+  corner-two:
+    x: -32
+    y: 320
+    z: -32
+natrual-rules:
+  lava-ignite: false
+  lightning-strike: false
+  water-flow: false
+  lava-flow: false
+  snow-fall: false
+  snow-melt: false
+  ice-melt: false
+  mushroom-growth: false
+  leaf-decay: false
+  grass-growth: false
+  mycelium-spread: false
+  vine-growth: false
+  rock-growth: false
+  sculk-growth: false
+  crop-growth: false
+  soil-dry: false
+mob-rules:
+  creeper-explosion: false
+  enderdragon-break: false
+  ghast-fireball-break: false
+  enderman-break: false
+  snowman-trails: false
+  ravager-break: false
+  mob-damage: false
+  mob-destroy-paintings: true
+  mob-destroy-item-frames: true
+  wither-break: false
+  hostile-mob-spawn-list:
+    - "NONE"
+  passive-mob-spawn-list:
+    - "ANY"
+  allow-custom-mobs: true
+protection-rules:
+  fire-spread: false
+  interact: true
+  mount: false
+  chest-access: false
+  pvp: false
+  sleep: false
+  respawn-anchors: false
+  tnt: false
+  vehicle-place: false
+  vehicle-destroy: false
+  ignite: false
+  trampling: false
+  frost-walker: false
+  item-frame-rotation: false
+  station-interact: false
+  build-list:
+    - "NONE"
+  break-list:
+    - "NONE"
+  explosion-proof-blocks:
+    - "ALL"
+player-rules:
+  entry-message: "Welcome to spawn"
+  entry-list:
+    - "ALL"
+  exit-message: "Leaving spawn!"
+  exit-list:
+    - "ALL"
+  enderpearl: true
+  chorus-fruit: true 
+map-rules:
+  item-pickup: true
+  item-drop: true
+  exp-drop: false
+  fall-damage: false
+  weather-lock: false
+  natural-health-regen: true
+  natural-hunger-drain: false
+  blocked-commands:
+    - "NONE"

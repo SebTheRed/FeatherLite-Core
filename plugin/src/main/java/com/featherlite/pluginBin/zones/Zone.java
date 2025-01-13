@@ -168,7 +168,7 @@ public class Zone {
 
     private void loadList(FileConfiguration config, String path, Set<String> list) {
         List<String> configList = config.getStringList(path);
-        if (configList.contains("ALL")) {
+        if (configList.contains("ALL") || configList.contains("ANY")) {
             list.clear();
             list.add("ALL");
         } else if (configList.contains("NONE")) {
@@ -201,7 +201,7 @@ public class Zone {
     // Mob spawning rules check
     public boolean canSpawnHostileMob(String mobType) {
         if (hostileMobSpawnList.contains("NONE")) return false;
-        return hostileMobSpawnList.contains("ANY") || hostileMobSpawnList.contains(mobType);
+        return hostileMobSpawnList.contains("ANY") || hostileMobSpawnList.contains(mobType) || hostileMobSpawnList.contains("ALL");
     }
     // Setter for hostileMobSpawnList
     public void setHostileMobSpawnList(Set<String> hostileMobSpawnList) {
@@ -214,7 +214,7 @@ public class Zone {
 
     public boolean canSpawnPassiveMob(String mobType) {
         if (passiveMobSpawnList.contains("NONE")) return false;
-        return passiveMobSpawnList.contains("ANY") || passiveMobSpawnList.contains(mobType);
+        return passiveMobSpawnList.contains("ANY") || passiveMobSpawnList.contains(mobType) || passiveMobSpawnList.contains("ALL");
     }
     // Setter for passiveMobSpawnList
     public void setPassiveMobSpawnList(Set<String> passiveMobSpawnList) {
@@ -231,7 +231,7 @@ public class Zone {
         if (buildList.contains("NONE")) {
             return false;
         }
-        return buildList.contains("ALL") || buildList.contains(material);
+        return buildList.contains("ALL") || buildList.contains(material) || buildList.contains("ANY") ;
     }
     // Setter for buildList
     public void setBuildList(Set<String> buildList) {
@@ -247,7 +247,7 @@ public class Zone {
         if (breakList.contains("NONE")) {
             return false;
         }
-        return breakList.contains("ALL") || breakList.contains(material);
+        return breakList.contains("ALL") || breakList.contains(material) || breakList.contains("ANY");
     }
     // Setter for breakList
     public void setBreakList(Set<String> breakList) {
@@ -262,7 +262,7 @@ public class Zone {
 
     // Explosion-proof blocks check
     public boolean isExplosionProof(String material) {
-        if (explosionProofBlocks.contains("ALL")) {
+        if (explosionProofBlocks.contains("ALL") || explosionProofBlocks.contains("ANY")) {
             return true;
         }
         return explosionProofBlocks.contains(material);
@@ -280,7 +280,7 @@ public class Zone {
         if (blockedCommands.contains("NONE")) {
             return false;
         }
-        return blockedCommands.contains("ALL") || blockedCommands.contains(command);
+        return blockedCommands.contains("ALL") || blockedCommands.contains(command) || blockedCommands.contains("ANY");
     }
     // Setter for blockedCommands
     public void setBlockedCommands(Set<String> blockedCommands) {
@@ -295,7 +295,7 @@ public class Zone {
         if (entryList.contains("NONE")) {
             return false;
         }
-        return entryList.contains("ALL") || entryList.contains(playerName);
+        return entryList.contains("ALL") || entryList.contains(playerName) || entryList.contains("ANY");
     }
     // Setter for entryList
     public void setEntryList(Set<String> entryList) {
@@ -313,7 +313,7 @@ public class Zone {
         if (exitList.contains("NONE")) {
             return false;
         }
-        return exitList.contains("ALL") || exitList.contains(playerName);
+        return exitList.contains("ALL") || exitList.contains(playerName) || exitList.contains("ANY");
     }
     // Setter for exitList
     public void setExitList(Set<String> exitList) {
@@ -516,7 +516,7 @@ public class Zone {
     public boolean isSnowMelt() { return snowMelt; }
     public void setSnowMelt(boolean snowMelt) { setConfigBoolean("natural-rules.snow-melt", snowMelt); }
 
-    public boolean iIceMelt() { return iceMelt; }
+    public boolean isIceMelt() { return iceMelt; }
     public void setIceMelt(boolean iceMelt) { setConfigBoolean("natural-rules.ice-melt", iceMelt); }
 
     public boolean isMushroomGrowth() { return mushroomGrowth; }
