@@ -1,7 +1,6 @@
 permission-groups:
   default:
     - core.party
-    - core.board.default
     - core.eco.bal
     - core.eco.baltop
     - core.eco.pay

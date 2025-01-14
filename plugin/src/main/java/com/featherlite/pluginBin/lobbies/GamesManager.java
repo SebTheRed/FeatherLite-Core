@@ -1,6 +1,7 @@
 package com.featherlite.pluginBin.lobbies;
 
 import org.bukkit.Location;
+import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -159,13 +160,14 @@ public class GamesManager {
      * @param instanceManager The InstanceManager to handle the game instance.
      * @return The created GameInstance, or null if the game could not be started.
      */
-    public GameInstance startGameInstance(String gameName, String worldChoice, boolean isInstancePublic, InstanceManager instanceManager) {
+    public GameInstance startGameInstance(String gameName, String worldChoice, boolean isInstancePublic, InstanceManager instanceManager, String sender, boolean isPlayer) {
         GameData gameData = getGameData(gameName);
         if (gameData == null) {
             throw new IllegalArgumentException("No game registered with the name: " + gameName);
         }
 
         return instanceManager.createInstance(
+                sender,
                 isInstancePublic,
                 gameData.getGameName(),
                 gameData.getGameType(),

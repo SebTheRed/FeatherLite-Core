@@ -346,21 +346,49 @@ permissions:
 
   core.editor:
     description: Allows the player to use the editor session link.
-    default: op
+    default: false
+
   core.permissions:
     description: Allows the player to manage permissions.
-    default: op
+    default: false
 
-  core.party:
+  core.party.*:
+    description: Allows all access to party functions.
+    default: false
+    children:
+      core.party.player: true
+      core.party.admin: true
+  core.party.player:
     description: Allows the player to create and manage parties.
-    default: op
-  core.game:
-    description: Allows the player to create and manage game instances.
-    default: op
+    default: false
+  core.party.admin:
+    description: Allows the player to control other players' parties.
+    default: false
 
-  core.zone:
+  core.games.*:
+    description: Allows the player to create and manage game instances.
+    default: false
+    children:
+      core.games.menu: true
+      core.games.play: true
+      core.games.create: true
+      core.games.close: true
+  core.games.menu:
+    description: Allows the player to open and interact with the games menu.
+    default: false
+  core.games.play:
+    description: Allows the player to join any game that isn't private.
+    default: false
+  core.games.create:
+    description: Allows the player to create their own game instance.
+    default: false
+  core.games.close:
+    description: Allows the player to close their own game instance.
+    default: false
+
+  core.zones:
     description: Allows the player to manage zones.
-    default: op
+    default: false
 
   core.restoreinventory:
     description: Allows the player to restore other players inventories.
@@ -371,19 +399,20 @@ permissions:
     default: false
     children:
       core.board.reload: true
+      core.board.switch: true
   core.board.reload:
     description: Allows user to reload all scoreboards.
-    default: op
+    default: false
+  core.board.switch:
+    description: Allows the player to switch their active scoreboard to any other registered board.
 
   core.eco.*:
-    description: All economy-related permissions.
+    description: All economy-related permissions. Except admin commands.
     default: false
     children:
       core.eco.balance: true
       core.eco.baltop: true
       core.eco.pay: true
-      core.eco.give: true
-      core.eco.take: true
   core.eco.balance:
     description: Allows viewing your balance.
     default: false
@@ -393,12 +422,9 @@ permissions:
   core.eco.pay:
     description: Allows paying other players.
     default: false
-  core.eco.give:
-    description: Allows giving money to players.
-    default: op
-  core.eco.take:
-    description: Allows taking money from players.
-    default: op
+  core.eco.admin:
+    description: Allows giving money to or taking money from players.
+    default: false
 
   core.world.*:
     description: Allows the player to create and manage worlds.
@@ -439,158 +465,248 @@ permissions:
 
   core.items:  # New permission
     description: Allows the player to open the Item UI.
-    default: op
+    default: false
   core.items.reload:
-    description: Allows players to reload item configs.
-    default: op
+    description: Allows the player to reload item configs.
+    default: false
+  core.items.give:
+    description: Allows the player to run a command to give items.
+    default: false
 
   core.home:
-    description: Allows players to set, delete, and teleport to homes.
-    default: op
+    description: Allows the player to set, delete, and teleport to homes.
+    default: false
+  core.homes.unlimited:
+    description: Allows the player to have unlimited homes.
+    default: false
+  core.homes.1:
+    description: Allows the player to have 1 home.
+    default: false
+  core.homes.2:
+    description: Allows the player to have 2 homes.
+    default: false
+  core.homes.3:
+    description: Allows the player to have 3 homes.
+    default: false
+  core.homes.4:
+    description: Allows the player to have 4 homes.
+    default: false
+  core.homes.5:
+    description: Allows the player to have 5 homes.
+    default: false
+  core.homes.6:
+    description: Allows the player to have 6 homes.
+    default: false
+  core.homes.7:
+    description: Allows the player to have 7 homes.
+    default: false
+  core.homes.8:
+    description: Allows the player to have 8 homes.
+    default: false
+  core.homes.9:
+    description: Allows the player to have 9 homes.
+    default: false
+  core.homes.10:
+    description: Allows the player to have 10 homes.
+    default: false
+  core.homes.11:
+    description: Allows the player to have 11 homes.
+    default: false
+  core.homes.12:
+    description: Allows the player to have 12 homes.
+    default: false
+  core.homes.13:
+    description: Allows the player to have 13 homes.
+    default: false
+  core.homes.14:
+    description: Allows the player to have 14 homes.
+    default: false
+  core.homes.15:
+    description: Allows the player to have 15 homes.
+    default: false
+  core.homes.16:
+    description: Allows the player to have 16 homes.
+    default: false
+  core.homes.17:
+    description: Allows the player to have 17 homes.
+    default: false
+  core.homes.18:
+    description: Allows the player to have 18 homes.
+    default: false
+  core.homes.19:
+    description: Allows the player to have 19 homes.
+    default: false
+  core.homes.20:
+    description: Allows the player to have 20 homes.
+    default: false
+  core.homes.30:
+    description: Allows the player to have 30 homes.
+    default: false
+  core.homes.40:
+    description: Allows the player to have 40 homes.
+    default: false
+  core.homes.50:
+    description: Allows the player to have 50 homes.
+    default: false
 
+
+  core.teleport.*:
+    description: Allows the player to use all teleportation commands.
+    default: false
+    children:
+      core.teleport.tpr: true
+      core.teleport.tppos: true
+      core.teleport.tp: true
+      core.teleport.tphere: true
+      core.teleport.tpall: true
+      core.teleport.tpa: true
+      core.teleport.tpahere: true
+      core.teleport.back: true
+      core.teleport.spawn: true
+      core.teleport.setspawn: true
   core.teleport:
-    description: Allows players to use teleportation commands.
-    default: op
+    description: Allows players to use all teleportation commands.
+    default: false
   core.teleport.tpr:
     description: Allows players to use random teleportation.
-    default: op
+    default: false
   core.teleport.tppos:
     description: Allows players to teleport to specific coordinates.
-    default: op
+    default: false
   core.teleport.tp:
     description: Allows players to teleport to other players.
-    default: op
+    default: false
   core.teleport.tphere:
     description: Allows players to teleport another player to them.
-    default: op
+    default: false
   core.teleport.tpall:
     description: Allows players to teleport all online players to them.
-    default: op
+    default: false
   core.teleport.tpa:
     description: Allows players to request teleports to other players.
-    default: op
+    default: false
   core.teleport.tpahere:
     description: Allows players to request others to teleport to them.
-    default: op
+    default: false
   core.teleport.back:
     description: Allows players to return to their last location.
-    default: op
+    default: false
   core.teleport.spawn:
     description: Allows players to teleport to the server's spawn location.
-    default: op
+    default: false
   core.teleport.setspawn:
     description: Allows players to set the server's spawn location.
-    default: op
+    default: false
 
   core.message:
     description: Allows players to message eachother.
-    default: op
+    default: false
   core.broadcast:
     description: Allows players to broadcast a message to the server.
-    default: op
+    default: false
   core.time:
     description: Allows players to change the time in the world.
-    default: op
+    default: false
   core.weather:
     description: Allows players to change the weather in the world.
-    default: op
+    default: false
   core.sudo:
     description: Allows players to execute commands as other players.
-    default: op
+    default: false
   core.kill:
     description: Allows players to instantly kill other players.
-    default: op
+    default: false
   core.killall:
     description: Kills all of many types of things.
-    default: op
+    default: false
   core.give:
     description: Allows players to give items to others.
-    default: op
+    default: false
   core.exp:
     description: Allows players to modify experience levels or points.
-    default: op
+    default: false
   core.enchant:
     description: Allows players to enchant items.
-    default: op
+    default: false
   core.god:
     description: Allows God-mode
-    default: op
+    default: false
 
   core.heal:
     description: Allows players to fully heal themselves or others.
-    default: op
+    default: false
   core.feed:
     description: Allows players to fully restore their hunger or that of others.
-    default: op
+    default: false
   core.rest:
     description: Allows players to fully heal and feed themselves or others.
-    default: op
+    default: false
   core.repair:
     description: Allows players to repair the durability of items.
-    default: op
+    default: false
   core.afk:
     description: Allows players to toggle AFK status.
-    default: op
+    default: false
   core.enderchest:
     description: Allows players to access their Ender Chest.
-    default: op
+    default: false
   core.trash:
     description: Allows players to open a trash inventory to dispose of items.
-    default: op
+    default: false
   core.top:
     description: Allows players to teleport to the highest block at their current location.
-    default: op
+    default: false
   core.hat:
     description: Allows players to equip the item in their hand as a hat.
-    default: op
+    default: false
   core.nick:
     description: Allows players to change their display name.
-    default: op
+    default: false
   core.realname:
     description: Allows players to retrieve the real username of another player based on their nickname.
-    default: op
+    default: false
   core.list:
     description: Allows players to list all online players.
-    default: op
+    default: false
   core.near:
     description: Allows players to view a list of nearby players within a given radius.
-    default: op
+    default: false
   core.getpos:
     description: Allows players to view their own or another player’s current coordinates.
-    default: op
+    default: false
   core.ping:
     description: Allows players to check their connection latency to the server.
-    default: op
+    default: false
   core.seen:
     description: Allows players to check when another player was last online.
-    default: op
+    default: false
   core.workbench:
     description: Allows players to open a crafting table interface.
-    default: op
+    default: false
   core.anvil:
     description: Allows players to open an anvil interface.
-    default: op
+    default: false
   core.cartographytable:
     description: Allows players to open a cartography table interface.
-    default: op
+    default: false
   core.grindstone:
     description: Allows players to open a grindstone interface.
-    default: op
+    default: false
   core.loom:
     description: Allows players to open a loom interface.
-    default: op
+    default: false
   core.smithing:
     description: Allows players to open a smithing table interface.
-    default: op
+    default: false
   core.stonecutter:
     description: Allows players to open a stonecutter interface.
-    default: op
+    default: false
   core.ptime:
     description: Allows players to change their personal in-game time.
-    default: op
+    default: false
   core.pweather:
     description: Allows players to change their personal in-game weather.
-    default: op
+    default: false
 
   core.chat.*:
     description: All chat-related permissions.

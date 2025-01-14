@@ -38,6 +38,10 @@ public class GameCommands implements TabCompleter {
             }
         }
     
+        if (args.length <= 0) {
+            sender.sendMessage("Usage: /game <ui|menu|join|leave|create|delete|close>");
+        }
+
         switch (args[0].toLowerCase()) {
             case "ui":
             case "menu":
@@ -141,7 +145,7 @@ public class GameCommands implements TabCompleter {
     
             // Start the game instance
             try {
-                GameInstance newGame = gamesManager.startGameInstance(gameName, worldName, true, instanceManager);
+                GameInstance newGame = gamesManager.startGameInstance(gameName, worldName, true, instanceManager, sender.getName(), true);
                 if (newGame == null) {
                     player.sendMessage("Failed to create game instance. Please check the game name and world.");
                 } else {

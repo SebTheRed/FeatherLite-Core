@@ -33,6 +33,7 @@ public class GameInstance {
     private final List<UUID> spectators; // List of spectators
     private final Object pluginConfig; // Optional plugin-specific configuration
     private GameState state;
+    private String createdBy;
 
     private int readinessTaskId = -1; // To track the scheduled task ID
 
@@ -49,7 +50,8 @@ public class GameInstance {
             List<String> teamNames,
             Map<String, Location> teamSpawns,
             Location waitingRoom,
-            Object pluginConfig
+            Object pluginConfig,
+            String createdBy
     ) {
         this.instanceManager = instanceManager;
         this.instanceUuid = instanceUuid;
@@ -66,6 +68,7 @@ public class GameInstance {
         this.spectators = new ArrayList<>();
         this.pluginConfig = pluginConfig;
         this.state = GameState.WAITING;
+        this.createdBy = createdBy;
 
         // Initialize teams
         for (String team : teamNames) {
@@ -149,6 +152,10 @@ public class GameInstance {
 
     public Location getWaitingRoom() {
         return waitingRoom;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
     }
 
     public void setState(GameState state) {

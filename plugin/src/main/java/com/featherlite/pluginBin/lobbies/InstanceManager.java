@@ -55,6 +55,7 @@ public class InstanceManager {
      * @return The created GameInstance, or null if the creation failed.
      */
     public GameInstance createInstance(
+            String createdBy,
             boolean isInstancePublic,
             String gameName,
             String gameType,
@@ -115,7 +116,8 @@ public class InstanceManager {
                     teamNames,
                     resolvedTeamSpawns,
                     resolvedWaitingRoom,
-                    pluginConfig
+                    pluginConfig,
+                    createdBy
             );
 
         activeInstances.put(instanceId, instance);

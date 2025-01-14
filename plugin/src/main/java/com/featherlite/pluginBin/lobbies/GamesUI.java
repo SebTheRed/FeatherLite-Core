@@ -2,6 +2,8 @@ package com.featherlite.pluginBin.lobbies;
 
 import org.bukkit.Bukkit;
 import net.md_5.bungee.api.ChatColor;
+
+import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -17,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.UUID;
 
 public class GamesUI implements Listener {
 
@@ -25,6 +28,7 @@ public class GamesUI implements Listener {
     private final Map<Player, String> chosenRegisteredGame = new HashMap<>();
     private final Map<Player, Boolean> isInstancePublic = new HashMap<>();
     private final Map<Player, String> selectedWorld = new HashMap<>();
+    private final Map<Player, String> selectedInstanceId = new HashMap<>();
 
 
     public GamesUI(GamesManager gamesManager, InstanceManager instanceManager) {
@@ -46,7 +50,7 @@ public class GamesUI implements Listener {
 
         // Check if the inventory belongs to GamesUI
         String inventoryTitle = ChatColor.stripColor(event.getView().getTitle());
-        if (!isGamesUIMenu(inventoryTitle)) {
+        if (!isGamesUIMenu(inventoryTitle, player)) {
             return; // Exit if this isn't one of your menus
         }
         // Get the clicked item
@@ -82,6 +86,7 @@ public class GamesUI implements Listener {
                 } else if (loreContainsRegisteredString) {
                     chosenRegisteredGame.put(player,itemDisplayName);
                     openViewInstancesSelectionMenu(player, chosenRegisteredGame.get(player));
+
                 }
                 break;
 
@@ -91,25 +96,50 @@ public class GamesUI implements Listener {
                 } else if (loreContainsRegisteredString) {
                     chosenRegisteredGame.put(player,itemDisplayName);
                     openCreateGameMenu(player, chosenRegisteredGame.get(player));
+
                 }
                 break;
             default:
                 if (inventoryTitle.equalsIgnoreCase(chosenRegisteredGame.get(player))) {
                     if (loreContainsJoinString) {
                         player.sendMessage("Attempting to join: " + chosenRegisteredGame.get(player));
+
+                        //here gpt
+                        String uuidString = ChatColor.stripColor(lore.get(lore.size() - 1)).trim();
+                        selectedInstanceId.put(player, uuidString);
+                        // HERE IS WHERE WE WILL STOP FOR TN
+                        // TOMORROW make another menu to display
+                            // game status
+                                // if game is started, colored teams to join.
+                                // if still lobby put in lobby.
+                            // teams w/ players
+                            // spectator option
+                        // instanceManager.addPlayerToInstance(player, null);
                     }
                 } else if (inventoryTitle.equalsIgnoreCase("Create " + chosenRegisteredGame.get(player))) {
-                    if (lore != null && lore.contains(ChatColor.GRAY + "Click to select this world.")) {
-                        // Select world
-                        selectedWorld.put(player, itemDisplayName);
-                        player.sendMessage(ChatColor.GREEN + "Selected world: " + selectedWorld.get(player));
-                        openCreateGameMenu(player, chosenRegisteredGame.get(player)); // Refresh the menu
-                    } else if (itemDisplayName.equalsIgnoreCase("Open to Public") || itemDisplayName.equalsIgnoreCase("Closed to Private")) {
+                    player.sendMessage("Clicking inside game options menu");
+
+
+
+                    if (itemDisplayName != null && itemDisplayName.contains("Select World")) {
+
+
+                        
+                        GameData gameTypeData = gamesManager.getGameData(chosenRegisteredGame.get(player));
+                        openWorldSelectionMenu(player, gameTypeData.getWorldOptions()); // Refresh the menu
+                    
+                        event.setCancelled(true);
+
+                    
+                    
+                    } else if (itemDisplayName.contains("Open to Public") || itemDisplayName.equalsIgnoreCase("Closed to Public")) {
                         boolean isPublic = isInstancePublic.getOrDefault(player, false);
                         isInstancePublic.put(player, !isPublic); // Toggle state
                         player.sendMessage(ChatColor.YELLOW + "Instance is now " + (!isPublic ? "public" : "private") + ".");
                         openCreateGameMenu(player, chosenRegisteredGame.get(player)); // Refresh the menu
-                    } else if (itemDisplayName.equalsIgnoreCase("Create Instance")) {
+                        event.setCancelled(true);
+
+                    } else if (itemDisplayName.contains("Create Instance")) {
                         String chosenWorld = selectedWorld.get(player);
                         if (chosenWorld == null) {
                             player.sendMessage(ChatColor.RED + "You must select a world before creating an instance.");
@@ -117,7 +147,7 @@ public class GamesUI implements Listener {
                         }
                 
                         GameInstance instance = gamesManager.startGameInstance(
-                            chosenRegisteredGame.get(player), chosenWorld, isInstancePublic.get(player) ,instanceManager
+                            chosenRegisteredGame.get(player), chosenWorld, isInstancePublic.get(player) ,instanceManager, player.getName(), true
                         );
                 
                         if (instance != null) {
@@ -125,7 +155,19 @@ public class GamesUI implements Listener {
                         } else {
                             player.sendMessage(ChatColor.RED + "Failed to create the instance.");
                         }
+                        event.setCancelled(true);
                     }
+                } else if (inventoryTitle.equalsIgnoreCase("Select World Map")) {
+                    event.setCancelled(true);
+                    ItemStack clickedItemWorld = event.getCurrentItem();
+                    if (clickedItemWorld != null && clickedItemWorld.hasItemMeta()) {
+                        String worldName = ChatColor.stripColor(clickedItemWorld.getItemMeta().getDisplayName());
+                        selectedWorld.put(player, worldName);
+                        String gameName = chosenRegisteredGame.get(player);
+                        player.sendMessage( ChatColor.GRAY + "Selected world: " + ChatColor.GREEN + worldName);
+                        openCreateGameMenu(player, gameName); // Return to the Create Game menu
+                    }
+                    return;
                 }
                 break;
         }
@@ -138,14 +180,16 @@ public class GamesUI implements Listener {
      * @param player The player opening the menu.
      */
     public void openMainMenu(Player player) {
-        Inventory mainMenu = Bukkit.createInventory(null, 27, ChatColor.GREEN + "Games Menu");
+        Inventory mainMenu = Bukkit.createInventory(null, 27, ChatColor.BOLD + "" + ChatColor.GREEN + "Games Menu");
 
         // Option 1: View/Join Games
-        ItemStack viewJoinGames = createMenuItem("View/Join Games", ChatColor.BLUE + "Click to view or join games.");
+        ItemStack joinItem = new ItemStack(org.bukkit.Material.COMPASS);
+        ItemStack viewJoinGames = createMenuItem(ChatColor.LIGHT_PURPLE + "View/Join Games", ChatColor.AQUA + "Click to view or join games.", joinItem);
         mainMenu.setItem(12, viewJoinGames);
 
         // Option 2: Create Game
-        ItemStack createGame = createMenuItem("Create Game", ChatColor.LIGHT_PURPLE + "Click to create a new game.");
+        ItemStack createItem = new ItemStack(org.bukkit.Material.ANVIL);
+        ItemStack createGame = createMenuItem(ChatColor.GREEN + "Create Game", ChatColor.YELLOW + "Click to create a new game.", createItem);
         mainMenu.setItem(14, createGame);
 
         player.openInventory(mainMenu);
@@ -182,7 +226,7 @@ public class GamesUI implements Listener {
 
         // Create paginated menus if necessary
         int inventorySize = 54;
-        Inventory viewJoinMenu = Bukkit.createInventory(null, inventorySize, ChatColor.DARK_GREEN + "Create a Game");
+        Inventory viewJoinMenu = Bukkit.createInventory(null, inventorySize, ChatColor.BLUE + "Create a Game");
 
         // Populate menu with active games
         int slot = 10;
@@ -234,7 +278,7 @@ public class GamesUI implements Listener {
 
         // Create paginated menus if necessary
         int inventorySize = 54;
-        Inventory gameSelectionMenu = Bukkit.createInventory(null, inventorySize, ChatColor.DARK_GREEN + "Create a Game");
+        Inventory gameSelectionMenu = Bukkit.createInventory(null, inventorySize, ChatColor.BLUE + "Create a Game");
 
         // Populate menu with active games
         int slot = 10;
@@ -246,6 +290,88 @@ public class GamesUI implements Listener {
         player.openInventory(gameSelectionMenu);
     }
 
+
+
+
+
+
+
+    
+    public void openCreateGameMenu(Player player, String registeredGameName) {
+        GameData registeredGameData = gamesManager.getGameData(registeredGameName);
+
+        // Check if there are no games of the specified type
+        if (registeredGameData == null) {
+            player.sendMessage(ChatColor.RED + "No game with name " + registeredGameName + " is registered.");
+            return; // Exit the method to avoid the exception
+        }
+
+        Inventory createMenu = Bukkit.createInventory(
+            null,
+            27,
+            ChatColor.GREEN + "Create " + registeredGameName
+        );
+
+        // World selection option
+        String worldName = selectedWorld.getOrDefault(player, "Select World");
+        ItemStack worldItem = createMenuItem(
+            ChatColor.AQUA + "Select World",
+            worldName.equals("Select World")
+                ? ChatColor.GRAY + "Click to select a world."
+                : ChatColor.GRAY + "Selected world: " + ChatColor.GREEN + worldName,
+            worldName.equals("Select World")
+                ? new ItemStack(Material.GRASS_BLOCK)
+                : new ItemStack(Material.EMERALD_BLOCK)
+
+        );
+        createMenu.setItem(11, worldItem);
+
+        // Toggle open/closed
+        ItemStack toggleOpenClosed = createMenuItem(
+            isInstancePublic.getOrDefault(player, true) ? ChatColor.GREEN + "Open to Public" : ChatColor.YELLOW + "Closed to Public",
+            ChatColor.GRAY + "Click to toggle instance visibility.",
+            isInstancePublic.getOrDefault(player, true)
+                ? new ItemStack(Material.DARK_OAK_FENCE_GATE)
+                : new ItemStack(Material.DARK_OAK_FENCE)
+        );
+        createMenu.setItem(13, toggleOpenClosed);
+
+        // Create instance button
+        ItemStack createInstance = createMenuItem(
+            ChatColor.GREEN + "Create Instance",
+            ChatColor.GRAY + "Click to create the instance.",
+            new ItemStack(Material.LIME_CONCRETE_POWDER)
+        );
+        createMenu.setItem(15, createInstance);
+
+        player.openInventory(createMenu);
+    }
+
+
+    public void openWorldSelectionMenu(Player player, List<String> worlds) {
+        Inventory worldSelectionMenu = Bukkit.createInventory(
+            null,
+            54,
+            ChatColor.DARK_GREEN + "Select World Map"
+        );
+
+        int slot = 0;
+        for (String world : worlds) {
+            if (slot >= 54) break; // Limit to a single menu page for now
+            ItemStack worldItem = new ItemStack(Material.GRASS_BLOCK);
+            ItemStack menuItem = createMenuItem(
+                ChatColor.YELLOW + world,
+                ChatColor.GRAY + "Click to select this world.",
+                worldItem
+            );
+            worldSelectionMenu.setItem(slot++, menuItem);
+        }
+
+        player.openInventory(worldSelectionMenu);
+    }
+
+
+
     /**
      * Creates a menu item.
      *
@@ -253,11 +379,10 @@ public class GamesUI implements Listener {
      * @param description The description of the item.
      * @return The ItemStack representing the menu item.
      */
-    private ItemStack createMenuItem(String name, String description) {
-        ItemStack item = new ItemStack(org.bukkit.Material.PAPER);
+    private ItemStack createMenuItem(String name, String description, ItemStack item) {
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(ChatColor.AQUA + name);
+            meta.setDisplayName(name);
             List<String> lore = new ArrayList<>();
             lore.add(description);
             meta.setLore(lore);
@@ -276,12 +401,14 @@ public class GamesUI implements Listener {
         player.sendMessage(ChatColor.YELLOW + "Toggle open/closed functionality not yet implemented.");
     }
 
-    private boolean isGamesUIMenu(String title) {
+    private boolean isGamesUIMenu(String title, Player player) {
         return title.equals("Games Menu") ||
                title.equals("View/Join Games") ||
                title.equals("Create Game") ||
                title.equals("Create a Game") ||
-               title.equals("Select Map");
+               title.equals("Select World Map") ||
+               title.equals("Create " + chosenRegisteredGame.get(player)) ||
+               title.equals(chosenRegisteredGame.get(player));
     }
 
     /**
@@ -345,56 +472,25 @@ public class GamesUI implements Listener {
      * @return The ItemStack representing the game type.
      */
     private ItemStack createInstanceItem(GameInstance instance) {
-        ItemStack item = new ItemStack(Material.DIAMOND_SWORD); // Icon for active instances
+        ItemStack item = new ItemStack(Material.GOLD_BLOCK); // Icon for active instances
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
             meta.setDisplayName(ChatColor.GREEN + instance.getGameName());
             List<String> lore = new ArrayList<>();
+            lore.add(ChatColor.WHITE + "Created By: " + instance.getCreatedBy());
             lore.add(ChatColor.GRAY + "World: " + instance.getBaseWorldName());
             lore.add(ChatColor.GRAY + "Players: " + instance.getTotalPlayerCount());
+
             // instance.getTeamSizes().values().stream()
             //        .mapToInt(sizeMap -> sizeMap.getOrDefault("max", 0)) // Sum up the "max" values
             //        .sum());            lore.add(ChatColor.GRAY + "State: " + instance.getState());
             lore.add("");
             lore.add(ChatColor.YELLOW + "Click to join this game.");
+            lore.add(ChatColor.DARK_GRAY + instance.getInstanceId().toString());
             meta.setLore(lore);
             item.setItemMeta(meta);
         }
         return item;
     }
 
-    public void openCreateGameMenu(Player player, String registeredGameName) {
-        GameData registeredGameData = gamesManager.getGameData(registeredGameName);
-    
-        // Check if there are no games of the specified type
-        if (registeredGameData == null) {
-            player.sendMessage(ChatColor.RED + "No game with name " + registeredGameName + " is registered.");
-            return; // Exit the method to avoid the exception
-        }
-    
-        Inventory createMenu = Bukkit.createInventory(null, 54, ChatColor.DARK_GREEN + "Create " + registeredGameName);
-    
-        // World selection options
-        int slot = 10;
-        for (String world : registeredGameData.getWorldOptions()) {
-            ItemStack worldOption = createMenuItem(world, ChatColor.GRAY + "Click to select this world.");
-            createMenu.setItem(slot++, worldOption);
-        }
-    
-        // Toggle open/closed
-        ItemStack toggleOpenClosed = createMenuItem(
-            isInstancePublic.getOrDefault(player, false) ? "Open to Public" : "Closed to Private",
-            ChatColor.YELLOW + "Click to toggle instance visibility."
-        );
-        createMenu.setItem(45, toggleOpenClosed); // Bottom-left corner
-    
-        // Create instance button
-        ItemStack createInstance = createMenuItem(
-            ChatColor.GREEN + "Create Instance",
-            ChatColor.GRAY + "Click to create the instance."
-        );
-        createMenu.setItem(49, createInstance); // Center slot
-    
-        player.openInventory(createMenu);
-    }
 }
