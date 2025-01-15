@@ -30,7 +30,7 @@ public class AppCommands {
             player = (Player) sender;
         }
         // Permission check for "/app" and "/app save {sessionString}"
-        if (player.hasPermission("feathercore.session")) {
+        if (player.hasPermission("core.editor")) {
             // Handle "/app save {sessionString}" command to apply changes
             if (args.length == 2 && args[0].equalsIgnoreCase("save")) {
                 String sessionID = args[1];

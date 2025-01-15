@@ -54,6 +54,10 @@ public class ScoreboardCommands implements TabCompleter {
                 return true;
             default:
                 if (!isPlayer) {sender.sendMessage(ChatColor.RED + "This command (/board <name>) can only be typed by players."); return true;}
+                if (isPlayer && !sender.hasPermission("core.board.switch")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to manually switch your scoreboard.");
+                    return true;
+                }
                 String scoreboardName = args[0];
                 if (scoreboardManager.renderScoreboard(player, scoreboardName)) {
                     sender.sendMessage("Switched to scoreboard: " + scoreboardName);

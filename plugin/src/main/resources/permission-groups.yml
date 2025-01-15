@@ -1,27 +1,112 @@
 permission-groups:
   default:
     - core.party
-    - core.eco.bal
-    - core.eco.baltop
-    - core.eco.pay
+    - core.games.menu
+    - core.games.play
+    - core.board.switch
+    - core.home
+    - core.homes.3
+    - core.eco.*
+    - core.teleport.tpr
+    - core.teleport.tpa
+    - core.teleport.spawn
+    - core.message
+    - core.list
+    - core.ping
+    - core.seen
+    - core.menu.help
 
   member:
     - group.default
-    - core.back
+    - core.homes.10
+    - core.teleport.back
+    - core.afk
+    - core.hat
     - core.chat.white
+    - core.menu.memberkit
 
   gamer:
     - core.game
+    - core.party.player
+    - core.games.create
+    - core.games.close
+
+  donor:
+    - core.fly
+    - core.feed
+    - core.rest
+    - core.enderchest
+    - core.trash
+    - core.nick
+    - core.workbench
+    - core.anvil
+    - core.cartographytable
+    - core.grindstone
+    - core.loom
+    - core.smithing
+    - core.stonecutter
+    - core.ptime
+    - core.pweather
 
   mod:
     - group.member
-    - core.seen
+    - group.gamer
+    - core.homes.20
+    - core.teleport.tppos
+    - core.teleport.tp
+    - core.teleport.tphere
+    - core.teleport.tpall
     - core.broadcast
-    - core.tp
+    - core.nick
+    - core.realname
+    - core.near
+    - core.getpos
+    - core.chat.*
 
   admin:
     - group.mod
-    - core.world
-    - core.board.reload
-    - core.eco.*
-    - core.chat.badwords
+    - core.editor
+    - core.permissions
+    - core.party.admin
+    - core.zones
+    - core.zonebypass
+    - core.restoreinventory
+    - core.board.*
+    - core.eco.admin
+    - core.world.*
+    - core.items.menu
+    - core.items.reload
+    - core.items.give
+    - core.homes.unlimited
+    - core.teleport.setspawn
+    - core.time
+    - core.weather
+    - core.sudo
+    - core.kill
+    - core.killall
+    - core.give
+    - core.exp
+    - core.enchant
+    - core.god
+    - core.speed
+    - core.flyspeed
+    - core.gamemode
+    - core.heal
+    - core.repair
+    - core.fly
+    - core.feed
+    - core.rest
+    - core.enderchest
+    - core.trash
+    - core.top
+    - core.nick
+    - core.workbench
+    - core.anvil
+    - core.cartographytable
+    - core.grindstone
+    - core.loom
+    - core.smithing
+    - core.stonecutter
+    - core.ptime
+    - core.pweather
+

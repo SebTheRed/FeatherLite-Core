@@ -4,15 +4,14 @@ import com.featherlite.pluginBin.menus.Menu;
 import com.featherlite.pluginBin.menus.MenuManager;
 import com.featherlite.pluginBin.menus.MenuPage;
 
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
-import java.util.ArrayList;
-import java.util.List;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MenuCommands implements TabCompleter {
     private final MenuManager menuManager;
@@ -44,13 +43,19 @@ public class MenuCommands implements TabCompleter {
             return true;
         }
 
+        // Check for the required permission
+        String requiredPermission = "core.menu." + menuId.toLowerCase();
+        if (!player.hasPermission(requiredPermission) || !player.hasPermission("core.menu.all")) {
+            player.sendMessage("§cYou do not have permission to open this menu. Required: " + requiredPermission);
+            return true;
+        }
+
         // Open the main page of the menu
         MenuPage target = menu.getPage("main");
         String menuPageTitle = target.getTitle();
         player.openInventory(menuManager.buildInventory(menu.getPage("main"), menu.getSlots(), menu.getID(), menuPageTitle));
         return true;
     }
-
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {

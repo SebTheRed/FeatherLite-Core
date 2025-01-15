@@ -44,14 +44,26 @@ public class UtilCommands implements TabCompleter {
         
         switch (label.toLowerCase()) {
             case "fly":
+                if (isPlayer && !sender.hasPermission("core.fly")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 return utilManager.toggleFlight(target != null ? target : executor);
             case "speed":
+                if (isPlayer && !sender.hasPermission("core.speed")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 if (args.length < 1) {
                     sender.sendMessage("Usage: /speed <value> [player_name]");
                     return true;
                 }
                 return utilManager.setWalkSpeed(target != null ? target : executor, args[0]);
             case "flyspeed":
+                if (isPlayer && !sender.hasPermission("core.flyspeed")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 if (args.length < 1) {
                     sender.sendMessage("Usage: /flyspeed <value> [player_name]");
                     return true;
@@ -59,51 +71,107 @@ public class UtilCommands implements TabCompleter {
                 return utilManager.setFlySpeed(target != null ? target : executor, args[0]);
             case "gamemode":
             case "gm":
+                if (isPlayer && !sender.hasPermission("core.gamemode")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 if (args.length < 1) {
                     sender.sendMessage("Usage: /gamemode <survival|creative|spectator> [player_name]");
                     return true;
                 }
                 return utilManager.setGameMode(target != null ? target : executor, args[0]);
             case "heal":
+                if (isPlayer && !sender.hasPermission("core.heal")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 return utilManager.healPlayer(target != null ? target : executor, sender);
             case "feed":
+                if (isPlayer && !sender.hasPermission("core.feed")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 return utilManager.feedPlayer(target != null ? target : executor, sender);
             case "rest":
+                if (isPlayer && !sender.hasPermission("core.rest")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 return utilManager.restPlayer(target != null ? target : executor, sender);
             case "repair":
+                if (isPlayer && !sender.hasPermission("core.repair")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 if (!isPlayer) {sender.sendMessage(ChatColor.RED + "Only players can /repair their own gear!"); return true;}
                 return utilManager.repairItem(executor); // Repair remains executor-specific
             case "afk":
+                if (isPlayer && !sender.hasPermission("core.afk")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 return utilManager.toggleAFK(target != null ? target : executor, sender);
             case "enderchest":
             case "ec":
+                if (isPlayer && !sender.hasPermission("core.enderchest")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 if (!isPlayer) {sender.sendMessage(ChatColor.RED + "Only players can use /ec in game!"); return true;}
                 return utilManager.openEnderChest(target != null ? target : executor, sender);
             case "trash":
+                if (isPlayer && !sender.hasPermission("core.trash")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 if (!isPlayer) {sender.sendMessage(ChatColor.RED + "Only players can use /trash in game!"); return true;}
                 return utilManager.openTrash(executor); // Trash remains executor-specific
             case "top":
+                if (isPlayer && !sender.hasPermission("core.top")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 if (!isPlayer) {sender.sendMessage(ChatColor.RED + "Only players can use /top in game!"); return true;}
                 return utilManager.teleportToTop(executor); // Top remains executor-specific
             case "hat":
+                if (isPlayer && !sender.hasPermission("core.hat")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 if (!isPlayer) {sender.sendMessage(ChatColor.RED + "Only players can use /hat in game!"); return true;}
                 return utilManager.wearHat(executor); // Hat remains executor-specific
             case "nick":
             case "nickname":
+                if (isPlayer && !sender.hasPermission("core.nick")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 if (args.length < 1) {
                     sender.sendMessage("Usage: /nick <desired_name> [player_name]");
                     return true;
                 }
                 return utilManager.setNickname(target != null ? target : executor, args, sender, playerDataManager);
             case "realname":
+                if (isPlayer && !sender.hasPermission("core.realname")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 if (args.length < 1) {
                     sender.sendMessage("Usage: /realname <player_nickname>");
                     return true;
                 }
                 return utilManager.getRealName(executor, args);
             case "list":
+                if (isPlayer && !sender.hasPermission("core.list")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 return utilManager.listPlayers(sender);
             case "near":
+                if (isPlayer && !sender.hasPermission("core.near")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 if (!isPlayer) {sender.sendMessage(ChatColor.RED + "Only players can use /near in game!"); return true;}
                 if (args.length < 1) {
                     sender.sendMessage("Usage: /near <radius>");
@@ -111,10 +179,22 @@ public class UtilCommands implements TabCompleter {
                 }
                 return utilManager.nearPlayers(executor, args);
             case "getpos":
+                if (isPlayer && !sender.hasPermission("core.getpos")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 return utilManager.getPlayerPosition(target != null ? target : executor, args, isPlayer);
             case "ping":
+                if (isPlayer && !sender.hasPermission("core.ping")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 return utilManager.pingPlayer(target != null ? target : executor, sender);
             case "seen":
+                if (isPlayer && !sender.hasPermission("core.seen")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 if (args.length < 1) {
                     sender.sendMessage("Usage: /seen <player_name>");
                     return true;
@@ -124,39 +204,75 @@ public class UtilCommands implements TabCompleter {
             case "workbench":
             case "wb":
             case "craft":
+                if (isPlayer && !sender.hasPermission("core.workbench")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 if (!isPlayer) {sender.sendMessage(ChatColor.RED + "Only players can use /craft in game!"); return true;}
                 return utilManager.openWorkbench(executor); // Workbench remains executor-specific
 
             case "anvil":
+                if (isPlayer && !sender.hasPermission("core.anvil")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 if (!isPlayer) {sender.sendMessage(ChatColor.RED + "Only players can use /anvil in game!"); return true;}
                 return utilManager.openAnvil(executor); // Anvil remains executor-specific
 
             case "cartographytable":
+                if (isPlayer && !sender.hasPermission("core.cartographytable")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 if (!isPlayer) {sender.sendMessage(ChatColor.RED + "Only players can use /cartographytable in game!"); return true;}
                 return utilManager.openCartographyTable(executor); // Cartography remains executor-specific
 
             case "grindstone":
+                if (isPlayer && !sender.hasPermission("core.grindstone")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 if (!isPlayer) {sender.sendMessage(ChatColor.RED + "Only players can use /grindstone in game!"); return true;}
                 return utilManager.openGrindstone(executor); // Grindstone remains executor-specific
 
             case "loom":
+                if (isPlayer && !sender.hasPermission("core.loom")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 if (!isPlayer) {sender.sendMessage(ChatColor.RED + "Only players can use /loom in game!"); return true;}
                 return utilManager.openLoom(executor); // Loom remains executor-specific
     
             case "smithingtable":
             case "smithing":
+                if (isPlayer && !sender.hasPermission("core.smithing")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 if (!isPlayer) {sender.sendMessage(ChatColor.RED + "Only players can use /smithingtable in game!"); return true;}
                 return utilManager.openSmithingTable(executor); // Smithing remains executor-specific
     
             case "stonecutter":
+                if (isPlayer && !sender.hasPermission("core.stonecutter")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 if (!isPlayer) {sender.sendMessage(ChatColor.RED + "Only players can use /stonecutter in game!"); return true;}
                 return utilManager.openStonecutter(executor); // Stonecutter remains executor-specific
     
             case "ptime":
+                if (isPlayer && !sender.hasPermission("core.ptime")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 if (!isPlayer) {sender.sendMessage(ChatColor.RED + "Only players can use /ptime in game!"); return true;}
                 return utilManager.setPlayerTime(target != null ? target : executor, args);
     
             case "pweather":
+                if (isPlayer && !sender.hasPermission("core.pweather")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 if (!isPlayer) {sender.sendMessage(ChatColor.RED + "Only players can use /pweather in game!"); return true;}
                 return utilManager.setPlayerWeather(target != null ? target : executor, args);
     

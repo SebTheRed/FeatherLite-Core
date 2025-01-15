@@ -1,6 +1,9 @@
 package com.featherlite.pluginBin.commands;
 
 import com.featherlite.pluginBin.utils.InventoryManager;
+
+import net.md_5.bungee.api.ChatColor;
+
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -13,6 +16,11 @@ public class InventoryCommands {
     }
 
     public boolean handleInventoryCommands(CommandSender sender, String[] args, boolean isPlayer) {
+
+        if (isPlayer && !sender.hasPermission("core.restoreinventory")) {
+            sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+            return true;
+        }
 
         if (args.length == 0) {
             sender.sendMessage("§cUsage: /restoreinventory <player>");

@@ -6,6 +6,7 @@ import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -34,14 +35,14 @@ public class PermissionsCommands implements TabCompleter {
                 if (isPlayer && sender.hasPermission("core.permissions")) {
                     permissionManager.showAllServerPermissions(player);
                 } else {
-                    sender.sendMessage("You do not have permission to check your permissions.");
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to check your permissions.");
                 }
             case "reload":
                 if (sender.hasPermission("core.permissions")) {
                     permissionManager.reloadConfig();
                     sender.sendMessage("Permissions configuration reloaded.");
                 } else {
-                    sender.sendMessage("You do not have permission to reload the configuration.");
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to reload the configuration.");
                 }
                 break;
 
@@ -53,7 +54,7 @@ public class PermissionsCommands implements TabCompleter {
                 if (sender.hasPermission("permissions")) {
                     permissionManager.addPlayerToGroup(args[1], args[2], sender);
                 } else {
-                    sender.sendMessage("You do not have permission to manage groups.");
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to manage groups.");
                 }
                 break;
 
@@ -65,7 +66,7 @@ public class PermissionsCommands implements TabCompleter {
                 if (sender.hasPermission("core.permissions")) {
                     permissionManager.removePlayerFromGroup(args[1], args[2], sender);
                 } else {
-                    sender.sendMessage("You do not have permission to manage groups.");
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to manage groups.");
                 }
                 break;
 
@@ -78,7 +79,7 @@ public class PermissionsCommands implements TabCompleter {
                     boolean value = Boolean.parseBoolean(args[3]);
                     permissionManager.setPlayerPermission(args[1], args[2], value, sender);
                 } else {
-                    sender.sendMessage("You do not have permission to manage individual permissions.");
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to manage individual permissions.");
                 }
                 break;
 

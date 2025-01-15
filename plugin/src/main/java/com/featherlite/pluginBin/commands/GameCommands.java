@@ -5,6 +5,9 @@ import com.featherlite.pluginBin.lobbies.InstanceManager;
 import com.featherlite.pluginBin.lobbies.TeamSelectorBook;
 import com.featherlite.pluginBin.lobbies.GamesManager;
 import com.featherlite.pluginBin.lobbies.GamesManager.GameData;
+
+import net.md_5.bungee.api.ChatColor;
+
 import com.featherlite.pluginBin.lobbies.GamesUI;
 
 import org.bukkit.command.CommandSender;
@@ -46,6 +49,10 @@ public class GameCommands implements TabCompleter {
             case "ui":
             case "menu":
                 if (isPlayer) {
+                    if (isPlayer && !sender.hasPermission("core.games.menu")) {
+                        sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                        return true;
+                    }
                     gamesUI.openMainMenu((Player) sender);
                 } else {
                     plugin.getLogger().warning("The /game menu command can only be used by players.");
@@ -54,6 +61,10 @@ public class GameCommands implements TabCompleter {
     
             case "join":
                 if (isPlayer) {
+                    if (isPlayer && !sender.hasPermission("core.games.play")) {
+                        sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                        return true;
+                    }
                     handleJoinCommand((Player) sender, args);
                 } else {
                     plugin.getLogger().warning("The /game join command can only be used by players.");
@@ -61,19 +72,31 @@ public class GameCommands implements TabCompleter {
                 return true;
     
             case "create":
+                if (isPlayer && !sender.hasPermission("core.games.create")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 handleCreateCommand(sender, args);
                 return true;
     
             case "delete":
-                if (isPlayer) {
-                    handleDeleteCommand((Player) sender, args);
-                } else {
-                    plugin.getLogger().warning("The /game delete command can only be used by players.");
-                }
+                // if (isPlayer && !sender.hasPermission("core.games.create")) {
+                //     sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                // }
+                // if (isPlayer) {
+                //     handleDeleteCommand((Player) sender, args);
+                // } else {
+                //     plugin.getLogger().warning("The /game delete command can only be used by players.");
+                // }
+                sender.sendMessage("This command doesn't do anything! Use close.");
                 return true;
     
             case "leave":
                 if (isPlayer) {
+                    if (isPlayer && !sender.hasPermission("core.games.play")) {
+                        sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                        return true;
+                    }
                     Player player = (Player) sender;
                     instanceManager.handlePlayerLeave(player);
                     player.sendMessage("You left the game.");
@@ -83,7 +106,11 @@ public class GameCommands implements TabCompleter {
                 return true;
     
             case "close":
-                handleCloseCommand(sender, args);
+                if (isPlayer && !sender.hasPermission("core.games.close")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
+                handleCloseCommand(sender, args, isPlayer);
                 return true;
     
             default:
@@ -176,7 +203,7 @@ public class GameCommands implements TabCompleter {
         }
     }
 
-    private void handleCloseCommand(CommandSender sender, String[] args) {
+    private void handleCloseCommand(CommandSender sender, String[] args, boolean isPlayer) {
         if (args.length < 3) {
             sender.sendMessage("Usage: /game close <instanceID> <lobbyName>");
             return;
@@ -184,9 +211,17 @@ public class GameCommands implements TabCompleter {
 
         try {
             UUID instanceId = UUID.fromString(args[1]);
-            String lobbyName = args[2];
-            instanceManager.closeInstance(instanceId);
-            sender.sendMessage("Game instance closed successfully and players teleported to " + lobbyName + "!");
+            GameInstance closingInstance = instanceManager.getInstance(instanceId);
+            if (sender.getName().equalsIgnoreCase(closingInstance.getCreatedBy()) || !isPlayer || sender.hasPermission("core.games.closeothers")) {
+                String lobbyName = args[2];
+                instanceManager.closeInstance(instanceId);
+                sender.sendMessage("Game instance closed successfully and players teleported to " + lobbyName + "!");
+                return;
+            } else {
+                sender.sendMessage("Only admins / console can close a game instance!");
+                return;
+            }
+
         } catch (IllegalArgumentException e) {
             sender.sendMessage("Invalid instance ID or lobby name.");
         }

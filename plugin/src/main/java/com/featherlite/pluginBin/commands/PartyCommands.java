@@ -1,6 +1,9 @@
 package com.featherlite.pluginBin.commands;
 
 import com.featherlite.pluginBin.lobbies.PartyManager;
+
+import net.md_5.bungee.api.ChatColor;
+
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -28,6 +31,11 @@ public class PartyCommands implements TabCompleter {
         }
         if (args.length < 1) {
             player.sendMessage("Usage: /party <create|invite|accept|deny|leave|disband|list>");
+            return true;
+        }
+
+        if (isPlayer && !sender.hasPermission("core.party.player")) {
+            sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
             return true;
         }
 

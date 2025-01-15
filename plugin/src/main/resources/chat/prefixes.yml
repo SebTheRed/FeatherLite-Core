@@ -1,13 +1,25 @@
 prefixes:
   default:
     permission-group: default
-    tag: "&7[&fDefault&7]"
+    tag: "&7[&7Default&7]"
     weight: 1
+  member:
+    permission-group: member
+    tag: "&e[&fMember&e]"
+    weight: 2
+  gamer:
+    permission-group: gamer
+    tag: "&a[&fGamer&a]"
+    weight: 3
+  donor:
+    permission-group: donor
+    tag: "&6[&fDonor&6]"
+    weight: 4
   moderator: 
     permission-group: moderator
     tag: "&9[&bMod&9]"
-    weight: 2
+    weight: 5
   admin:
     permission-group: admin
     tag: "&6[&eAdmin&6]"
-    weight: 3
+    weight: 6

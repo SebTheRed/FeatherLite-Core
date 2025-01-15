@@ -30,6 +30,10 @@ public class AdminCommands implements TabCompleter {
         switch (label.toLowerCase()) {
 
             case "enchant":
+                if (isPlayer && !sender.hasPermission("core.enchant")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 if (args.length < 2) {
                     if (!isPlayer) {sender.sendMessage("Only players can type the /enchant command!"); return true;}
                     sender.sendMessage("Usage: /enchant <enchantment> <level>");
@@ -38,6 +42,10 @@ public class AdminCommands implements TabCompleter {
                 return adminManager.enchantItem(player, args[0], Integer.parseInt(args[1]));
 
             case "exp":
+                if (isPlayer && !sender.hasPermission("core.exp")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 if (args.length < 2) {
                     sender.sendMessage("Usage: /exp <give|set|view> <player> <amount>");
                     return true;
@@ -51,6 +59,10 @@ public class AdminCommands implements TabCompleter {
                 return true;
 
             case "give":
+                if (isPlayer && !sender.hasPermission("core.give")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 if (args.length < 2) {
                     sender.sendMessage("Usage: /give <player> <item> [amount]"); 
                     return true;
@@ -63,6 +75,10 @@ public class AdminCommands implements TabCompleter {
                 return handleGiveCommand(sender, target, args);
 
             case "kill":
+                if (isPlayer && !sender.hasPermission("core.kill")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 if (args.length < 1) {
                     sender.sendMessage("Usage: /kill <player>");
                     return true;
@@ -77,6 +93,10 @@ public class AdminCommands implements TabCompleter {
                 return true;
 
             case "sudo":
+                if (isPlayer && !sender.hasPermission("core.sudo")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 if (args.length < 2) {
                     sender.sendMessage("Usage: /sudo <player> <command>");
                     return true;
@@ -91,6 +111,10 @@ public class AdminCommands implements TabCompleter {
                 return true;
 
             case "weather":
+                if (isPlayer && !sender.hasPermission("core.weather")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 if (args.length < 1 || args.length > 2) {
                     sender.sendMessage("Usage: /weather <clear|rain|thunder> [world]");
                     return true;
@@ -122,6 +146,10 @@ public class AdminCommands implements TabCompleter {
 
 
             case "god":
+                if (isPlayer && !sender.hasPermission("core.god")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 if (!isPlayer) {sender.sendMessage("Only players can type the /god command!"); return true;}
                 boolean enabled = adminManager.toggleGodMode(player);
                 player.sendMessage(enabled 
@@ -183,6 +211,10 @@ public class AdminCommands implements TabCompleter {
             
             case "killall":
             case "remove":
+                if (isPlayer && !sender.hasPermission("core.killall")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 if (player != null && !player.hasPermission("core.killall")) {
                     sender.sendMessage(ChatColor.RED + "You don't have permission to use this command.");
                     return true;

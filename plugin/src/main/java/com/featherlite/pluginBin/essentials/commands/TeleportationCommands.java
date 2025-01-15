@@ -33,45 +33,99 @@ public class TeleportationCommands implements TabCompleter {
             return true;
         }
 
+
+
         switch (label.toLowerCase()) {
             case "tppos":
+                if (isPlayer && !sender.hasPermission("core.teleport.tppos")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 return handleTppos(executor, args);
 
             case "tp":
+                if (isPlayer && !sender.hasPermission("core.teleport.tp")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 return handleTp(executor, args);
 
             case "tphere":
+                if (isPlayer && !sender.hasPermission("core.teleport.tphere")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 return handleTphere(executor, args);
 
             case "tpall":
+                if (isPlayer && !sender.hasPermission("core.teleport.tpall")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 return handleTpAll(executor);
 
             case "tpa":
+                if (isPlayer && !sender.hasPermission("core.teleport.tpa")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 return handleTpa(executor, args);
 
             case "tpahere":
+                if (isPlayer && !sender.hasPermission("core.teleport.tpa")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 return handleTpahere(executor, args);
 
             case "tpaccept":
+                if (isPlayer && !sender.hasPermission("core.teleport.tpa")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 return teleportationManager.acceptTeleport(executor);
 
             case "tpadeny":
+                if (isPlayer && !sender.hasPermission("core.teleport.tpa")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 return teleportationManager.denyTeleport(executor);
 
             case "tpacancel":
+                if (isPlayer && !sender.hasPermission("core.teleport.tpa")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 return teleportationManager.cancelTeleport(executor);
 
             case "back":
+                if (isPlayer && !sender.hasPermission("core.teleport.back")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 return teleportationManager.teleportBack(executor);
 
             case "tpr":
             case "rtp":
+                if (isPlayer && !sender.hasPermission("core.teleport.tpr")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 return handleTpr(executor);
 
             case "spawn":
+                if (isPlayer && !sender.hasPermission("core.teleport.spawn")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 return teleportationManager.teleportToSpawn(executor);
 
             case "setspawn":
+                if (isPlayer && !sender.hasPermission("core.teleport.setspawn")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 return handleSetSpawn(executor);
 
             default:

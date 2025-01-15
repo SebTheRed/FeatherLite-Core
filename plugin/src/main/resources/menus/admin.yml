@@ -1,0 +1,17 @@
+menu:
+  id: Admin_Menu
+  title: "&aAdmin Menu" # The title of menu. Never seen by the player.
+  slots: 27 # Number of inventory slots (must be a multiple of 9)
+  pages:
+    main:
+      title: "&aAdmin Menu" # The title of the inventory
+      items:
+        0:
+          type: command-button
+          icon:
+            material: COMPASS
+            amount: 1
+          displayName: "Work in Progress"
+          lore:
+            - "&7Click to become god."
+          command: "god"

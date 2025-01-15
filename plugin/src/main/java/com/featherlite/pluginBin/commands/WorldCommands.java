@@ -59,8 +59,8 @@ public class WorldCommands implements TabCompleter {
                 WorldType type = args.length > 3 ? WorldType.valueOf(args[3].toUpperCase()) : WorldType.NORMAL;
                 worldManager.createNewWorld(worldName, environment, type);
                 sender.sendMessage(ChatColor.GREEN + "World created: " + worldName);
-                boolean worldImport = worldManager.importWorld(worldName, environment);
-                if (worldImport) {
+                World worldImport = worldManager.loadWorld(worldName);
+                if (worldImport != null) {
                     sender.sendMessage(ChatColor.GREEN + worldName + " registered successfully");
                 } else {
                     sender.sendMessage(ChatColor.RED + worldName + " failed to register!!");
@@ -101,12 +101,16 @@ public class WorldCommands implements TabCompleter {
                 }
                 break;
 
-                case "tp":
+            case "tp":
+                if (isPlayer && !sender.hasPermission("core.world.tp")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 if (args.length < 2) {
                     sender.sendMessage(ChatColor.YELLOW + "Usage: /world tp <worldName> [playerName]");
                     return true;
                 }
-            
+                
                 String targetWorldName = args[1];
                 World targetWorld = Bukkit.getWorld(targetWorldName);
             
@@ -119,7 +123,7 @@ public class WorldCommands implements TabCompleter {
             
                 if (args.length > 2) {
                     // Teleporting another player
-                    if (player != null && !player.hasPermission("core.world.tp.others")) {
+                    if (player != null && !player.hasPermission("core.world.tpothers")) {
                         sender.sendMessage(ChatColor.RED + "You don't have permission to teleport other players.");
                         return true;
                     }
@@ -151,6 +155,10 @@ public class WorldCommands implements TabCompleter {
             
             
             case "import":
+                if (isPlayer && !sender.hasPermission("core.world.create")) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                    return true;
+                }
                 if (args.length < 2) {
                     sender.sendMessage(ChatColor.YELLOW + "Usage: /world import <worldName> [environment]");
                     return true;
