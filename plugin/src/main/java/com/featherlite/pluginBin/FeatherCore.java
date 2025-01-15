@@ -59,6 +59,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -123,13 +124,16 @@ public class FeatherCore extends JavaPlugin {
     private TeleportationCommands teleportationCommands;
     private HomeCommands homeCommands;
 
-    
+    public boolean isDebuggerOn;
 
     @Override
     public void onEnable() {
         saveDefaultConfig();
         getLogger().info("FeatherCore Plugin Enabled!");
 
+        FileConfiguration mainConfig = Bukkit.getPluginManager().getPlugin("FeatherLite-Core").getConfig();
+        isDebuggerOn = mainConfig.getBoolean("debugger-tool");
+        getLogger().info("FeatherCore debugger is: " + isDebuggerOn);
         playerDataManager = new PlayerDataManager(this, "player_data");
         teleportationManager = new TeleportationManager(playerDataManager, this);
         homeManager = new HomeManager(playerDataManager);
@@ -145,34 +149,34 @@ public class FeatherCore extends JavaPlugin {
 
         particleManager = new ParticleManager(this);
         projectileManager = new ProjectileManager(this);
-        displayPieceManager = new DisplayPieceManager(this);
+        displayPieceManager = new DisplayPieceManager(this, isDebuggerOn);
 
-        abilityRegistry = new AbilityRegistry(this, projectileManager, particleManager, displayPieceManager); // Initialize AbilityRegistry
+        abilityRegistry = new AbilityRegistry(this, projectileManager, particleManager, displayPieceManager, isDebuggerOn); // Initialize AbilityRegistry
         cooldownManager = new CooldownManager();
-        fileManager = new FileManager(this);
+        fileManager = new FileManager(this, isDebuggerOn);
         fileManager.loadActiveItemCategories();
-        worldManager = new WorldManager(this);
+        worldManager = new WorldManager(this, isDebuggerOn);
         worldManager.loadPersistedWorlds();
 
-        webAppManager = new WebAppManager(this, fileManager);
+        webAppManager = new WebAppManager(this, fileManager, isDebuggerOn);
         partyManager = new PartyManager();
-        itemManager = new ItemManager(this, abilityRegistry);  // Initialize ItemManager
+        itemManager = new ItemManager(this, abilityRegistry, isDebuggerOn);  // Initialize ItemManager
         uiManager = new UIManager(this, itemManager); // Initialize UIManager with ItemManager
-        teamSelectorBook = new TeamSelectorBook(this);
+        teamSelectorBook = new TeamSelectorBook(this, isDebuggerOn);
         instanceManager = new InstanceManager(partyManager, worldManager, this, teamSelectorBook, teleportationManager);
         gamesManager = new GamesManager();
-        gamesUI = new GamesUI(gamesManager, instanceManager);
+        gamesUI = new GamesUI(gamesManager, instanceManager, isDebuggerOn);
         getServer().getPluginManager().registerEvents(gamesUI, this);
 
-        permissionManager = new PermissionManager(this, playerDataManager); // Initialize the permission manager
+        permissionManager = new PermissionManager(this, playerDataManager, isDebuggerOn); // Initialize the permission manager
         zoneManager = new ZoneManager(this);
-        getServer().getPluginManager().registerEvents(new ZoneListeners(zoneManager, this), this);
+        getServer().getPluginManager().registerEvents(new ZoneListeners(zoneManager, this, isDebuggerOn), this);
 
-        scoreboardManager = new ScoreboardManager(this);
+        scoreboardManager = new ScoreboardManager(this, isDebuggerOn);
 
         economyManager = new EconomyManager(this, playerDataManager);
-        menuManager = new MenuManager(this, economyManager);
-        getServer().getPluginManager().registerEvents(new MenuListeners(this, menuManager), this);
+        menuManager = new MenuManager(this, economyManager, isDebuggerOn);
+        getServer().getPluginManager().registerEvents(new MenuListeners(this, menuManager, isDebuggerOn), this);
 
 
         chatManager = new ChatManager(this);
@@ -188,7 +192,7 @@ public class FeatherCore extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new PlayerRespawnListener(teleportationManager, this), this);
 
-        playerStatsManager = new PlayerStatsManager(this);
+        playerStatsManager = new PlayerStatsManager(this, isDebuggerOn);
         getServer().getPluginManager().registerEvents(new StatListeners(playerStatsManager), this);
 
         getServer().getPluginManager().registerEvents(new LobbyMenuListeners(this, instanceManager, teamSelectorBook), this);
@@ -371,7 +375,8 @@ public class FeatherCore extends JavaPlugin {
             for (Entity entity : world.getEntities()) {
                 if (entity instanceof Display) {
                     entity.remove();
-                    this.getLogger().info("Force-removed lingering display entity: " + entity.getUniqueId());
+                    if (isDebuggerOn) {this.getLogger().info("Force-removed lingering display entity: " + entity.getUniqueId());}
+                    
                 }
             }
         });

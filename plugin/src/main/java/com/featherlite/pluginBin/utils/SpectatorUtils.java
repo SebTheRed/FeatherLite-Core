@@ -32,7 +32,7 @@ public class SpectatorUtils implements Listener {
         
         // Add player to the spectator set and make them invincible
         spectators.add(player.getUniqueId());
-        player.sendMessage("You are now in spectator mode with flight.");
+        player.sendMessage("You are now in feather-spectator mode.");
     }
 
     public void disableSpectatorMode(Player player) {
@@ -43,7 +43,7 @@ public class SpectatorUtils implements Listener {
         spectators.remove(player.getUniqueId());
         
         player.setGameMode(GameMode.SURVIVAL);
-        player.sendMessage("You have left spectator mode.");
+        player.sendMessage("You have left feather-spectator mode.");
     }
 
     public boolean isInSpectatorMode(Player player) {

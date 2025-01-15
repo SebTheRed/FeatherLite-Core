@@ -17,6 +17,7 @@ public class PlayerStatsManager implements Listener {
     private final File statsFolder;
     private final Map<UUID, Map<String, Object>> inMemoryStats = new HashMap<>();
     private final Plugin plugin;
+    private final boolean isDebuggerOn;
 
     // Predefined list of tracked stats
     private static final List<Statistic> trackedStats = List.of(
@@ -26,8 +27,9 @@ public class PlayerStatsManager implements Listener {
             Statistic.JUMP, Statistic.CRAFT_ITEM, Statistic.BREAK_ITEM
     );
 
-    public PlayerStatsManager(Plugin plugin) {
+    public PlayerStatsManager(Plugin plugin, boolean isDebuggerOn) {
         this.plugin = plugin;
+        this.isDebuggerOn = isDebuggerOn;
         this.statsFolder = new File(plugin.getDataFolder(), "player_stats");
         if (!statsFolder.exists()) {
             statsFolder.mkdirs();
@@ -91,7 +93,7 @@ public class PlayerStatsManager implements Listener {
         // Increment the value
         playerStats.put(key, currentValue + amount);
 
-        // plugin.getLogger().info("Stat incremented: " + key + " -> " + (currentValue + amount));   // ADD THIS WITH DEBUGGER
+        if (isDebuggerOn) {plugin.getLogger().info("Stat incremented: " + key + " -> " + (currentValue + amount));}
     }
 
     /**
@@ -130,7 +132,7 @@ public class PlayerStatsManager implements Listener {
     
                     savePlayerStats(player);
                 });
-                // plugin.getLogger().info("Polled and saved stats for all online players."); // REACTIVATE W/ DEBUGGER
+                if (isDebuggerOn) {plugin.getLogger().info("Polled and saved stats for all online players.");} // REACTIVATE W/ DEBUGGER
             }
         }.runTaskTimer(plugin, 1200L, 1200L); // Every 60 seconds
     }

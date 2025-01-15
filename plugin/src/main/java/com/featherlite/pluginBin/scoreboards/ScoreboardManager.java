@@ -17,12 +17,14 @@ import java.util.List;
 import java.util.Map;
 
 public class ScoreboardManager implements Listener {
-    private final JavaPlugin plugin;
+    private final Plugin plugin;
     private final Map<String, ScoreboardDisplay> scoreboards = new HashMap<>();
     private final Map<Player, ScoreboardDisplay> activeScoreboards = new HashMap<>();
+    private final boolean isDebuggerOn;
 
-    public ScoreboardManager(JavaPlugin plugin) {
+    public ScoreboardManager(Plugin plugin, boolean isDebuggerOn) {
         this.plugin = plugin;
+        this.isDebuggerOn = isDebuggerOn;
     
         // Ensure the scoreboards folder exists
         File scoreboardFolder = new File(plugin.getDataFolder(), "scoreboards");
@@ -83,12 +85,12 @@ public class ScoreboardManager implements Listener {
         scoreboards.clear();
 
         // Load core scoreboards first
-        loadScoreboardsFromPlugin(plugin);
+        loadScoreboardsFromPlugin(plugin, isDebuggerOn);
 
         // Load scoreboards from all other plugins
         for (Plugin installedPlugin : Bukkit.getPluginManager().getPlugins()) {
             if (installedPlugin.isEnabled() && !installedPlugin.equals(plugin)) {
-                loadScoreboardsFromPlugin(installedPlugin);
+                loadScoreboardsFromPlugin(installedPlugin, isDebuggerOn);
             }
         }
     }
@@ -118,9 +120,9 @@ public class ScoreboardManager implements Listener {
     }
 
     // Load scoreboards from a single plugin
-    private void loadScoreboardsFromPlugin(Plugin plugin) {
+    private void loadScoreboardsFromPlugin(Plugin plugin, boolean isDebuggerOn) {
         plugin.getLogger().info("Loading scoreboards from " + plugin.getName());
-        ScoreboardParser parser = new ScoreboardParser(plugin);
+        ScoreboardParser parser = new ScoreboardParser(plugin, isDebuggerOn);
         Map<String, ScoreboardDisplay> pluginScoreboards = parser.parseScoreboards();
 
         // Register all scoreboards from this plugin
@@ -175,7 +177,7 @@ public class ScoreboardManager implements Listener {
             // Stop and remove the current scoreboard
             activeScoreboards.get(player).stop(player);
             activeScoreboards.remove(player);
-            player.sendMessage("Scoreboard hidden.");
+            if (isDebuggerOn) {player.sendMessage("Scoreboard hidden.");}
         } else {
             // Render the default scoreboard
             if (!renderScoreboard(player, "default-board")) {

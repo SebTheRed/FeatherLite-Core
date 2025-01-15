@@ -28,15 +28,17 @@ public class WorldManager {
     private final WorldDeleterUtil deleterUtil;
     private final WorldCopyUtil copyUtil;
     private final WorldTeleporterUtil teleporterUtil;
+    private final boolean isDebuggerOn;
 
-    public WorldManager(JavaPlugin plugin) {
+    public WorldManager(JavaPlugin plugin, boolean isDebuggerOn) {
         this.plugin = plugin;
+        this.isDebuggerOn = isDebuggerOn;
         this.configFile = new File(plugin.getDataFolder(), "worlds-data.yml");
         this.config = YamlConfiguration.loadConfiguration(configFile);
-        this.loaderUtil = new WorldLoaderUtil(plugin);
+        this.loaderUtil = new WorldLoaderUtil(plugin, isDebuggerOn);
         this.creatorUtil = new WorldCreatorUtil(plugin);
         this.deleterUtil = new WorldDeleterUtil(plugin, "world");
-        this.copyUtil = new WorldCopyUtil(plugin);
+        this.copyUtil = new WorldCopyUtil(plugin, isDebuggerOn);
         this.teleporterUtil = new WorldTeleporterUtil(plugin);
     }
 
@@ -67,7 +69,7 @@ public class WorldManager {
         for (String worldName : worlds) {
             World world = Bukkit.getWorld(worldName);
             if (world == null) {
-                plugin.getLogger().info("Loading persisted world: " + worldName);
+                if (isDebuggerOn) {plugin.getLogger().info("Loading persisted world: " + worldName);}
                 // Use your WorldLoaderUtil or equivalent to load the world
                 loaderUtil.loadWorld(worldName);
             }
@@ -135,7 +137,7 @@ public class WorldManager {
     public void setWorldBorder(String worldName, double radius) {
         config.set("world-borders." + worldName + ".radius", radius);
         saveConfig();
-        plugin.getLogger().info("Square world border set for " + worldName + " with radius: " + radius);
+        if (isDebuggerOn) {plugin.getLogger().info("Square world border set for " + worldName + " with radius: " + radius);}
     }
 
     // Get the square world border radius

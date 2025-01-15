@@ -13,10 +13,12 @@ import net.md_5.bungee.api.ChatColor;
 public class MenuListeners implements Listener {
     private final MenuManager menuManager;
     private final JavaPlugin plugin;
+    private final boolean isDebuggerOn;
 
-    public MenuListeners(JavaPlugin plugin, MenuManager menuManager) {
+    public MenuListeners(JavaPlugin plugin, MenuManager menuManager, boolean isDebuggerOn) {
         this.plugin = plugin;
         this.menuManager = menuManager;
+        this.isDebuggerOn = isDebuggerOn;
     }
 
     @EventHandler
@@ -35,8 +37,8 @@ public class MenuListeners implements Listener {
         // Get the menu ID using the inventory title
         String inventoryTitle = ChatColor.stripColor(event.getView().getTitle());
         String menuId = menuManager.getInventoryTitleToMenuId().get(inventoryTitle);
-        // plugin.getLogger().info("inventoryTitle: " + inventoryTitle);
-        // plugin.getLogger().info("menuId" + menuId);
+        if (isDebuggerOn) {plugin.getLogger().info("inventoryTitle: " + inventoryTitle);}
+        if (isDebuggerOn) {plugin.getLogger().info("menuId" + menuId);}
         if (menuId == null) {
             // plugin.getLogger().warning("Not a managed menu!");
             return; // Not a managed menu
@@ -61,7 +63,7 @@ public class MenuListeners implements Listener {
             return;
         }
         
-        plugin.getLogger().info("Executing button action for button type: " + button.getClass().getSimpleName());
+        if (isDebuggerOn) {plugin.getLogger().info("Executing button action for button type: " + button.getClass().getSimpleName());}
         button.onClick(player);
     }
     

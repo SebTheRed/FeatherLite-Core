@@ -53,7 +53,7 @@ public class LobbyMenuListeners implements Listener {
             // Fetch the GameInstance for the player
             GameInstance instance = instanceManager.getInstanceForPlayer(player);
             if (instance == null) {
-                player.sendMessage("§cYou are not in a game instance.");
+                player.sendMessage("§cYou are not in a game instance. ?? Report error to admin. Team Selector book instance == null");
                 Bukkit.getLogger().warning("Player " + player.getName() + " tried to use the Team Selector book, but they are not in a game instance.");
                 return;
             }

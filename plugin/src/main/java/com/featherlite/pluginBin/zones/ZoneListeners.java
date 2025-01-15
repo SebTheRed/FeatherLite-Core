@@ -57,9 +57,11 @@ public class ZoneListeners implements Listener {
 
     private final ZoneManager zoneManager;
     private final Map<Player, Zone> playerZoneCache = new HashMap<>();
+    private final boolean isDebuggerOn;
 
-    public ZoneListeners(ZoneManager zoneManager, JavaPlugin plugin) {
+    public ZoneListeners(ZoneManager zoneManager, JavaPlugin plugin, boolean isDebuggerOn) {
         this.zoneManager = zoneManager;
+        this.isDebuggerOn = isDebuggerOn;
     }
 
     @EventHandler
@@ -113,7 +115,7 @@ public class ZoneListeners implements Listener {
 
         if (zone != null && !zone.canBreak(event.getBlock().getType().name())) {
             event.setCancelled(true);
-            player.sendMessage(ChatColor.RED + "You cannot break this block in this zone.");
+            if (isDebuggerOn) {player.sendMessage(ChatColor.RED + "You cannot break this block in this zone.");}
         }
     }
 
@@ -125,7 +127,7 @@ public class ZoneListeners implements Listener {
 
         if (zone != null && !zone.canBuild(event.getBlock().getType().name())) {
             event.setCancelled(true);
-            player.sendMessage(ChatColor.RED + "You cannot place blocks in this zone.");
+            if (isDebuggerOn) {player.sendMessage(ChatColor.RED + "You cannot place blocks in this zone.");}
         }
     }
 
@@ -150,7 +152,7 @@ public class ZoneListeners implements Listener {
                             Player attacker = (Player) entityEvent.getDamager();
                             if (!zone.isPvp()) {
                                 event.setCancelled(true);
-                                attacker.sendMessage(ChatColor.RED + "PvP is not allowed in this zone.");
+                                if (isDebuggerOn) {attacker.sendMessage(ChatColor.RED + "PvP is not allowed in this zone.");}
                             }
                         } else {
                             if (!zone.isMobDamage()) {
@@ -217,7 +219,7 @@ public class ZoneListeners implements Listener {
 
         if (zone != null && !zone.isItemPickup()) {
             event.setCancelled(true);
-            player.sendMessage(ChatColor.RED + "Item pickup is disabled in this zone.");
+            if (isDebuggerOn) {player.sendMessage(ChatColor.RED + "Item pickup is disabled in this zone.");}
         }
     }
 
@@ -228,7 +230,7 @@ public class ZoneListeners implements Listener {
 
         if (zone != null && !zone.isItemDrop()) {
             event.setCancelled(true);
-            player.sendMessage(ChatColor.RED + "Item dropping is disabled in this zone.");
+            if (isDebuggerOn) {player.sendMessage(ChatColor.RED + "Item dropping is disabled in this zone.");}
         }
     }
 
@@ -241,7 +243,7 @@ public class ZoneListeners implements Listener {
 
         if (zone != null && zone.isCommandBlocked(command)) {
             event.setCancelled(true);
-            player.sendMessage(ChatColor.RED + "This command is blocked in this zone.");
+            if (isDebuggerOn) {player.sendMessage(ChatColor.RED + "This command is blocked in this zone.");}
         }
     }
 
@@ -260,7 +262,7 @@ public class ZoneListeners implements Listener {
             Location spawnPoint = zone.getSpawnPoint();
             if (spawnPoint != null) {
                 event.setRespawnLocation(spawnPoint);
-                player.sendMessage(ChatColor.GREEN + "You have respawned at the "+ zone.getName() +" designated spawn point.");
+                if (isDebuggerOn) {player.sendMessage(ChatColor.GREEN + "You have respawned at the "+ zone.getName() +" designated spawn point.");}
             }
         }
     }
@@ -296,7 +298,7 @@ public class ZoneListeners implements Listener {
 
             if (zone != null && !zone.isMount()) {
                 event.setCancelled(true);
-                player.sendMessage(ChatColor.RED + "You cannot mount entities in this zone.");
+                if (isDebuggerOn) {player.sendMessage(ChatColor.RED + "You cannot mount entities in this zone.");}
             }
         }
     }
@@ -401,11 +403,11 @@ public class ZoneListeners implements Listener {
         // 1. Ender Pearl and Chorus Fruit Usage
         if (itemType == Material.ENDER_PEARL && !zone.isEnderpearl()) {
             event.setCancelled(true);
-            player.sendMessage(ChatColor.RED + "Ender pearl usage is not allowed in this zone.");
+            if (isDebuggerOn) {player.sendMessage(ChatColor.RED + "Ender pearl usage is not allowed in this zone.");}
             return;
         } else if (itemType == Material.CHORUS_FRUIT && !zone.isChorusFruit()) {
             event.setCancelled(true);
-            player.sendMessage(ChatColor.RED + "Chorus fruit usage is not allowed in this zone.");
+            if (isDebuggerOn) {player.sendMessage(ChatColor.RED + "Chorus fruit usage is not allowed in this zone.");}
             return;
         }
 
@@ -420,7 +422,7 @@ public class ZoneListeners implements Listener {
 
         if ((isBoat || isMinecart) && !zone.isVehiclePlace()) {
             event.setCancelled(true);
-            player.sendMessage(ChatColor.RED + "Vehicle placement is disabled in this zone.");
+            if (isDebuggerOn) {player.sendMessage(ChatColor.RED + "Vehicle placement is disabled in this zone.");}
             return;
         }
 
@@ -444,7 +446,7 @@ public class ZoneListeners implements Listener {
                 clickedBlockType == Material.COMPOSTER || clickedBlockType == Material.NOTE_BLOCK ||
                 clickedBlockType == Material.ITEM_FRAME) {
                 event.setCancelled(true);
-                player.sendMessage(ChatColor.RED + "You cannot interact with this block in this zone.");
+                if (isDebuggerOn) {player.sendMessage(ChatColor.RED + "You cannot interact with this block in this zone.");}
                 return;
             }
         }
@@ -456,7 +458,7 @@ public class ZoneListeners implements Listener {
                 clickedBlockType == Material.BREWING_STAND || clickedBlockType == Material.GRINDSTONE ||
                 clickedBlockType == Material.LOOM || clickedBlockType == Material.STONECUTTER) {
                 event.setCancelled(true);
-                player.sendMessage(ChatColor.RED + "Station interaction is disabled in this zone.");
+                if (isDebuggerOn) {player.sendMessage(ChatColor.RED + "Station interaction is disabled in this zone.");}
                 return;
             }
         }
@@ -464,11 +466,11 @@ public class ZoneListeners implements Listener {
         // 5. Bucket Placement Check
         if (itemType == Material.WATER_BUCKET && !zone.isWaterBucket()) {
             event.setCancelled(true);
-            player.sendMessage(ChatColor.RED + "Placing water with a bucket is not allowed in this zone.");
+            if (isDebuggerOn) {player.sendMessage(ChatColor.RED + "Placing water with a bucket is not allowed in this zone.");}
             return;
         } else if (itemType == Material.LAVA_BUCKET && !zone.isLavaBucket()) {
             event.setCancelled(true);
-            player.sendMessage(ChatColor.RED + "Placing lava with a bucket is not allowed in this zone.");
+            if (isDebuggerOn) {player.sendMessage(ChatColor.RED + "Placing lava with a bucket is not allowed in this zone.");}
             return;
         }
     }
@@ -545,17 +547,17 @@ public class ZoneListeners implements Listener {
     }
 
 
-    @EventHandler
-    public void onFrostWalker(PlayerMoveEvent event) {
-        Player player = event.getPlayer();
-        Zone zone = zoneManager.getZoneAtLocation(player.getLocation());
+    // @EventHandler
+    // public void onFrostWalker(PlayerMoveEvent event) {
+    //     Player player = event.getPlayer();
+    //     Zone zone = zoneManager.getZoneAtLocation(player.getLocation());
 
-        if (zone != null && !zone.isFrostWalker() && player.getInventory().getBoots() != null 
-                && player.getInventory().getBoots().containsEnchantment(Enchantment.FROST_WALKER)) {
-            event.setCancelled(true);
-            player.sendMessage(ChatColor.RED + "Frost Walker is disabled in this zone.");
-        }
-    }
+    //     if (zone != null && !zone.isFrostWalker() && player.getInventory().getBoots() != null 
+    //             && player.getInventory().getBoots().containsEnchantment(Enchantment.FROST_WALKER)) {
+    //         event.setCancelled(true);
+    //         if (isDebuggerOn) {player.sendMessage(ChatColor.RED + "Frost Walker is disabled in this zone.");}
+    //     }
+    // }
 
 
     @EventHandler
@@ -698,7 +700,7 @@ public class ZoneListeners implements Listener {
     
         if (zone != null && !zone.isChestAccess()) {
             event.setCancelled(true);
-            player.sendMessage(ChatColor.RED + "You cannot access chests in this zone.");
+            if (isDebuggerOn) {player.sendMessage(ChatColor.RED + "You cannot access chests in this zone.");}
         }
     }
 

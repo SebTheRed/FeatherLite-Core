@@ -9,9 +9,11 @@ import java.io.File;
 
 public class WorldLoaderUtil {
     private final JavaPlugin plugin;
+    private final boolean isDebuggerOn;
 
-    public WorldLoaderUtil(JavaPlugin plugin) {
+    public WorldLoaderUtil(JavaPlugin plugin, boolean isDebuggerOn) {
         this.plugin = plugin;
+        this.isDebuggerOn = isDebuggerOn;
     }
 
     // Method to load an existing world from its folder
@@ -28,7 +30,7 @@ public class WorldLoaderUtil {
             return null;
         }
 
-        plugin.getLogger().info("Importing and loading world: " + worldName);
+        if (isDebuggerOn) {plugin.getLogger().info("Importing and loading world: " + worldName);}
         return Bukkit.createWorld(new WorldCreator(worldName));
     }
 
@@ -36,7 +38,7 @@ public class WorldLoaderUtil {
     public void unloadWorld(String worldName, boolean save) {
         World world = Bukkit.getWorld(worldName);
         if (world != null) {
-            plugin.getLogger().info("Unloading world: " + worldName);
+            if (isDebuggerOn) {plugin.getLogger().info("Unloading world: " + worldName);}
             Bukkit.unloadWorld(world, save);
         }
     }

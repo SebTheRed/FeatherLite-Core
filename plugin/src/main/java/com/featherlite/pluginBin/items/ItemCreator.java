@@ -37,16 +37,17 @@ public class ItemCreator {
     private final JavaPlugin plugin;
     private final Multimap<Attribute, AttributeModifier> attributeModifiers;
     private final Map<String, String> loreTemplates; // Add lore templates map
+    private final boolean isDebuggerOn;
 
 
-
-    public ItemCreator(JavaPlugin plugin, Material material, Map<String, String> loreTemplates) {
+    public ItemCreator(JavaPlugin plugin, Material material, Map<String, String> loreTemplates, boolean isDebuggerOn) {
         this.plugin = plugin;
         this.itemStack = new ItemStack(material);
         this.itemMeta = itemStack.getItemMeta();
         this.dataContainer = itemMeta.getPersistentDataContainer();
         this.attributeModifiers = HashMultimap.create();
         this.loreTemplates = loreTemplates; // Assign lore templates
+        this.isDebuggerOn = isDebuggerOn;
 
     }
 
@@ -142,7 +143,7 @@ public class ItemCreator {
     public ItemCreator setAbilityParam(String paramName, String paramValue) {
         NamespacedKey key = new NamespacedKey(plugin, "itemAbility_" + paramName);
         dataContainer.set(key, PersistentDataType.STRING, paramValue);
-        // plugin.getLogger().info("Setting ability param: " + paramName + " with value: " + paramValue);  // Log the parameter being set
+        if (isDebuggerOn) {plugin.getLogger().info("Setting ability param: " + paramName + " with value: " + paramValue);}  // Log the parameter being set
 
         return this;
     }
@@ -173,9 +174,9 @@ public class ItemCreator {
             PotionMeta potionMeta = (PotionMeta) itemMeta;
             
             // Debugging statement to log the effect details being set
-            // plugin.getLogger().info("Setting potion effect: " + effectType.getName() +
-            //                         " | Duration: " + duration +
-            //                         " ticks | Amplifier: " + amplifier);
+            if (isDebuggerOn) {plugin.getLogger().info("Setting potion effect: " + effectType.getName() +
+                                    " | Duration: " + duration +
+                                    " ticks | Amplifier: " + amplifier);}
             
             PotionEffect potionEffect = new PotionEffect(effectType, duration, amplifier);
             potionMeta.addCustomEffect(potionEffect, true);
@@ -499,9 +500,9 @@ public class ItemCreator {
 
     // Helper method to fetch and format lore templates dynamically
     public String getFormattedLore(String templateKey, Map<String, String> replacements) {
-        // plugin.getLogger().info("Fetching lore template for key: " + templateKey);
+        if (isDebuggerOn) {plugin.getLogger().info("Fetching lore template for key: " + templateKey);}
         String template = loreTemplates.getOrDefault(templateKey, "&7" + templateKey + ": {value}");
-        // plugin.getLogger().info("Template found: " + template);
+        if (isDebuggerOn) {plugin.getLogger().info("Template found: " + template);}
         for (Map.Entry<String, String> entry : replacements.entrySet()) {
             template = template.replace("{" + entry.getKey() + "}", entry.getValue());
         }

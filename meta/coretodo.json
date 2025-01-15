@@ -11,7 +11,7 @@
         "add pagination and back buttons to menu manager": false,
         "add multiple homes permission up to 20": "test",
         "test leaving game - ensuring it takes back to chosen /spawn": false,
-
+        "weave in debugger": false,
         "realname not working from console": false,
         "allow players to only be able to close their own games instances": "test"
     },
@@ -201,3 +201,6 @@
 
 
 }
+
+
+

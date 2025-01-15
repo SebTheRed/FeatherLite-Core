@@ -27,7 +27,7 @@ public class WorldDeleterUtil {
         File worldFolder = new File(Bukkit.getWorldContainer(), worldName);
         if (worldFolder.exists()) {
             deleteWorldFolder(worldFolder);
-            plugin.getLogger().info("Deleted world folder: " + worldName);
+            plugin.getLogger().info("Deleted world folder: " + worldName + " 🗑️");
         }
     }
 

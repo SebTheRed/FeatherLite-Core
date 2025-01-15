@@ -29,11 +29,13 @@ public class GamesUI implements Listener {
     private final Map<Player, Boolean> isInstancePublic = new HashMap<>();
     private final Map<Player, String> selectedWorld = new HashMap<>();
     private final Map<Player, String> selectedInstanceId = new HashMap<>();
+    private final boolean isDebuggerOn;
 
 
-    public GamesUI(GamesManager gamesManager, InstanceManager instanceManager) {
+    public GamesUI(GamesManager gamesManager, InstanceManager instanceManager, boolean isDebuggerOn) {
         this.gamesManager = gamesManager;
         this.instanceManager = instanceManager;
+        this.isDebuggerOn = isDebuggerOn;
     }
 
 
@@ -117,7 +119,7 @@ public class GamesUI implements Listener {
                         // instanceManager.addPlayerToInstance(player, null);
                     }
                 } else if (inventoryTitle.equalsIgnoreCase("Create " + chosenRegisteredGame.get(player))) {
-                    player.sendMessage("Clicking inside game options menu");
+                    if (isDebuggerOn) {player.sendMessage("Clicking inside game options menu");}
 
 
 
@@ -135,7 +137,7 @@ public class GamesUI implements Listener {
                     } else if (itemDisplayName.contains("Open to Public") || itemDisplayName.equalsIgnoreCase("Closed to Public")) {
                         boolean isPublic = isInstancePublic.getOrDefault(player, false);
                         isInstancePublic.put(player, !isPublic); // Toggle state
-                        player.sendMessage(ChatColor.YELLOW + "Instance is now " + (!isPublic ? "public" : "private") + ".");
+                        if (isDebuggerOn) {player.sendMessage(ChatColor.YELLOW + "Instance is now " + (!isPublic ? "public" : "private") + ".");}
                         openCreateGameMenu(player, chosenRegisteredGame.get(player)); // Refresh the menu
                         event.setCancelled(true);
 
@@ -164,7 +166,7 @@ public class GamesUI implements Listener {
                         String worldName = ChatColor.stripColor(clickedItemWorld.getItemMeta().getDisplayName());
                         selectedWorld.put(player, worldName);
                         String gameName = chosenRegisteredGame.get(player);
-                        player.sendMessage( ChatColor.GRAY + "Selected world: " + ChatColor.GREEN + worldName);
+                        if (isDebuggerOn) {player.sendMessage( ChatColor.GRAY + "Selected world: " + ChatColor.GREEN + worldName);}
                         openCreateGameMenu(player, gameName); // Return to the Create Game menu
                     }
                     return;

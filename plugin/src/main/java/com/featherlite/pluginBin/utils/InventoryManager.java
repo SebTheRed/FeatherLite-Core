@@ -60,7 +60,7 @@ public class InventoryManager {
             deleteInventoryFile(uuid);
         } else {
             player.sendMessage("§cFailed to restore your inventory. Please contact an admin!");
-            Bukkit.getLogger().warning("Could not restore inventory for player: " + player.getName());
+            plugin.getLogger().warning("Could not restore inventory for player: " + player.getName());
         }
     }
 

@@ -25,11 +25,13 @@ public class InternalAbilities {
     private final ProjectileManager projectileManager;
     private final ParticleManager particleManager;
     private final DisplayPieceManager displayPieceManager;
+    private final boolean isDebuggerOn;
 
-    public InternalAbilities(ProjectileManager projectileManager, ParticleManager particleManager, DisplayPieceManager displayPieceManager) {
+    public InternalAbilities(ProjectileManager projectileManager, ParticleManager particleManager, DisplayPieceManager displayPieceManager, boolean isDebuggerOn) {
         this.projectileManager = projectileManager;
         this.particleManager = particleManager;
         this.displayPieceManager = displayPieceManager;
+        this.isDebuggerOn = isDebuggerOn;
         
     }
 
@@ -48,7 +50,7 @@ public class InternalAbilities {
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_FLAP, 1.0f, 1.0f);
         player.getWorld().spawnParticle(Particle.SONIC_BOOM, player.getLocation(), 10, 0.1, 0.1, 0.1, 0.1);
         
-        player.sendMessage("§aYou thrust forward with strength " + strength + "!");
+        if (isDebuggerOn) {player.sendMessage("§aYou thrust forward with strength " + strength + "!");}
     }
 
     /**
@@ -62,7 +64,7 @@ public class InternalAbilities {
         world.strikeLightning(targetLocation);
         world.spawnParticle(Particle.CRIT, targetLocation, 20, 0.5, 1.0, 0.5, 0.1);
 
-        player.sendMessage("§eYou called down lightning within " + range + " blocks!");
+        if (isDebuggerOn) {player.sendMessage("§eYou called down lightning within " + range + " blocks!");}
     }
 
     public void magicMissile(Player player, Map<String, String> params) {
@@ -157,12 +159,12 @@ public class InternalAbilities {
                         // Check if the entity is a LivingEntity before applying damage
                         if (entity instanceof org.bukkit.entity.LivingEntity livingEntity) {
                             livingEntity.damage(damage); // Deal 5 damage to the entity
-                            player.sendMessage("§aMagic Missile hit: " + livingEntity.getName());
+                            if (isDebuggerOn) {player.sendMessage("§aMagic Missile hit: " + livingEntity.getName());}
                         } else {
-                            player.sendMessage("§eHit an entity, but it can't take damage: " + entity.getName());
+                           if (isDebuggerOn) {player.sendMessage("§eHit an entity, but it can't take damage: " + entity.getName());}
                         }
                     } else if (hitResult.hasHitBlock()) {
-                        player.sendMessage("§aMagic Missile hit a block: " + hitResult.getHitBlock().getType());
+                       if (isDebuggerOn) {player.sendMessage("§aMagic Missile hit a block: " + hitResult.getHitBlock().getType());}
                     }
                 },
                 projectile -> {

@@ -17,11 +17,12 @@ import java.util.Map;
 public class DisplayPieceManager {
     private final JavaPlugin plugin;
     private final Map<String, DisplayPiece> displayPieces = new HashMap<>();
+    private final boolean isDebuggerOn;
 
 
-
-    public DisplayPieceManager(JavaPlugin plugin) {
+    public DisplayPieceManager(JavaPlugin plugin, boolean isDebuggerOn) {
         this.plugin = plugin;
+        this.isDebuggerOn = isDebuggerOn;
         startTextDisplayCleanupClock();
 
     }
@@ -89,7 +90,7 @@ public class DisplayPieceManager {
                         String text = display.getText();
                         if (text != null && (text.contains("♡") || text.contains("XP"))) {
                             display.remove(); // Remove the display
-                            plugin.getLogger().info("Removed TextDisplay: " + text); // Log for debugging
+                            if (isDebuggerOn) {plugin.getLogger().info("Removed TextDisplay: " + text);}
                         }
                     });
                 });

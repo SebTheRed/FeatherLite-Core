@@ -102,7 +102,7 @@ public class GameInstance {
     }
 
     public Map<String, TeamSize> getTeamSizes() {
-        Bukkit.getLogger().info("Current teamSizes: " + teamSizes);
+        // Bukkit.getLogger().info("Current teamSizes: " + teamSizes);
         return teamSizes;
     }
 
@@ -199,7 +199,7 @@ public class GameInstance {
         TeamSize size = teamSizes.get(targetTeam);
         if (size == null) {
             Bukkit.getLogger().warning("TeamSize for team '" + targetTeam + "' is null. Check your configuration.");
-            player.sendMessage("An error occurred while assigning you to a team. Please report this issue.");
+            player.sendMessage("An error occurred while assigning you to a team. Please report this issue. Size==null");
             return;
         }
     

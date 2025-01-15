@@ -29,11 +29,12 @@ public class MenuManager {
     private final EconomyManager economyManager;
     private final Map<String, Menu> menus = new HashMap<>();
     private final Map<String, String> inventoryTitleToMenuId = new HashMap<>();
+    private final boolean isDebuggerOn;
 
-
-    public MenuManager(JavaPlugin plugin, EconomyManager economyManager) {
+    public MenuManager(JavaPlugin plugin, EconomyManager economyManager, boolean isDebuggerOn) {
         this.plugin = plugin;
         this.economyManager = economyManager;
+        this.isDebuggerOn = isDebuggerOn;
         ensureDefaultMenuFile();
         loadMenusFromAllPlugins();
     }
@@ -74,17 +75,32 @@ public class MenuManager {
             menuFolder.mkdirs();
         }
     
-        File defaultMenuFile = new File(menuFolder, "featherlite-help.yml");
+        File defaultMenuFile = new File(menuFolder, "help.yml");
         if (!defaultMenuFile.exists()) {
-            plugin.getLogger().info("Default menu file not found. Copying featherlite-help.yml from resources...");
+            plugin.getLogger().info("Default menu file not found. Copying help.yml from resources...");
             try {
-                plugin.saveResource("menus/featherlite-help.yml", false);
-                plugin.getLogger().info("Successfully copied featherlite-help.yml.");
+                plugin.saveResource("menus/help.yml", false);
+                plugin.getLogger().info("Successfully copied help.yml.");
             } catch (Exception e) {
-                plugin.getLogger().severe("Failed to copy featherlite-help.yml: " + e.getMessage());
+                plugin.getLogger().severe("Failed to copy menu help.yml: " + e.getMessage());
                 e.printStackTrace();
             }
         }
+
+        File adminMenuFile = new File(menuFolder, "admin.yml");
+        if (!adminMenuFile.exists()) {
+            plugin.getLogger().info("Default menu file not found. Copying help.yml from resources...");
+            try {
+                plugin.saveResource("menus/admin.yml", false);
+                plugin.getLogger().info("Successfully copied help.yml.");
+            } catch (Exception e) {
+                plugin.getLogger().severe("Failed to copy menu admin.yml: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+
+        // add admin menu here
+
     }
 
 
@@ -105,14 +121,14 @@ public class MenuManager {
     public void loadMenusFromPlugin(Plugin plugin) {
         File pluginMenuFolder = new File(plugin.getDataFolder(), "menus");
         if (pluginMenuFolder.exists() && pluginMenuFolder.isDirectory()) {
-            plugin.getLogger().info("Loading menus from " + plugin.getName());
+            if (isDebuggerOn) {plugin.getLogger().info("Loading menus from " + plugin.getName());}
             for (File file : pluginMenuFolder.listFiles()) {
                 if (file.getName().endsWith(".yml")) {
                     try {
                         Menu menu = parseMenu(file);
                         if (menu != null) {
                             menus.put(menu.getID(), menu);
-                            plugin.getLogger().info("Loaded menu: " + menu.getID());
+                            if (isDebuggerOn) {plugin.getLogger().info("Loaded menu: " + menu.getID());}
                         }
                     } catch (Exception e) {
                         plugin.getLogger().severe("Failed to load menu from " + file.getName() + ": " + e.getMessage());
@@ -121,7 +137,7 @@ public class MenuManager {
                 }
             }
         } else {
-            plugin.getLogger().info("No menus folder found for " + plugin.getName());
+            plugin.getLogger().warning("No menus folder found for " + plugin.getName());
         }
     }
     
@@ -131,7 +147,7 @@ public class MenuManager {
         FileConfiguration config = YamlConfiguration.loadConfiguration(file);
         String id = config.getString("menu.id", "Unknown ID");
         int slots = config.getInt("menu.slots", 27);
-        plugin.getLogger().info("Parsing menu: " + id);
+        if (isDebuggerOn) {plugin.getLogger().info("Parsing menu: " + id);}
     
         Menu menu = new Menu(id, slots);
     
@@ -140,7 +156,7 @@ public class MenuManager {
             for (String pageName : pagesSection.getKeys(false)) {
                 ConfigurationSection pageSection = pagesSection.getConfigurationSection(pageName);
                 String pageTitle = pageSection.getString("title", "Unknown Page");
-                plugin.getLogger().info("Parsing page: " + pageName + " | Title: " + pageTitle);
+                if (isDebuggerOn) {plugin.getLogger().info("Parsing page: " + pageName + " | Title: " + pageTitle);}
     
                 MenuPage page = new MenuPage(pageTitle);
     
@@ -150,7 +166,7 @@ public class MenuManager {
                         int slot = Integer.parseInt(key);
                         MenuButton button = parseButton(itemsSection.getConfigurationSection(key));
                         if (button != null) {
-                            plugin.getLogger().info("Adding button to page: " + pageName + " | Slot: " + slot + " | Type: " + button.getClass().getSimpleName());
+                            if (isDebuggerOn) {plugin.getLogger().info("Adding button to page: " + pageName + " | Slot: " + slot + " | Type: " + button.getClass().getSimpleName());}
                             page.addItem(slot, button);
                         }
                     }
@@ -215,7 +231,7 @@ public class MenuManager {
     
                 String command = giveSection != null ? giveSection.getString("command") : null;
     
-                return new BuyButton(icon, currency, cost, vanillaMaterial, vanillaAmount, command, economyManager, plugin);
+                return new BuyButton(icon, currency, cost, vanillaMaterial, vanillaAmount, command, economyManager, plugin, isDebuggerOn);
     
             default:
                 plugin.getLogger().warning("Unknown button type: " + type);

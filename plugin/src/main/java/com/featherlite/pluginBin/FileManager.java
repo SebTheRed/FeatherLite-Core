@@ -18,9 +18,11 @@ import java.util.List;
 public class FileManager {
     private final JavaPlugin plugin;
     private final Map<String, FileConfiguration> pluginConfigs = new HashMap<>();
+    private final boolean isDebuggerOn;
 
-    public FileManager(JavaPlugin plugin) {
+    public FileManager(JavaPlugin plugin, boolean isDebuggerOn) {
         this.plugin = plugin;
+        this.isDebuggerOn = isDebuggerOn;
     }
 
 
@@ -41,7 +43,7 @@ public class FileManager {
         File itemsFolder = new File(plugin.getDataFolder(), "items");
         if (!itemsFolder.exists()) {
             if (itemsFolder.mkdirs()) {
-                plugin.getLogger().info("Created items directory in plugin data folder.");
+                if (isDebuggerOn) {plugin.getLogger().info("Created items directory in plugin data folder.");}
             } else {
                 plugin.getLogger().severe("Failed to create items directory!");
                 return;
@@ -53,10 +55,10 @@ public class FileManager {
             File itemFile = new File(itemsFolder, fileName);
 
             if (!itemFile.exists()) {
-                plugin.getLogger().info("File not found: " + fileName + ". Attempting to copy default resource.");
+                if (isDebuggerOn) {plugin.getLogger().info("File not found: " + fileName + ". Attempting to copy default resource.");}
                 copyDefaultResourceIfAbsent("items/" + fileName, itemFile);
             } else {
-                plugin.getLogger().info("Loading item file: " + fileName);
+                if (isDebuggerOn) {plugin.getLogger().info("Loading item file: " + fileName);}
                 loadItemFile(itemFile);
             }
         }
@@ -70,7 +72,7 @@ public class FileManager {
     private void loadItemFile(File file) {
         try {
             FileConfiguration config = YamlConfiguration.loadConfiguration(file);
-            plugin.getLogger().info("Successfully loaded " + file.getName());
+            if (isDebuggerOn) {plugin.getLogger().info("Successfully loaded " + file.getName());}
             // Here you would handle the file content as needed for your plugin
         } catch (Exception e) {
             plugin.getLogger().severe("Failed to load " + file.getName());
@@ -93,7 +95,7 @@ public class FileManager {
 
             // Copy the resource if it exists in the JAR and not on disk
             Files.copy(in, destinationFile.toPath());
-            plugin.getLogger().info("Copied default file: " + destinationFile.getName());
+            if (isDebuggerOn) {plugin.getLogger().info("Copied default file: " + destinationFile.getName());}
         } catch (IOException e) {
             plugin.getLogger().severe("Error copying default file " + destinationFile.getName() + ": " + e.getMessage());
             e.printStackTrace();

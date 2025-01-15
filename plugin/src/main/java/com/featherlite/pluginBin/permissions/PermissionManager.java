@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import net.md_5.bungee.api.ChatColor;
 
 import com.featherlite.pluginBin.essentials.PlayerDataManager;
 
@@ -19,11 +20,13 @@ public class PermissionManager {
     private final JavaPlugin plugin;
     private final Map<UUID, PermissionAttachment> attachments = new HashMap<>();
     private FileConfiguration groupConfig;
+    private boolean isDebuggerOn;
 
-    public PermissionManager(JavaPlugin plugin, PlayerDataManager playerDataManager) {
+    public PermissionManager(JavaPlugin plugin, PlayerDataManager playerDataManager, boolean isDebuggerOn) {
         this.plugin = plugin;
         this.playerDataManager = playerDataManager;
         this.fileManager = new PermissionsFileManager(plugin);
+        this.isDebuggerOn = isDebuggerOn;
 
         // Load the group configuration using the FileManager
         this.groupConfig = fileManager.loadConfig("permission-groups.yml");
@@ -108,7 +111,7 @@ public class PermissionManager {
             plugin.getLogger().warning("Group " + groupName + " not found or has no permissions.");
         }
     
-        // plugin.getLogger().info("Permissions for group " + groupName + ": " + permissions); // REACTIVATE FOR DEBUGGER
+        if (isDebuggerOn) {plugin.getLogger().info("Permissions for group " + groupName + ": " + permissions);}
         return permissions;
     }
     
@@ -214,7 +217,7 @@ public class PermissionManager {
             List<String> defaultGroups = plugin.getConfig().getStringList("first-join-permission-groups");
             playerData.set("permissions.groups", defaultGroups);
             playerDataManager.savePlayerData(player, playerData);
-            plugin.getLogger().info("Assigned default groups to new player: " + player.getName());
+            if (isDebuggerOn) {plugin.getLogger().info("Assigned default groups to new player: " + player.getName());}
         }
 
         // Apply effective permissions
@@ -223,7 +226,7 @@ public class PermissionManager {
             attachment.setPermission(permission, true);
         }
 
-        plugin.getLogger().info("Permissions attached for player: " + player.getName());
+        if (isDebuggerOn) {plugin.getLogger().info("Permissions attached for player: " + player.getName());}
     }
 
 
@@ -239,7 +242,7 @@ public class PermissionManager {
     public void reloadConfig() {
         groupConfig = fileManager.loadConfig("permission-groups.yml");
         attachPermissionsToAllOnlinePlayers();
-        plugin.getLogger().info("Configuration reloaded and permissions refreshed for all online players.");
+        plugin.getLogger().info("Permissions config reloaded and permissions refreshed for all players.");
     }
 
 

@@ -6,6 +6,7 @@ import com.featherlite.pluginBin.utils.ColorUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.scoreboard.Criteria;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
@@ -20,11 +21,11 @@ public class ScoreboardDisplay {
     private final List<String> lines;
     private final PlaceholderManager placeholderManager;
 
-    public ScoreboardDisplay(String name, FileConfiguration config) {
+    public ScoreboardDisplay(String name, FileConfiguration config, Plugin plugin, boolean isDebuggerOn) {
         this.name = name;
         this.title = config.getString("scoreboard.title", "Scoreboard");
         this.lines = config.getStringList("scoreboard.lines");
-        this.placeholderManager = PlaceholderManager.getInstance();
+        this.placeholderManager = PlaceholderManager.getInstance(plugin);
     }
 
     public void start(Player player) {

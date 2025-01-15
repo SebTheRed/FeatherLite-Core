@@ -24,9 +24,11 @@ import java.util.UUID;
 public class TeamSelectorBook implements Listener {
     private final JavaPlugin plugin;
     private final NamespacedKey instanceKey;
+    private final boolean isDebuggerOn;
 
-    public TeamSelectorBook(JavaPlugin plugin) {
+    public TeamSelectorBook(JavaPlugin plugin, boolean isDebuggerOn) {
         this.plugin = plugin;
+        this.isDebuggerOn = isDebuggerOn;
         this.instanceKey = new NamespacedKey(plugin, "game_instance_uuid");
     }
 
@@ -116,7 +118,7 @@ public class TeamSelectorBook implements Listener {
             if (teamSpawn != null) {
                 player.teleport(teamSpawn);
                 player.setGameMode(org.bukkit.GameMode.SURVIVAL);
-                player.sendMessage("§aYou have been teleported into the game!");
+                if (isDebuggerOn) {player.sendMessage("§aYou have been teleported into the game!");}
             } else {
                 player.sendMessage("§cNo spawn location found for your team. Please report this issue.");
             }
@@ -134,7 +136,7 @@ public class TeamSelectorBook implements Listener {
      */
     public void openTeamSelectionGUI(Player player, GameInstance instance) {
         try {
-            Bukkit.getLogger().info("Opening Team Selection GUI for player: " + player.getName() + ", Instance ID: " + instance.getInstanceId());
+            if (isDebuggerOn) {plugin.getLogger().info("Opening Team Selection GUI for player: " + player.getName() + ", Instance ID: " + instance.getInstanceId());}
 
             int rows = Math.max(1, (int) Math.ceil(instance.getTeams().size() / 9.0));
             Inventory gui = Bukkit.createInventory(null, rows * 9, "§6Team Selection");
@@ -146,7 +148,7 @@ public class TeamSelectorBook implements Listener {
                     .findFirst()
                     .orElse(null); // Determine the current team the player is on
 
-            Bukkit.getLogger().info("Player " + player.getName() + " is currently on team: " + currentTeam);
+            if (isDebuggerOn) {plugin.getLogger().info("Player " + player.getName() + " is currently on team: " + currentTeam);}
 
             int slot = 0;
             for (Map.Entry<String, List<UUID>> entry : instance.getTeams().entrySet()) {
@@ -155,7 +157,7 @@ public class TeamSelectorBook implements Listener {
                 TeamSize teamSize = instance.getTeamSizes().get(teamName.toLowerCase());
 
                 if (teamSize == null) {
-                    Bukkit.getLogger().warning("Team '" + teamName + "' in instance " + instance.getInstanceId() + " has no TeamSize defined.");
+                    plugin.getLogger().warning("Team '" + teamName + "' in instance " + instance.getInstanceId() + " has no TeamSize defined.");
                     continue;
                 }
 
@@ -177,17 +179,17 @@ public class TeamSelectorBook implements Listener {
                     }
                     teamItem.setItemMeta(meta);
                 } else {
-                    Bukkit.getLogger().warning("Failed to set meta for team item: " + teamName);
+                    plugin.getLogger().warning("Failed to set meta for team item: " + teamName);
                 }
 
                 gui.setItem(slot++, teamItem);
             }
 
             player.openInventory(gui);
-            Bukkit.getLogger().info("Team Selection GUI successfully opened for player: " + player.getName());
+            if (isDebuggerOn) {plugin.getLogger().info("Team Selection GUI successfully opened for player: " + player.getName());}
 
         } catch (Exception e) {
-            Bukkit.getLogger().severe("An error occurred while opening Team Selection GUI for player " + player.getName() + ": " + e.getMessage());
+            plugin.getLogger().severe("An error occurred while opening Team Selection GUI for player " + player.getName() + ": " + e.getMessage());
             e.printStackTrace();
             player.sendMessage("§cAn error occurred while opening the team selection menu. Please report this to the admin.");
         }
@@ -255,7 +257,7 @@ public class TeamSelectorBook implements Listener {
                 break;
             default:
                 woolMaterial = Material.WHITE_WOOL; // Default to white wool if no match
-                Bukkit.getLogger().warning("Unknown team color: " + teamName + ". Defaulting to white wool.");
+                plugin.getLogger().warning("Unknown team color: " + teamName + ". Defaulting to white wool.");
                 break;
         }
 

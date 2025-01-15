@@ -26,12 +26,14 @@ public class AbilityRegistry {
     private final ProjectileManager projectileManager;
     private final ParticleManager particleManager;
     private final DisplayPieceManager displayPieceManager;
+    private final boolean isDebuggerOn;
 
-    public AbilityRegistry(JavaPlugin plugin, ProjectileManager projectileManager, ParticleManager particleManager, DisplayPieceManager displayPieceManager) {
+    public AbilityRegistry(JavaPlugin plugin, ProjectileManager projectileManager, ParticleManager particleManager, DisplayPieceManager displayPieceManager, boolean isDebuggerOn) {
         this.plugin = plugin;
         this.projectileManager = projectileManager;
         this.particleManager = particleManager;
         this.displayPieceManager = displayPieceManager;
+        this.isDebuggerOn = isDebuggerOn;
         loadAbilitiesFromPlugins();
     }
 
@@ -55,7 +57,7 @@ public class AbilityRegistry {
         ConfigurationSection abilitiesSection = config.getConfigurationSection("item-abilities");
     
         if (abilitiesSection == null) {
-            plugin.getLogger().info("No `itemAbilities` section found in config.yml for " + plugin.getName());
+            plugin.getLogger().severe("No `itemAbilities` section found in config.yml for " + plugin.getName());
             return;
         }
     
@@ -90,7 +92,7 @@ public class AbilityRegistry {
                     Class<?> abilityClass = Class.forName(className);
                     targetInstance = abilityClass.getConstructor().newInstance();
                 } else if (plugin instanceof FeatherCore) {
-                    targetInstance = new InternalAbilities(projectileManager, particleManager, displayPieceManager); // Use InternalAbilities for FeatherCore abilities
+                    targetInstance = new InternalAbilities(projectileManager, particleManager, displayPieceManager, isDebuggerOn); // Use InternalAbilities for FeatherCore abilities
                 } else {
                     targetInstance = plugin;
                 }
@@ -102,7 +104,7 @@ public class AbilityRegistry {
             // Register the ability in the registry
             AbilityInfo abilityInfo = new AbilityInfo(targetInstance, methodName, params);
             abilityRegistry.put(abilityName, abilityInfo);
-            // plugin.getLogger().info("Registered ability: " + abilityName + " from " + plugin.getName() + " with method: " + methodName);
+            if (isDebuggerOn) {plugin.getLogger().info("Registered ability: " + abilityName + " from " + plugin.getName() + " with method: " + methodName);}
         }
     }
     
@@ -127,13 +129,13 @@ public class AbilityRegistry {
             // Log the class and method that we’re trying to invoke
             Object abilitySource = abilityInfo.getAbilitySource();
             String methodName = abilityInfo.getMethodName();
-            // plugin.getLogger().info("Attempting to invoke method '" + methodName + "' on class '" + abilitySource.getClass().getName() + "'");
+            if (isDebuggerOn) {plugin.getLogger().info("Attempting to invoke method '" + methodName + "' on class '" + abilitySource.getClass().getName() + "'");}
     
             // Check if method exists with expected parameters (Player and Map)
             Method method = abilitySource.getClass().getMethod(methodName, Player.class, Map.class);
     
             // Log parameters being passed to the method for verification
-            // plugin.getLogger().info("Parameters for ability '" + abilityName + "': " + finalParams);
+            if (isDebuggerOn) {plugin.getLogger().info("Parameters for ability '" + abilityName + "': " + finalParams);}
     
             // Invoke the method
             player.sendMessage("§aExecuting ability: " + abilityName + " from " + abilityInfo.getSourceName());

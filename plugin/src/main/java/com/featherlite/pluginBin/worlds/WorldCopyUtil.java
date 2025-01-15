@@ -10,9 +10,11 @@ import java.nio.file.StandardCopyOption;
 
 public class WorldCopyUtil {
     private final JavaPlugin plugin;
+    private final boolean isDebuggerOn;
 
-    public WorldCopyUtil(JavaPlugin plugin) {
+    public WorldCopyUtil(JavaPlugin plugin, boolean isDebuggerOn) {
         this.plugin = plugin;
+        this.isDebuggerOn = isDebuggerOn;
     }
 
     public boolean copyWorld(String baseWorldName, String newWorldName) {
@@ -32,7 +34,7 @@ public class WorldCopyUtil {
                 plugin.getLogger().warning("Failed to delete uid.dat file in copied world " + newWorldName);
             }
     
-            plugin.getLogger().info("Copied world from " + baseWorldName + " to " + newWorldName);
+            if (isDebuggerOn) {plugin.getLogger().info("Copied world from " + baseWorldName + " to " + newWorldName);}
             return true;
         } catch (IOException e) {
             plugin.getLogger().severe("Failed to copy world folder: " + e.getMessage());

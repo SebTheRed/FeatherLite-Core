@@ -17,8 +17,9 @@ public class BuyButton implements MenuButton {
     private final String command;
     private final EconomyManager economyManager;
     private final JavaPlugin plugin;
+    private final boolean isDebuggerOn;
 
-    public BuyButton(ItemStack icon, String currency, double cost, String vanillaMaterial, int vanillaAmount, String command, EconomyManager economyManager, JavaPlugin plugin) {
+    public BuyButton(ItemStack icon, String currency, double cost, String vanillaMaterial, int vanillaAmount, String command, EconomyManager economyManager, JavaPlugin plugin, boolean isDebuggerOn) {
         this.icon = icon;
         this.currency = currency;
         this.cost = cost;
@@ -27,6 +28,7 @@ public class BuyButton implements MenuButton {
         this.command = command;
         this.economyManager = economyManager;
         this.plugin = plugin;
+        this.isDebuggerOn = isDebuggerOn;
     }
 
     @Override
@@ -52,13 +54,13 @@ public class BuyButton implements MenuButton {
             }
             ItemStack item = new ItemStack(material, vanillaAmount);
             player.getInventory().addItem(item);
-            player.sendMessage("§aPurchase successful! You received " + vanillaAmount + " " + material.name().toLowerCase() + "!");
+            if (isDebuggerOn) {player.sendMessage("§aPurchase successful! You received " + vanillaAmount + " " + material.name().toLowerCase() + "!");}
         }
 
         // Execute Command
         if (command != null && !command.isEmpty()) {
             String parsedCommand = command.replace("<player>", player.getName());
-            plugin.getLogger().info("Executing command as console: " + parsedCommand);
+            if (isDebuggerOn) {plugin.getLogger().info("Executing command as console: " + parsedCommand);}
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), parsedCommand);
         }
 

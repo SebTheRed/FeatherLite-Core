@@ -228,7 +228,7 @@ public class InstanceManager {
         }, 0L, 20L * 20); // Run every 20 seconds (20 ticks = 1 second)
     
         instance.setReadinessTaskId(taskId); // Track the task ID in the instance
-        plugin.getLogger().info("Started readiness timer for GameInstance: " + instance.getInstanceId());
+        // plugin.getLogger().info("Started readiness timer for GameInstance: " + instance.getInstanceId());
     }
     
 
@@ -284,7 +284,7 @@ public class InstanceManager {
 
 
 
-    public void removeInstance(UUID instanceId) {
+    private void removeInstance(UUID instanceId) {
         GameInstance instance = activeInstances.remove(instanceId);
         if (instance != null) {
             // Unload and delete the instance-specific world

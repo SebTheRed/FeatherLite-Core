@@ -3,16 +3,17 @@ package com.featherlite.pluginBin.scoreboards;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
-
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
 public class ScoreboardParser {
     private final Plugin plugin;
+    private final boolean isDebuggerOn;
 
-    public ScoreboardParser(Plugin plugin) {
+    public ScoreboardParser(Plugin plugin, boolean isDebuggerOn) {
         this.plugin = plugin;
+        this.isDebuggerOn = isDebuggerOn;
     }
 
     public Map<String, ScoreboardDisplay> parseScoreboards() {
@@ -30,7 +31,7 @@ public class ScoreboardParser {
 
                 // Parse the scoreboard
                 String name = file.getName().replace(".yml", "");
-                ScoreboardDisplay display = new ScoreboardDisplay(name, config);
+                ScoreboardDisplay display = new ScoreboardDisplay(name, config, plugin, isDebuggerOn);
                 scoreboards.put(name, display);
 
                 plugin.getLogger().info("Loaded scoreboard: " + name);

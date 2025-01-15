@@ -24,12 +24,12 @@ import java.util.logging.Logger;
 public class WebAppManager {
     private final FeatherCore plugin;
     private final FileManager fileManager;
-    private final Logger logger;
+    private final boolean isDebuggerOn;
 
-    public WebAppManager(FeatherCore plugin, FileManager fileManager) {
+    public WebAppManager(FeatherCore plugin, FileManager fileManager, boolean isDebuggerOn) {
         this.plugin = plugin;
         this.fileManager = fileManager;
-        this.logger = plugin.getLogger();
+        this.isDebuggerOn = isDebuggerOn;
     }
 
 
@@ -52,14 +52,14 @@ public class WebAppManager {
                 String sessionLink = "https://featherlite.app/session/" + sessionID;
                 player.sendMessage("Follow the app link to manage all FeatherLite configs.");
                 player.sendMessage(sessionLink);
-                logger.info("Session link generated for " + player.getName() + ": " + sessionLink);
+                plugin.getLogger().info("Session link generated for " + player.getName() + ": " + sessionLink);
             } else {
                 player.sendMessage("Server error: Unable to start session. Please try again later.");
-                logger.warning("Failed to send session data to Firebase for player " + player.getName());
+                plugin.getLogger().warning("Failed to send session data to Firebase for player " + player.getName());
             }
         } catch (Exception e) {
             player.sendMessage("An unexpected server error occurred. Please try again later.");
-            logger.severe("Error creating session for player " + player.getName() + ": " + e.getMessage());
+            plugin.getLogger().severe("Error creating session for player " + player.getName() + ": " + e.getMessage());
             e.printStackTrace();
         }
         return true;
@@ -82,14 +82,14 @@ public class WebAppManager {
             boolean changesApplied = applyChangesFromFirebase(sessionID);
             if (changesApplied) {
                 player.sendMessage("Changes saved and applied successfully.");
-                logger.info("Changes applied successfully for session: " + sessionID);
+                plugin.getLogger().info("Changes applied successfully for session: " + sessionID);
             } else {
                 player.sendMessage("Failed to apply changes. Please ensure the session is valid.");
-                logger.warning("Failed to apply changes for session: " + sessionID);
+                plugin.getLogger().warning("Failed to apply changes for session: " + sessionID);
             }
         } catch (Exception e) {
             player.sendMessage("An error occurred while applying changes. Please try again later.");
-            logger.severe("Error applying changes for session " + sessionID + ": " + e.getMessage());
+            plugin.getLogger().severe("Error applying changes for session " + sessionID + ": " + e.getMessage());
             e.printStackTrace();
         }
         return true;
@@ -117,7 +117,7 @@ public class WebAppManager {
             }
             return true;
         } catch (Exception e) {
-            logger.severe("Error applying changes for session " + sessionID + ": " + e.getMessage());
+            plugin.getLogger().severe("Error applying changes for session " + sessionID + ": " + e.getMessage());
             e.printStackTrace();
             return false;
         }
@@ -159,7 +159,7 @@ public class WebAppManager {
         String jsonPayload = new Gson().toJson(requestData);
 
         player.sendMessage("App session starting up...");
-        plugin.getLogger().info("Sending JSON payload to Firebase: " + jsonPayload);
+        if (isDebuggerOn) {plugin.getLogger().info("Sending JSON payload to Firebase: " + jsonPayload);}
 
         try {
             String firebaseFunctionURL = "https://us-central1-featherlite-73f54.cloudfunctions.net/startSession";
@@ -199,7 +199,7 @@ public class WebAppManager {
     
         for (File subDir : pluginsFolder.listFiles(File::isDirectory)) {
             if (subDir.getName().startsWith("FeatherLite-")) {
-                plugin.getLogger().info("Processing plugin directory: " + subDir.getName());
+                if (isDebuggerOn) {plugin.getLogger().info("Processing plugin directory: " + subDir.getName());}
                 String pluginName = subDir.getName();
     
                 // Call the FileManager method to read YAML contents as strings

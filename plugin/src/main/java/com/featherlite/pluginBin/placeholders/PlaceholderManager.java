@@ -1,6 +1,7 @@
 package com.featherlite.pluginBin.placeholders;
 
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,7 +12,14 @@ public class PlaceholderManager {
     private static PlaceholderManager instance;
     private final Map<String, Function<Player, String>> placeholderResolvers = new HashMap<>();
 
-    public PlaceholderManager() {
+    private final Plugin plugin;
+    private final boolean isDebuggerOn;
+
+    public PlaceholderManager(Plugin plugin, boolean isDebuggerOn) {
+        this.plugin = plugin;
+        this.isDebuggerOn = isDebuggerOn;
+
+
         // Register default placeholders
         registerPlaceholder("online_player_count", PlaceholderMethods::getOnlinePlayerCount);
         registerPlaceholder("max_player_count", PlaceholderMethods::getMaxPlayerCount);
@@ -68,9 +76,9 @@ public class PlaceholderManager {
         registerPlaceholder("top_balance", PlaceholderEconomy::getTopBalance);
     }
 
-    public static PlaceholderManager getInstance() {
+    public static PlaceholderManager getInstance(Plugin plugin) {
         if (instance == null) {
-            instance = new PlaceholderManager();
+            instance = new PlaceholderManager(plugin, false);
         }
         return instance;
     }
@@ -83,6 +91,7 @@ public class PlaceholderManager {
      */
     public void registerPlaceholder(String key, Function<Player, String> resolver) {
         placeholderResolvers.put(key, resolver);
+        if (isDebuggerOn) {plugin.getLogger().info("Placeholder " + key + " registered.");}
     }
 
     /**

@@ -31,12 +31,13 @@ public class ItemManager {
     private final Map<String, Map<String, ItemStack>> categorizedItems = new HashMap<>(); // category -> itemName -> ItemStack
     private final Map<String, ItemStack> categoryIcons = new HashMap<>(); // category -> icon ItemStack
     private final Map<String, String> loreTemplates = new HashMap<>();
+    private final boolean isDebuggerOn;
 
 
-    public ItemManager(JavaPlugin plugin, AbilityRegistry abilityRegistry) {
+    public ItemManager(JavaPlugin plugin, AbilityRegistry abilityRegistry, boolean isDebuggerOn) {
         this.plugin = plugin;
         this.abilityRegistry = abilityRegistry; // Pass plugin here
-        
+        this.isDebuggerOn = isDebuggerOn;
         loadLoreTemplates();
 
         loadAllPluginItems();
@@ -74,7 +75,7 @@ public class ItemManager {
             for (String key : loreSection.getKeys(false)) {
                 String value = loreSection.getString(key);
                 loreTemplates.put(key, value);
-                // plugin.getLogger().info("Loaded key: " + key + " | Value: " + value); // Debug log
+                if (isDebuggerOn) {plugin.getLogger().info("Loaded key: " + key + " | Value: " + value);} // Debug log
             
             }
         } else {
@@ -92,7 +93,7 @@ public class ItemManager {
         categoryIcons.clear();
         loadLoreTemplates();
         loadAllPluginItems();
-        plugin.getLogger().info("All items have been reloaded successfully.");
+        plugin.getLogger().info("All FeatherLite items have been reloaded successfully.");
         
         // Clear UI-related caches
         uiManager.clearCategoryInventories();
@@ -185,7 +186,7 @@ public ItemStack createItemFromConfig(ConfigurationSection itemSection) {
     if (material == null) material = Material.STONE;
 
     // Create the item using ItemCreator
-    ItemCreator itemCreator = new ItemCreator(plugin, material, loreTemplates);
+    ItemCreator itemCreator = new ItemCreator(plugin, material, loreTemplates, isDebuggerOn);
 
     // Set display name
     String displayName = itemSection.getString("name");
@@ -203,22 +204,6 @@ public ItemStack createItemFromConfig(ConfigurationSection itemSection) {
         itemCreator.setUnbreakable(true);
         itemCreator.addLore(itemCreator.getFormattedLore("unbreakable", Map.of("value", String.valueOf(true))));
     }
-
-    // // **Add item ability and parameters**
-    // if (itemSection.contains("itemAbility")) {
-    //     String abilityName = itemSection.getString("itemAbility");
-    //     itemCreator.setItemAbility(abilityName);
-    
-    //     // Store additional parameters prefixed with itemAbility_
-    //     for (String key : itemSection.getKeys(false)) {
-    //         if (key.startsWith("itemAbility_")) {
-    //             String paramName = key.substring("itemAbility_".length());
-    //             String paramValue = itemSection.getString(key);
-    //             plugin.getLogger().info("Loading parameter " + paramName + " with value: " + paramValue); // Log the parameter from config
-    //             itemCreator.setAbilityParam(paramName, paramValue);
-    //         }
-    //     }
-    // }
 
 
     // Add enchantments if specified

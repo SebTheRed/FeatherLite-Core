@@ -188,21 +188,6 @@ public class GameCommands implements TabCompleter {
         
     }
 
-    private void handleDeleteCommand(Player player, String[] args) {
-        if (args.length < 2) {
-            player.sendMessage("Usage: /game delete <instanceID>");
-            return;
-        }
-
-        try {
-            UUID instanceId = UUID.fromString(args[1]);
-            instanceManager.removeInstance(instanceId);
-            player.sendMessage("Game instance deleted successfully!");
-        } catch (IllegalArgumentException e) {
-            player.sendMessage("Invalid instance ID.");
-        }
-    }
-
     private void handleCloseCommand(CommandSender sender, String[] args, boolean isPlayer) {
         if (args.length < 3) {
             sender.sendMessage("Usage: /game close <instanceID> <lobbyName>");
@@ -213,9 +198,10 @@ public class GameCommands implements TabCompleter {
             UUID instanceId = UUID.fromString(args[1]);
             GameInstance closingInstance = instanceManager.getInstance(instanceId);
             if (sender.getName().equalsIgnoreCase(closingInstance.getCreatedBy()) || !isPlayer || sender.hasPermission("core.games.closeothers")) {
-                String lobbyName = args[2];
+                String lobbyName = args[2] != null ? args[2] : "spawn";
                 instanceManager.closeInstance(instanceId);
-                sender.sendMessage("Game instance closed successfully and players teleported to " + lobbyName + "!");
+                sender.sendMessage("Game instance: " + closingInstance.getInstanceId());
+                sender.sendMessage("Closed successfully and players teleported to " + lobbyName + "!");
                 return;
             } else {
                 sender.sendMessage("Only admins / console can close a game instance!");
@@ -267,7 +253,7 @@ public class GameCommands implements TabCompleter {
     
         if (args.length == 1) {
             // Suggest subcommands
-            suggestions.addAll(Arrays.asList("ui", "menu", "join", "leave", "create", "delete", "close"));
+            suggestions.addAll(Arrays.asList("ui", "menu", "join", "leave", "create", "close"));
         } else if (args.length == 2) {
             // For the "create" command, suggest available game names
             if (args[0].equalsIgnoreCase("create")) {
@@ -277,7 +263,7 @@ public class GameCommands implements TabCompleter {
                         .map(name -> "\"" + name + "\"") // Ensure game names are quoted
                         .collect(Collectors.toList())
                 );
-            } else if (args[0].equalsIgnoreCase("join") || args[0].equalsIgnoreCase("delete") || args[0].equalsIgnoreCase("close")) {
+            } else if (args[0].equalsIgnoreCase("join")  || args[0].equalsIgnoreCase("close")) {
                 // For other commands, suggest active instance IDs
                 suggestions.addAll(
                     instanceManager.getActiveInstances().keySet().stream()

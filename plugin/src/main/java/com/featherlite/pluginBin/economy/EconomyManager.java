@@ -148,23 +148,5 @@ public class EconomyManager {
                 .collect(Collectors.toList());
     }
     
-    
 
-    // // File Handling
-    // private FileConfiguration getPlayerData(UUID playerId) {
-    //     File playerFile = new File(economyFolder, playerId.toString() + ".yml");
-    //     if (!playerFile.exists()) {
-    //         try {
-    //             playerFile.createNewFile();
-    //             FileConfiguration data = YamlConfiguration.loadConfiguration(playerFile);
-    //             data.set("balances." + defaultCurrency, startingCurrencyAmount);
-    //             savePlayerData(playerId, data);
-    //             plugin.getLogger().info("Created new economy file for player: " + playerId + " with starting balance: " + startingCurrencyAmount);
-    //         } catch (IOException e) {
-    //             plugin.getLogger().severe("Failed to create economy file for player: " + playerId);
-    //             e.printStackTrace();
-    //         }
-    //     }
-    //     return YamlConfiguration.loadConfiguration(playerFile);
-    // }
 }
