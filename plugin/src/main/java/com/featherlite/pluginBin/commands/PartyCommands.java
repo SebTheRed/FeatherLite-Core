@@ -34,7 +34,7 @@ public class PartyCommands implements TabCompleter {
             return true;
         }
 
-        if (isPlayer && !sender.hasPermission("core.party.player")) {
+        if (isPlayer && !(sender.hasPermission("core.party.player") || sender.isOp())) {
             sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
             return true;
         }

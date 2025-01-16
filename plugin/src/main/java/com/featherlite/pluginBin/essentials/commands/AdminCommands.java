@@ -30,7 +30,7 @@ public class AdminCommands implements TabCompleter {
         switch (label.toLowerCase()) {
 
             case "enchant":
-                if (isPlayer && !sender.hasPermission("core.enchant")) {
+                if (isPlayer && !(sender.hasPermission("core.enchant") || sender.isOp())) {
                     sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
                     return true;
                 }
@@ -42,7 +42,7 @@ public class AdminCommands implements TabCompleter {
                 return adminManager.enchantItem(player, args[0], Integer.parseInt(args[1]));
 
             case "exp":
-                if (isPlayer && !sender.hasPermission("core.exp")) {
+                if (isPlayer && !(sender.hasPermission("core.exp") || sender.isOp())) {
                     sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
                     return true;
                 }
@@ -59,7 +59,7 @@ public class AdminCommands implements TabCompleter {
                 return true;
 
             case "give":
-                if (isPlayer && !sender.hasPermission("core.give")) {
+                if (isPlayer && !(sender.hasPermission("core.give") || sender.isOp())) {
                     sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
                     return true;
                 }
@@ -75,7 +75,7 @@ public class AdminCommands implements TabCompleter {
                 return handleGiveCommand(sender, target, args);
 
             case "kill":
-                if (isPlayer && !sender.hasPermission("core.kill")) {
+                if (isPlayer && !(sender.hasPermission("core.kill") || sender.isOp())) {
                     sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
                     return true;
                 }
@@ -93,7 +93,7 @@ public class AdminCommands implements TabCompleter {
                 return true;
 
             case "sudo":
-                if (isPlayer && !sender.hasPermission("core.sudo")) {
+                if (isPlayer && !(sender.hasPermission("core.sudo") || sender.isOp())) {
                     sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
                     return true;
                 }
@@ -111,7 +111,7 @@ public class AdminCommands implements TabCompleter {
                 return true;
 
             case "weather":
-                if (isPlayer && !sender.hasPermission("core.weather")) {
+                if (isPlayer && !(sender.hasPermission("core.weather") || sender.isOp())) {
                     sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
                     return true;
                 }
@@ -146,7 +146,7 @@ public class AdminCommands implements TabCompleter {
 
 
             case "god":
-                if (isPlayer && !sender.hasPermission("core.god")) {
+                if (isPlayer && !(sender.hasPermission("core.god") || sender.isOp())) {
                     sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
                     return true;
                 }
@@ -211,15 +211,10 @@ public class AdminCommands implements TabCompleter {
             
             case "killall":
             case "remove":
-                if (isPlayer && !sender.hasPermission("core.killall")) {
+                if (isPlayer && !(sender.hasPermission("core.killall") || sender.isOp())) {
                     sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
                     return true;
                 }
-                if (player != null && !player.hasPermission("core.killall")) {
-                    sender.sendMessage(ChatColor.RED + "You don't have permission to use this command.");
-                    return true;
-                }
-            
                 if (args.length < 1) {
                     sender.sendMessage(ChatColor.RED + "Usage: /killall <monsters|entities|boats|minecarts|players|drops|arrows|mobs> [world-name]");
                     return true;

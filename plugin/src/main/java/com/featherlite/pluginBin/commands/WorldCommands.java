@@ -40,7 +40,7 @@ public class WorldCommands implements TabCompleter {
 
         switch (args[0].toLowerCase()) {
             case "create":
-                if (player != null && !player.hasPermission("core.world.create")) {
+                if (player != null && !(player.hasPermission("core.world.create") || sender.isOp())) {
                     sender.sendMessage(ChatColor.RED + "You don't have permission to create worlds.");
                     return true;
                 }
@@ -68,7 +68,7 @@ public class WorldCommands implements TabCompleter {
                 break;
 
             case "copy":
-                if (player != null && !player.hasPermission("core.world.copy")) {
+                if (player != null && !(player.hasPermission("core.world.copy") || sender.isOp())) {
                     sender.sendMessage(ChatColor.RED + "You don't have permission to copy worlds.");
                     return true;
                 }
@@ -86,7 +86,7 @@ public class WorldCommands implements TabCompleter {
                 break;
 
             case "list":
-                if (player != null && !player.hasPermission("core.world.list")) {
+                if (player != null && !(player.hasPermission("core.world.list") || sender.isOp())) {
                     sender.sendMessage(ChatColor.RED + "You don't have permission to list worlds.");
                     return true;
                 }
@@ -102,7 +102,7 @@ public class WorldCommands implements TabCompleter {
                 break;
 
             case "tp":
-                if (isPlayer && !sender.hasPermission("core.world.tp")) {
+                if (isPlayer && !(sender.hasPermission("core.world.tp") || sender.isOp())) {
                     sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
                     return true;
                 }
@@ -123,7 +123,7 @@ public class WorldCommands implements TabCompleter {
             
                 if (args.length > 2) {
                     // Teleporting another player
-                    if (player != null && !player.hasPermission("core.world.tpothers")) {
+                    if (player != null && !(player.hasPermission("core.world.tpothers") || sender.isOp())) {
                         sender.sendMessage(ChatColor.RED + "You don't have permission to teleport other players.");
                         return true;
                     }
@@ -155,7 +155,7 @@ public class WorldCommands implements TabCompleter {
             
             
             case "import":
-                if (isPlayer && !sender.hasPermission("core.world.create")) {
+                if (isPlayer && !(sender.hasPermission("core.world.create") || sender.isOp())) {
                     sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
                     return true;
                 }
@@ -189,7 +189,7 @@ public class WorldCommands implements TabCompleter {
                 break;
 
             case "load":
-                if (player != null && !player.hasPermission("core.world.load")) {
+                if (player != null && !(player.hasPermission("core.world.load") || sender.isOp())) {
                     sender.sendMessage(ChatColor.RED + "You don't have permission to load worlds.");
                     return true;
                 }
@@ -205,7 +205,7 @@ public class WorldCommands implements TabCompleter {
                 break;
 
             case "unload":
-                if (player != null && !player.hasPermission("core.world.unload")) {
+                if (player != null && !(player.hasPermission("core.world.unload") || sender.isOp())) {
                     sender.sendMessage(ChatColor.RED + "You don't have permission to unload worlds.");
                     return true;
                 }
@@ -217,7 +217,7 @@ public class WorldCommands implements TabCompleter {
                 sender.sendMessage(ChatColor.GREEN + "World unloaded: " + args[1]);
                 break;
             case "setborder":
-                if (player != null && !player.hasPermission("core.world.setborder")) {
+                if (player != null && !(player.hasPermission("core.world.setborder") || sender.isOp())) {
                     sender.sendMessage(ChatColor.RED + "You don't have permission to set world borders.");
                     return true;
                 }
@@ -242,7 +242,7 @@ public class WorldCommands implements TabCompleter {
                 if (!isPlayer) {
                     sender.sendMessage(ChatColor.RED + "World deletion can only be done in-game from a player! This is to protect your worlds!");
                 }
-                if (player != null && !player.hasPermission("core.world.delete")) {
+                if (player != null && !(player.hasPermission("core.world.delete") || sender.isOp())) {
                     sender.sendMessage(ChatColor.RED + "You don't have permission to delete worlds.");
                     return true;
                 }

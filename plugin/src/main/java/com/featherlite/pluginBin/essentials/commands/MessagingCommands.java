@@ -23,7 +23,7 @@ public class MessagingCommands implements TabCompleter {
     public boolean handleMessagingCommands(CommandSender sender, Command command, String label, String[] args, boolean isPlayer) {
 
         if (label.toLowerCase() == "broadcast") {
-            if (isPlayer && !sender.hasPermission("core.broadcast")) {
+            if (isPlayer && !(sender.hasPermission("core.broadcast") || sender.isOp())) {
                 sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
                 return true;
             }
@@ -38,7 +38,7 @@ public class MessagingCommands implements TabCompleter {
 
         Player player = (Player) sender;
 
-        if (isPlayer && !sender.hasPermission("core.message")) {
+        if (isPlayer && !(sender.hasPermission("core.message") || sender.isOp())) {
             sender.sendMessage(ChatColor.RED + "You do not have permission to message players.");
             return true;
         }
@@ -105,7 +105,7 @@ public class MessagingCommands implements TabCompleter {
     }
 
     private boolean handleBroadcast(CommandSender sender, String[] args) {
-        if ((sender instanceof Player) && !sender.hasPermission("core.messaging.broadcast")) {
+        if ((sender instanceof Player) && !(sender.hasPermission("core.messaging.broadcast") || sender.isOp())) {
             sender.sendMessage(ChatColor.RED + "You do not have permission to broadcast messages.");
             return true;
         }

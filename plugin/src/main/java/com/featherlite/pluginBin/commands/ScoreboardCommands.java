@@ -34,7 +34,7 @@ public class ScoreboardCommands implements TabCompleter {
                 scoreboardManager.toggleScoreboard(player);
                 return true;
             case "reload":
-                if (player != null && !player.hasPermission("core.board.reload")) {
+                if (player != null && !(player.hasPermission("core.board.reload") || sender.isOp())) {
                     sender.sendMessage("You don't have permission to reload scoreboards.");
                     return true;
                 }
@@ -54,7 +54,7 @@ public class ScoreboardCommands implements TabCompleter {
                 return true;
             default:
                 if (!isPlayer) {sender.sendMessage(ChatColor.RED + "This command (/board <name>) can only be typed by players."); return true;}
-                if (isPlayer && !sender.hasPermission("core.board.switch")) {
+                if (isPlayer && !(sender.hasPermission("core.board.switch") || sender.isOp())) {
                     sender.sendMessage(ChatColor.RED + "You do not have permission to manually switch your scoreboard.");
                     return true;
                 }

@@ -38,7 +38,7 @@ public class ZonesCommands implements TabCompleter {
 
     public boolean handleZoneCommands(CommandSender sender, String[] args, boolean isPlayer) {
 
-        if (isPlayer && !sender.hasPermission("core.zones")) {
+        if (isPlayer && !(sender.hasPermission("core.zones") || sender.isOp())) {
             sender.sendMessage(ChatColor.RED + "You do not have permission to manage zones!");
             return true;
         }

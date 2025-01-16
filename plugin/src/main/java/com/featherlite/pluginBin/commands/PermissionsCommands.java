@@ -32,13 +32,15 @@ public class PermissionsCommands implements TabCompleter {
 
         switch (args[0].toLowerCase()) {
             case "showall":
-                if (isPlayer && sender.hasPermission("core.permissions")) {
+                if ((sender.hasPermission("core.permissions") || sender.isOp())) {
                     permissionManager.showAllServerPermissions(player);
                 } else {
                     sender.sendMessage(ChatColor.RED + "You do not have permission to check your permissions.");
                 }
+                break;
+
             case "reload":
-                if (sender.hasPermission("core.permissions")) {
+                if (sender.hasPermission("core.permissions") || sender.isOp()) {
                     permissionManager.reloadConfig();
                     sender.sendMessage("Permissions configuration reloaded.");
                 } else {
@@ -51,7 +53,7 @@ public class PermissionsCommands implements TabCompleter {
                     sender.sendMessage("Usage: /permissions addgroup <playerName> <groupName>");
                     return true;
                 }
-                if (sender.hasPermission("permissions")) {
+                if (sender.hasPermission("permissions") || sender.isOp()) {
                     permissionManager.addPlayerToGroup(args[1], args[2], sender);
                 } else {
                     sender.sendMessage(ChatColor.RED + "You do not have permission to manage groups.");
@@ -63,7 +65,7 @@ public class PermissionsCommands implements TabCompleter {
                     sender.sendMessage("Usage: /permissions removegroup <playerName> <groupName>");
                     return true;
                 }
-                if (sender.hasPermission("core.permissions")) {
+                if (sender.hasPermission("core.permissions") || sender.isOp()) {
                     permissionManager.removePlayerFromGroup(args[1], args[2], sender);
                 } else {
                     sender.sendMessage(ChatColor.RED + "You do not have permission to manage groups.");
@@ -75,7 +77,7 @@ public class PermissionsCommands implements TabCompleter {
                     sender.sendMessage("Usage: /permissions setperm <playerName> <permission> <true|false>");
                     return true;
                 }
-                if (sender.hasPermission("core.permissions")) {
+                if (sender.hasPermission("core.permissions") || sender.isOp()) {
                     boolean value = Boolean.parseBoolean(args[3]);
                     permissionManager.setPlayerPermission(args[1], args[2], value, sender);
                 } else {

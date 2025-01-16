@@ -32,7 +32,7 @@ public class ItemCommands implements TabCompleter {
         if (args.length == 0) {
             // Open the Item UI if no arguments are provided
             if (isPlayer) {
-                if (isPlayer && !sender.hasPermission("core.items.menu")) {
+                if (isPlayer && !(sender.hasPermission("core.items.menu") || sender.isOp())) {
                     sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
                     return true;
                 }
@@ -45,7 +45,7 @@ public class ItemCommands implements TabCompleter {
 
         // Handle "reload" subcommand
         if (args[0].equalsIgnoreCase("reload")) {
-            if (player.hasPermission("core.items.reload")) {  // Separate permission for reloading
+            if (player.hasPermission("core.items.reload") || sender.isOp()) {  // Separate permission for reloading
                 itemManager.reloadItems(uiManager);
                 sender.sendMessage("Items have been reloaded from the configuration.");
             } else {
@@ -57,7 +57,7 @@ public class ItemCommands implements TabCompleter {
         // Handle "give" subcommand: /item give <category> <item_name> [player_name]
         if (args[0].equalsIgnoreCase("give")) {
 
-            if (isPlayer && !sender.hasPermission("core.items.give")) {
+            if (isPlayer && !(sender.hasPermission("core.items.give") || sender.isOp())) {
                 sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
                 return true;
             }

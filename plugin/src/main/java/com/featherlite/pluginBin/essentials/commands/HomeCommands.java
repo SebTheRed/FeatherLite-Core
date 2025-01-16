@@ -39,7 +39,7 @@ public class HomeCommands implements TabCompleter {
                 }
             
                 // Check if the player has permission for unlimited homes
-                if (player.hasPermission("core.homes.unlimited")) {
+                if (player.hasPermission("core.homes.unlimited") || sender.isOp()) {
                     homeManager.setHome(player, args[0], player.getLocation());
                     player.sendMessage(ChatColor.GREEN + "Home '" + args[0] + "' has been set!");
                     return true;
@@ -60,7 +60,7 @@ public class HomeCommands implements TabCompleter {
                 return true;
             
             case "home":
-                if (isPlayer && !sender.hasPermission("core.home")) {
+                if (isPlayer && !(sender.hasPermission("core.home") || sender.isOp())) {
                     sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
                     return true;
                 }
@@ -79,7 +79,7 @@ public class HomeCommands implements TabCompleter {
                 return true;
 
             case "delhome":
-                if (isPlayer && !sender.hasPermission("core.home")) {
+                if (isPlayer && !(sender.hasPermission("core.home") || sender.isOp())) {
                     sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
                     return true;
                 }
@@ -95,7 +95,7 @@ public class HomeCommands implements TabCompleter {
                 return true;
 
             case "homes":
-                if (isPlayer && !sender.hasPermission("core.home")) {
+                if (isPlayer && !(sender.hasPermission("core.home") || sender.isOp())) {
                     sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
                     return true;
                 }

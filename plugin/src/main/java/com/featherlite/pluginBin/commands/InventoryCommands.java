@@ -17,7 +17,7 @@ public class InventoryCommands {
 
     public boolean handleInventoryCommands(CommandSender sender, String[] args, boolean isPlayer) {
 
-        if (isPlayer && !sender.hasPermission("core.restoreinventory")) {
+        if (isPlayer && !(sender.hasPermission("core.restoreinventory") || sender.isOp())) {
             sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
             return true;
         }

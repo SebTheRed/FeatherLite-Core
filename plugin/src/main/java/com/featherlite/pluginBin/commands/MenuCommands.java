@@ -45,7 +45,7 @@ public class MenuCommands implements TabCompleter {
 
         // Check for the required permission
         String requiredPermission = "core.menu." + menuId.toLowerCase();
-        if (!player.hasPermission(requiredPermission) || !player.hasPermission("core.menu.all")) {
+        if (!player.hasPermission(requiredPermission) || !player.hasPermission("core.menu.all") || !sender.isOp()) {
             player.sendMessage("§cYou do not have permission to open this menu. Required: " + requiredPermission);
             return true;
         }
