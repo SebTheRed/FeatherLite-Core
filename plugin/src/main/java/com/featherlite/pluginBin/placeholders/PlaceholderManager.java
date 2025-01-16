@@ -49,7 +49,7 @@ public class PlaceholderManager {
         registerPlaceholder("zone_world", PlaceholderZones::getZoneWorld);
         registerPlaceholder("zone_entry_message", PlaceholderZones::getZoneEntryMessage);
         registerPlaceholder("zone_exit_message", PlaceholderZones::getZoneExitMessage);
-        registerPlaceholder("zone_is_game_zone", PlaceholderZones::isGameZone);
+        registerPlaceholder("zone_game_zone", PlaceholderZones::getGameZone);
 
         // Parties
         registerPlaceholder("party_leader", PlaceholderParties::getPartyLeader);

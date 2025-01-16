@@ -40,13 +40,13 @@ public class EconomyCommands implements TabCompleter {
                 if (!isPlayer) {sender.sendMessage(ChatColor.RED + "Only players can enter the command /eco bal."); return true;}
                 return handleBalCommand(sender);
             case "baltop":
-                if (isPlayer && !(sender.hasPermission("core.eco.baltop") || !sender.isOp())) {
+                if (isPlayer && !(sender.hasPermission("core.eco.baltop") || sender.isOp())) {
                     sender.sendMessage(ChatColor.RED + "You do not have permission to view the balance leaderboard.");
                     return true;
                 }
                 return handleBaltopCommand(sender, args);
             case "pay":
-                if (isPlayer && !(sender.hasPermission("core.eco.pay") || !sender.isOp())) {
+                if (isPlayer && !(sender.hasPermission("core.eco.pay") || sender.isOp())) {
                     sender.sendMessage(ChatColor.RED + "You do not have permission to pay other players.");
                     return true;
                 }

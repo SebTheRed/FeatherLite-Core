@@ -36,6 +36,9 @@ import com.featherlite.pluginBin.particles.ParticleManager;
 import com.featherlite.pluginBin.permissions.PermissionManager;
 import com.featherlite.pluginBin.permissions.PlayerJoinListener;
 import com.featherlite.pluginBin.placeholders.PlaceholderEconomy;
+import com.featherlite.pluginBin.placeholders.PlaceholderLobbies;
+import com.featherlite.pluginBin.placeholders.PlaceholderParties;
+import com.featherlite.pluginBin.placeholders.PlaceholderZones;
 import com.featherlite.pluginBin.scoreboards.ScoreboardManager;
 import com.featherlite.pluginBin.webapp.WebAppManager;
 import com.featherlite.pluginBin.worlds.WorldBorderListener;
@@ -173,7 +176,7 @@ public class FeatherCore extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ZoneListeners(zoneManager, this, isDebuggerOn), this);
 
         scoreboardManager = new ScoreboardManager(this, isDebuggerOn);
-
+        getServer().getPluginManager().registerEvents(scoreboardManager, this);
         economyManager = new EconomyManager(this, playerDataManager);
         menuManager = new MenuManager(this, economyManager, isDebuggerOn);
         getServer().getPluginManager().registerEvents(new MenuListeners(this, menuManager, isDebuggerOn), this);
@@ -223,6 +226,9 @@ public class FeatherCore extends JavaPlugin {
 
         //Set Managers for Placeholders
         PlaceholderEconomy.setEconomyManager(economyManager);
+        PlaceholderZones.setZoneManager(zoneManager);
+        PlaceholderLobbies.setInstanceManager(instanceManager);
+        
 
 
 
@@ -358,8 +364,6 @@ public class FeatherCore extends JavaPlugin {
         getCommand("stonecutter").setExecutor(this);
         getCommand("ptime").setExecutor(this);
         getCommand("pweather").setExecutor(this);
-
-
 
     }
 

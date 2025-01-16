@@ -20,7 +20,7 @@ public class Zone {
     private File configFile;
     private String world; // New field for the world
 
-    private boolean isGameZone;
+    private String gameZoneType;
     private boolean gameOverrideSpawnPoint;
     
     // Coordinates
@@ -73,7 +73,7 @@ public class Zone {
     public void setupZoneFromConfig() {
 
         this.description = config.getString("information.description");
-        this.isGameZone = config.getBoolean("information.is-game-zone", false);
+        this.gameZoneType = config.getString("information.game-zone-type", null);
         this.gameOverrideSpawnPoint = config.getBoolean("information.game-override-spawn-point", false);
 
         // Parse coordinates
@@ -351,8 +351,8 @@ public class Zone {
         setConfigString("information.description", desc);
     }
     
-    public boolean isGameZone() {
-        return isGameZone;
+    public String getGameZoneType() {
+        return gameZoneType;
     }
     
     public boolean isGameOverrideSpawnPoint() {
@@ -400,7 +400,7 @@ public class Zone {
         debugInfo.append("Zone Name: ").append(name).append("\n");
         debugInfo.append("Description: ").append(description).append("\n");
         debugInfo.append("World: ").append(world).append("\n");
-        debugInfo.append("Is Game Zone: ").append(isGameZone).append("\n");
+        debugInfo.append("Game Zone Type: ").append(gameZoneType).append("\n");
         debugInfo.append("Game Override Spawn Point: ").append(gameOverrideSpawnPoint).append("\n");
     
         // Coordinates

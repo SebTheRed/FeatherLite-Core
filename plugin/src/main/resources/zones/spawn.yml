@@ -2,8 +2,7 @@ information:
   name: "Spawn Zone"
   world: "world"
   description: "Zone that controls the spawn zone."
-  is-game-zone: false
-  game-override-spawn-point: false
+
 coordinates:
   spawn-point:
     x: 0

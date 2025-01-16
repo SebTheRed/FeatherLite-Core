@@ -43,9 +43,9 @@ public class PlaceholderZones {
     }
 
     // Get whether the current zone is a game zone
-    public static String isGameZone(Player player) {
+    public static String getGameZone(Player player) {
         Zone zone = getZoneForPlayer(player);
-        return zone != null && zone.isGameZone() ? "true" : "false";
+        return zone != null ? zone.getGameZoneType() : "Not in zone";
     }
 
 

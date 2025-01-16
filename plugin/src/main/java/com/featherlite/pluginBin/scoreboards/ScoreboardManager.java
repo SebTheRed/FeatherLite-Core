@@ -38,9 +38,6 @@ public class ScoreboardManager implements Listener {
         // Load all scoreboards
         loadScoreboardsFromAllPlugins();
     
-        // Register this class as a listener
-        plugin.getServer().getPluginManager().registerEvents(this, plugin);
-    
         // Start the scoreboard update task
         startUpdateTask();
     }

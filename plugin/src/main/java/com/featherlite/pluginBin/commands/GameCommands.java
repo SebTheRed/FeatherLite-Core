@@ -49,7 +49,7 @@ public class GameCommands implements TabCompleter {
             case "ui":
             case "menu":
                 if (isPlayer) {
-                    if (isPlayer && !(sender.hasPermission("core.games.menu") || !sender.isOp())) {
+                    if (isPlayer && !(sender.hasPermission("core.games.menu") || sender.isOp())) {
                         sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
                         return true;
                     }
@@ -61,7 +61,7 @@ public class GameCommands implements TabCompleter {
     
             case "join":
                 if (isPlayer) {
-                    if (isPlayer && !(sender.hasPermission("core.games.play") || !sender.isOp()) ) {
+                    if (isPlayer && !(sender.hasPermission("core.games.play") || sender.isOp()) ) {
                         sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
                         return true;
                     }
@@ -72,7 +72,7 @@ public class GameCommands implements TabCompleter {
                 return true;
     
             case "create":
-                if (isPlayer && !(sender.hasPermission("core.games.create") || !sender.isOp())) {
+                if (isPlayer && !(sender.hasPermission("core.games.create") || sender.isOp())) {
                     sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
                     return true;
                 }
@@ -93,7 +93,7 @@ public class GameCommands implements TabCompleter {
     
             case "leave":
                 if (isPlayer) {
-                    if (isPlayer && !(sender.hasPermission("core.games.play") || !sender.isOp())) {
+                    if (isPlayer && !(sender.hasPermission("core.games.play") || sender.isOp())) {
                         sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
                         return true;
                     }
@@ -106,7 +106,7 @@ public class GameCommands implements TabCompleter {
                 return true;
     
             case "close":
-                if (isPlayer && !(sender.hasPermission("core.games.close") || !sender.isOp())) {
+                if (isPlayer && !(sender.hasPermission("core.games.close") || sender.isOp())) {
                     sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
                     return true;
                 }
