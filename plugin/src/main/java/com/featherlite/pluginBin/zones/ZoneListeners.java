@@ -64,6 +64,11 @@ public class ZoneListeners implements Listener {
         this.isDebuggerOn = isDebuggerOn;
     }
 
+    private boolean canBypassZone(Player player) {
+        return player.hasPermission("core.zonebypass") || player.isOp();
+    }
+    
+
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
@@ -110,6 +115,7 @@ public class ZoneListeners implements Listener {
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
         Player player = event.getPlayer();
+        if (canBypassZone(player)) return;
         Location blockLocation = event.getBlock().getLocation();
         Zone zone = zoneManager.getZoneAtLocation(blockLocation);
 
@@ -122,6 +128,7 @@ public class ZoneListeners implements Listener {
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
         Player player = event.getPlayer();
+        if (canBypassZone(player)) return;
         Location blockLocation = event.getBlockPlaced().getLocation();
         Zone zone = zoneManager.getZoneAtLocation(blockLocation);
 
@@ -136,6 +143,7 @@ public class ZoneListeners implements Listener {
         if (!(event.getEntity() instanceof Player)) return;
     
         Player player = (Player) event.getEntity();
+        if (canBypassZone(player)) return;
         Zone zone = zoneManager.getZoneAtLocation(player.getLocation());
     
         if (zone != null) {
@@ -166,20 +174,6 @@ public class ZoneListeners implements Listener {
         }
     }
 
-    // @EventHandler
-    // public void onPvPDamage(EntityDamageByEntityEvent event) {
-    //     if (!(event.getEntity() instanceof Player) || !(event.getDamager() instanceof Player)) return;
-
-    //     Player victim = (Player) event.getEntity();
-    //     Player attacker = (Player) event.getDamager();
-
-    //     Zone zone = zoneManager.getZoneAtLocation(victim.getLocation());
-
-    //     if (zone != null && !zone.isPvp()) {
-    //         event.setCancelled(true);
-    //         attacker.sendMessage(ChatColor.RED + "PvP is not allowed in this zone.");
-    //     }
-    // }
 
     @EventHandler
     public void onEntityExplosion(EntityExplodeEvent event) {
@@ -215,6 +209,7 @@ public class ZoneListeners implements Listener {
     @EventHandler
     public void onPlayerPickupItem(PlayerPickupItemEvent event) {
         Player player = event.getPlayer();
+        if (canBypassZone(player)) return;
         Zone zone = zoneManager.getZoneAtLocation(player.getLocation());
 
         if (zone != null && !zone.isItemPickup()) {
@@ -226,6 +221,7 @@ public class ZoneListeners implements Listener {
     @EventHandler
     public void onPlayerDropItem(PlayerDropItemEvent event) {
         Player player = event.getPlayer();
+        if (canBypassZone(player)) return;
         Zone zone = zoneManager.getZoneAtLocation(player.getLocation());
 
         if (zone != null && !zone.isItemDrop()) {
@@ -237,6 +233,7 @@ public class ZoneListeners implements Listener {
     @EventHandler
     public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
         Player player = event.getPlayer();
+        if (canBypassZone(player)) return;
         Zone zone = zoneManager.getZoneAtLocation(player.getLocation());
         
         String command = event.getMessage().split(" ")[0].substring(1); // Get command name
@@ -250,6 +247,7 @@ public class ZoneListeners implements Listener {
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
+        if (canBypassZone(player)) return;
         Zone zone = zoneManager.getZoneAtLocation(player.getLocation()); // Check zone at player's location before respawn
         
         if (zone != null) {
@@ -304,92 +302,10 @@ public class ZoneListeners implements Listener {
     }
 
 
-    // @EventHandler
-    // public void onPlayerAction(PlayerInteractEvent event) {
-    //     Player player = event.getPlayer();
-    //     Zone zone = zoneManager.getZoneAtLocation(player.getLocation());
-    
-    //     if (zone == null) return;
-    
-    //     // Only process if player is right-clicking a block or air
-    //     if (event.getAction() != Action.RIGHT_CLICK_BLOCK && event.getAction() != Action.RIGHT_CLICK_AIR) return;
-    
-    //     Material clickedBlockType = event.getClickedBlock() != null ? event.getClickedBlock().getType() : null;
-    //     Material itemType = event.getItem() != null ? event.getItem().getType() : null;
-    
-    //     // 1. Ender Pearl and Chorus Fruit Usage
-    //     if (itemType == Material.ENDER_PEARL && !zone.isEnderpearl()) {
-    //         event.setCancelled(true);
-    //         player.sendMessage(ChatColor.RED + "Ender pearl usage is not allowed in this zone.");
-    //         return;
-    //     } else if (itemType == Material.CHORUS_FRUIT && !zone.isChorusFruit()) {
-    //         event.setCancelled(true);
-    //         player.sendMessage(ChatColor.RED + "Chorus fruit usage is not allowed in this zone.");
-    //         return;
-    //     }
-    
-    //     // 2. Vehicle Placement Check
-    //     boolean isBoat = itemType == Material.OAK_BOAT || itemType == Material.SPRUCE_BOAT ||
-    //                      itemType == Material.BIRCH_BOAT || itemType == Material.JUNGLE_BOAT ||
-    //                      itemType == Material.DARK_OAK_BOAT || itemType == Material.ACACIA_BOAT ||
-    //                      itemType == Material.MANGROVE_BOAT || itemType == Material.BAMBOO_RAFT;
-    //     boolean isMinecart = itemType == Material.MINECART || itemType == Material.CHEST_MINECART ||
-    //                          itemType == Material.FURNACE_MINECART || itemType == Material.HOPPER_MINECART ||
-    //                          itemType == Material.TNT_MINECART;
-        
-    //     if ((isBoat || isMinecart) && !zone.isVehiclePlace()) {
-    //         event.setCancelled(true);
-    //         player.sendMessage(ChatColor.RED + "Vehicle placement is disabled in this zone.");
-    //         return;
-    //     }
-    
-    //     // 3. Interactables Check
-    //     if (!zone.isInteract()) {
-    //         // List of general interactable blocks
-    //         if (clickedBlockType != null && (clickedBlockType == Material.OAK_DOOR || clickedBlockType == Material.SPRUCE_DOOR ||
-    //                                          clickedBlockType == Material.BIRCH_DOOR || clickedBlockType == Material.JUNGLE_DOOR ||
-    //                                          clickedBlockType == Material.ACACIA_DOOR || clickedBlockType == Material.DARK_OAK_DOOR ||
-    //                                          clickedBlockType == Material.MANGROVE_DOOR || clickedBlockType == Material.BAMBOO_DOOR ||
-    //                                          clickedBlockType == Material.IRON_DOOR || clickedBlockType == Material.OAK_TRAPDOOR || 
-    //                                          clickedBlockType == Material.SPRUCE_TRAPDOOR ||
-    //                                          clickedBlockType == Material.BIRCH_TRAPDOOR || clickedBlockType == Material.JUNGLE_TRAPDOOR ||
-    //                                          clickedBlockType == Material.ACACIA_TRAPDOOR || clickedBlockType == Material.DARK_OAK_TRAPDOOR ||
-    //                                          clickedBlockType == Material.MANGROVE_TRAPDOOR || clickedBlockType == Material.BAMBOO_TRAPDOOR ||
-    //                                          clickedBlockType == Material.IRON_TRAPDOOR ||
-                                             
-    //                                          clickedBlockType == Material.LEVER || clickedBlockType == Material.STONE_BUTTON || clickedBlockType == Material.OAK_BUTTON ||
-    //                                          clickedBlockType == Material.SPRUCE_BUTTON || clickedBlockType == Material.BIRCH_BUTTON ||
-    //                                          clickedBlockType == Material.JUNGLE_BUTTON || clickedBlockType == Material.ACACIA_BUTTON ||
-    //                                          clickedBlockType == Material.DARK_OAK_BUTTON || clickedBlockType == Material.MANGROVE_BUTTON ||
-    //                                          clickedBlockType == Material.BAMBOO_BUTTON || clickedBlockType == Material.POLISHED_BLACKSTONE_BUTTON ||
-    //                                          clickedBlockType == Material.CAULDRON ||
-    //                                          clickedBlockType == Material.COMPOSTER || clickedBlockType == Material.NOTE_BLOCK ||
-    //                                          clickedBlockType == Material.ITEM_FRAME)) {
-    //             event.setCancelled(true);
-    //             player.sendMessage(ChatColor.RED + "You cannot interact with this block in this zone.");
-    //             return;
-    //         }
-    //     }
-    
-    //     // 4. Station Interact Check
-    //     if (!zone.isStationInteract()) {
-    //         // List of station blocks that open an inventory interface
-    //         if (clickedBlockType != null && (clickedBlockType == Material.CRAFTING_TABLE || clickedBlockType == Material.ENCHANTING_TABLE ||
-    //                                          clickedBlockType == Material.SMITHING_TABLE || clickedBlockType == Material.CARTOGRAPHY_TABLE ||
-    //                                          clickedBlockType == Material.BREWING_STAND || clickedBlockType == Material.GRINDSTONE ||
-    //                                          clickedBlockType == Material.LOOM || clickedBlockType == Material.STONECUTTER)) {
-    //             event.setCancelled(true);
-    //             player.sendMessage(ChatColor.RED + "Station interaction is disabled in this zone.");
-    //             return;
-    //         }
-    //     }
-    // }
-
-
-
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
+        if (canBypassZone(player)) return;
         Zone zone = zoneManager.getZoneAtLocation(player.getLocation());
 
         // Exit early if no zone or invalid action
@@ -481,6 +397,7 @@ public class ZoneListeners implements Listener {
     public void onItemFrameRotate(PlayerInteractEntityEvent event) {
         if (event.getRightClicked() instanceof ItemFrame) {
             Player player = event.getPlayer();
+            if (canBypassZone(player)) return;
             Zone zone = zoneManager.getZoneAtLocation(player.getLocation());
 
             if (zone != null && !zone.isItemFrameRotation()) {
@@ -495,6 +412,7 @@ public class ZoneListeners implements Listener {
     @EventHandler
     public void onPlayerSleep(PlayerBedEnterEvent event) {
         Player player = event.getPlayer();
+        if (canBypassZone(player)) return;
         Zone zone = zoneManager.getZoneAtLocation(player.getLocation());
 
         if (zone != null && !zone.isSleep()) {
@@ -502,18 +420,6 @@ public class ZoneListeners implements Listener {
             player.sendMessage(ChatColor.RED + "You cannot sleep in this zone.");
         }
     }
-
-    // @EventHandler
-    // public void onFallDamage(EntityDamageEvent event) {
-    //     if (event.getEntity() instanceof Player && event.getCause() == EntityDamageEvent.DamageCause.FALL) {
-    //         Player player = (Player) event.getEntity();
-    //         Zone zone = zoneManager.getZoneAtLocation(player.getLocation());
-
-    //         if (zone != null && !zone.isFallDamage()) {
-    //             event.setCancelled(true);
-    //         }
-    //     }
-    // }
 
     @EventHandler
     public void onWeatherChange(WeatherChangeEvent event) {
@@ -527,6 +433,7 @@ public class ZoneListeners implements Listener {
     @EventHandler
     public void onRespawnAnchorUse(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
+        if (canBypassZone(player)) return;
         Zone zone = zoneManager.getZoneAtLocation(player.getLocation());
 
         if (zone != null && !zone.isRespawnAnchors()) {
@@ -547,19 +454,6 @@ public class ZoneListeners implements Listener {
     }
 
 
-    // @EventHandler
-    // public void onFrostWalker(PlayerMoveEvent event) {
-    //     Player player = event.getPlayer();
-    //     Zone zone = zoneManager.getZoneAtLocation(player.getLocation());
-
-    //     if (zone != null && !zone.isFrostWalker() && player.getInventory().getBoots() != null 
-    //             && player.getInventory().getBoots().containsEnchantment(Enchantment.FROST_WALKER)) {
-    //         event.setCancelled(true);
-    //         if (isDebuggerOn) {player.sendMessage(ChatColor.RED + "Frost Walker is disabled in this zone.");}
-    //     }
-    // }
-
-
     @EventHandler
     public void onExpDrop(EntityDeathEvent event) {
         Location location = event.getEntity().getLocation();
@@ -570,27 +464,6 @@ public class ZoneListeners implements Listener {
         }
     }
 
-    // @EventHandler
-    // public void onVehiclePlace(PlayerInteractEvent event) {
-    //     if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-    //         Material itemType = event.getPlayer().getInventory().getItemInMainHand().getType();
-    //         boolean isBoat = itemType == Material.OAK_BOAT || itemType == Material.SPRUCE_BOAT ||
-    //                          itemType == Material.BIRCH_BOAT || itemType == Material.JUNGLE_BOAT ||
-    //                          itemType == Material.DARK_OAK_BOAT || itemType == Material.ACACIA_BOAT ||
-    //                          itemType == Material.MANGROVE_BOAT || itemType == Material.BAMBOO_RAFT;
-    //         boolean isMinecart = itemType == Material.MINECART || itemType == Material.CHEST_MINECART ||
-    //                              itemType == Material.FURNACE_MINECART || itemType == Material.HOPPER_MINECART ||
-    //                              itemType == Material.TNT_MINECART;
-    
-    //         if (isBoat || isMinecart) {
-    //             Zone zone = zoneManager.getZoneAtLocation(event.getClickedBlock().getLocation());
-    //             if (zone != null && !zone.isVehiclePlace()) {
-    //                 event.setCancelled(true);
-    //                 event.getPlayer().sendMessage(ChatColor.RED + "Vehicle placement is disabled in this zone.");
-    //             }
-    //         }
-    //     }
-    // }
 
     @EventHandler
     public void onVehicleDestroy(VehicleDestroyEvent event) {
@@ -606,6 +479,7 @@ public class ZoneListeners implements Listener {
     public void onNaturalHealthRegen(EntityRegainHealthEvent event) {
         if (event.getEntity() instanceof Player && event.getRegainReason() == EntityRegainHealthEvent.RegainReason.SATIATED) {
             Player player = (Player) event.getEntity();
+            if (canBypassZone(player)) return;
             Zone zone = zoneManager.getZoneAtLocation(player.getLocation());
 
             if (zone != null && !zone.isNaturalHealthRegen()) {
@@ -614,49 +488,7 @@ public class ZoneListeners implements Listener {
         }
     }
 
-    // @EventHandler
-    // public void onCreeperExplosion(EntityExplodeEvent event) {
-    //     if (event.getEntityType() == EntityType.CREEPER) {
-    //         Zone zone = zoneManager.getZoneAtLocation(event.getLocation());
-            
-    //         if (zone != null && !zone.isCreeperExplosion()) {
-    //             event.setCancelled(true);
-    //         }
-    //     }
-    // }
 
-    // @EventHandler
-    // public void onGhastFireballExplosion(EntityExplodeEvent event) {
-    //     if (event.getEntityType() == EntityType.GHAST) {
-    //         Zone zone = zoneManager.getZoneAtLocation(event.getLocation());
-            
-    //         if (zone != null && !zone.isGhastFireballBreak()) {
-    //             event.setCancelled(true);
-    //         }
-    //     }
-    // }
-
-    // @EventHandler
-    // public void onEnderDragonBlockBreak(EntityExplodeEvent event) {
-    //     if (event.getEntityType() == EntityType.ENDER_DRAGON) {
-    //         Zone zone = zoneManager.getZoneAtLocation(event.getLocation());
-
-    //         if (zone != null && !zone.isEnderDragonBreak()) {
-    //             event.setCancelled(true);
-    //         }
-    //     }
-    // }
-    
-    // @EventHandler
-    // public void onWitherExplosion(EntityExplodeEvent event) {
-    //     if (event.getEntityType() == EntityType.WITHER) {
-    //         Zone zone = zoneManager.getZoneAtLocation(event.getLocation());
-            
-    //         if (zone != null && !zone.isWitherBreak()) {
-    //             event.setCancelled(true);
-    //         }
-    //     }
-    // }
 
     @EventHandler
     public void onRavagerBlockBreak(EntityChangeBlockEvent event) {
@@ -695,19 +527,38 @@ public class ZoneListeners implements Listener {
 
     @EventHandler
     public void onInventoryOpen(InventoryOpenEvent event) {
+        // Check if the inventory is opened by a player
+        if (!(event.getPlayer() instanceof Player)) return;
+    
         Player player = (Player) event.getPlayer();
+    
+        // Allow bypass
+        if (canBypassZone(player)) return;
+    
+        // Fetch the zone at the player's location
         Zone zone = zoneManager.getZoneAtLocation(player.getLocation());
     
         if (zone != null && !zone.isChestAccess()) {
-            event.setCancelled(true);
-            if (isDebuggerOn) {player.sendMessage(ChatColor.RED + "You cannot access chests in this zone.");}
+            // Only block access to "Chest" and "Large Chest" inventories
+            String inventoryTitle = event.getView().getTitle();
+    
+            if ("Chest".equalsIgnoreCase(inventoryTitle) || "Large Chest".equalsIgnoreCase(inventoryTitle)) {
+                event.setCancelled(true);
+    
+                // Debug message for blocking chest access
+                if (isDebuggerOn) {
+                    player.sendMessage(ChatColor.RED + "You cannot access chests in this zone.");
+                }
+            }
         }
     }
+    
 
     @EventHandler
     public void onHungerDrain(FoodLevelChangeEvent event) {
         if (event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();
+            if (canBypassZone(player)) return;
             Zone zone = zoneManager.getZoneAtLocation(player.getLocation());
 
             if (zone != null && !zone.isNaturalHungerDrain()) {
