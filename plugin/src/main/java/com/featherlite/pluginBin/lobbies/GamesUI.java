@@ -8,11 +8,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.Material;
 import com.featherlite.pluginBin.lobbies.GamesManager.GameData;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,14 +31,40 @@ public class GamesUI implements Listener {
     private final Map<Player, Boolean> isInstancePublic = new HashMap<>();
     private final Map<Player, String> selectedWorld = new HashMap<>();
     private final Map<Player, String> selectedInstanceId = new HashMap<>();
+    private final Map<Player, Boolean> suppressCloseEvent = new HashMap<>();
+
     private final boolean isDebuggerOn;
+    private final JavaPlugin plugin;
 
 
-    public GamesUI(GamesManager gamesManager, InstanceManager instanceManager, boolean isDebuggerOn) {
+    public GamesUI(GamesManager gamesManager, InstanceManager instanceManager, boolean isDebuggerOn, JavaPlugin plugin) {
         this.gamesManager = gamesManager;
         this.instanceManager = instanceManager;
         this.isDebuggerOn = isDebuggerOn;
+        this.plugin = plugin;
     }
+
+
+    @EventHandler
+    public void onInventoryClose(InventoryCloseEvent event) {
+        if (!(event.getPlayer() instanceof Player)) return;
+    
+        Player player = (Player) event.getPlayer();
+        if (suppressCloseEvent.getOrDefault(player, false)) return; // Skip if suppressed
+    
+        String inventoryTitle = ChatColor.stripColor(event.getView().getTitle());
+        if (isGamesUIMenu(inventoryTitle, player)) {
+            chosenRegisteredGame.remove(player);
+            isInstancePublic.remove(player);
+            selectedWorld.remove(player);
+            selectedInstanceId.remove(player);
+    
+            if (isDebuggerOn) {
+                plugin.getLogger().info("Cleared player-specific data for: " + player.getName());
+            }
+        }
+    }
+    
 
 
     /**
@@ -49,7 +77,7 @@ public class GamesUI implements Listener {
         if (!(event.getWhoClicked() instanceof Player)) return;
 
         Player player = (Player) event.getWhoClicked();
-
+        suppressCloseEvent.put(player, true);
         // Check if the inventory belongs to GamesUI
         String inventoryTitle = ChatColor.stripColor(event.getView().getTitle());
         if (!isGamesUIMenu(inventoryTitle, player)) {
@@ -116,7 +144,7 @@ public class GamesUI implements Listener {
                                 // if still lobby put in lobby.
                             // teams w/ players
                             // spectator option
-                        // instanceManager.addPlayerToInstance(player, null);
+                        instanceManager.addPlayerToInstance(player, instanceManager.getInstance(UUID.fromString(uuidString)));
                     }
                 } else if (inventoryTitle.equalsIgnoreCase("Create " + chosenRegisteredGame.get(player))) {
                     if (isDebuggerOn) {player.sendMessage("Clicking inside game options menu");}
@@ -135,7 +163,7 @@ public class GamesUI implements Listener {
                     
                     
                     } else if (itemDisplayName.contains("Open to Public") || itemDisplayName.equalsIgnoreCase("Closed to Public")) {
-                        boolean isPublic = isInstancePublic.getOrDefault(player, false);
+                        boolean isPublic = isInstancePublic.getOrDefault(player, true);
                         isInstancePublic.put(player, !isPublic); // Toggle state
                         if (isDebuggerOn) {player.sendMessage(ChatColor.YELLOW + "Instance is now " + (!isPublic ? "public" : "private") + ".");}
                         openCreateGameMenu(player, chosenRegisteredGame.get(player)); // Refresh the menu
@@ -144,13 +172,23 @@ public class GamesUI implements Listener {
                     } else if (itemDisplayName.contains("Create Instance")) {
                         String chosenWorld = selectedWorld.get(player);
                         if (chosenWorld == null) {
-                            player.sendMessage(ChatColor.RED + "You must select a world before creating an instance.");
+                            player.sendMessage(ChatColor.YELLOW + "You must select a world before creating an instance.");
                             return;
                         }
                 
                         GameInstance instance = gamesManager.startGameInstance(
                             chosenRegisteredGame.get(player), chosenWorld, isInstancePublic.get(player) ,instanceManager, player.getName(), true
                         );
+                        try {
+                            if (instance == null) {
+                                player.sendMessage(ChatColor.RED + "No game instance found with that ID, report this to an admin!");
+                                return;
+                            }
+                            instanceManager.addPlayerToInstance(player, instance);
+                            // player.sendMessage("You have joined the game instance!");
+                        } catch (IllegalArgumentException e) {
+                            player.sendMessage("Invalid instance ID.");
+                        }
                 
                         if (instance != null) {
                             player.sendMessage(ChatColor.GREEN + "Instance created successfully: " + instance.getGameName());
@@ -159,6 +197,7 @@ public class GamesUI implements Listener {
                         }
                         event.setCancelled(true);
                     }
+                    Bukkit.getScheduler().runTaskLater(plugin, () -> suppressCloseEvent.put(player, false), 1L);
                 } else if (inventoryTitle.equalsIgnoreCase("Select World Map")) {
                     event.setCancelled(true);
                     ItemStack clickedItemWorld = event.getCurrentItem();
@@ -168,6 +207,7 @@ public class GamesUI implements Listener {
                         String gameName = chosenRegisteredGame.get(player);
                         if (isDebuggerOn) {player.sendMessage( ChatColor.GRAY + "Selected world: " + ChatColor.GREEN + worldName);}
                         openCreateGameMenu(player, gameName); // Return to the Create Game menu
+                        Bukkit.getScheduler().runTaskLater(plugin, () -> suppressCloseEvent.put(player, false), 1L);
                     }
                     return;
                 }

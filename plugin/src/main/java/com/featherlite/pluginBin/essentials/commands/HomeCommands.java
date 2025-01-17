@@ -132,14 +132,29 @@ public class HomeCommands implements TabCompleter {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (!(sender instanceof Player)) return Collections.emptyList();
-    
+        
         Player player = (Player) sender;
-    
-        if ((alias.equalsIgnoreCase("home") || alias.equalsIgnoreCase("delhome"))) {
-            // Suggest existing home names for "home" and "delhome"
-            return homeManager.listHomes(player);
+        
+        // Check if the player has permission for homes
+        if (!(player.hasPermission("core.home") || player.isOp())) {
+            return Collections.emptyList();
         }
-    
+        
+        if (alias.equalsIgnoreCase("home") || alias.equalsIgnoreCase("delhome")) {
+            // Suggest existing home names for "home" and "delhome"
+            if (args.length == 1) {
+                return homeManager.listHomes(player);
+            }
+        }
+        
+        if (alias.equalsIgnoreCase("sethome")) {
+            // Suggest "<name>" placeholder for setting a home
+            if (args.length == 1) {
+                return Collections.singletonList("<name>");
+            }
+        }
+        
         return Collections.emptyList();
     }
+    
 }

@@ -168,8 +168,8 @@ public class FeatherCore extends JavaPlugin {
         teamSelectorBook = new TeamSelectorBook(this, isDebuggerOn);
         instanceManager = new InstanceManager(partyManager, worldManager, this, teamSelectorBook, teleportationManager);
         gamesManager = new GamesManager();
-        gamesUI = new GamesUI(gamesManager, instanceManager, isDebuggerOn);
-        getServer().getPluginManager().registerEvents(gamesUI, this);
+        gamesUI = new GamesUI(gamesManager, instanceManager, isDebuggerOn, this);
+        getServer().getPluginManager().registerEvents((gamesUI), this);
 
         permissionManager = new PermissionManager(this, playerDataManager, isDebuggerOn); // Initialize the permission manager
         zoneManager = new ZoneManager(this);

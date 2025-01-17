@@ -71,15 +71,55 @@ public class ScoreboardCommands implements TabCompleter {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (!(sender instanceof Player)) return Collections.emptyList();
-
+    
+        Player player = (Player) sender;
+    
         if (args.length == 1) {
-            // First argument: suggest "toggle" or available scoreboard names
             List<String> suggestions = new ArrayList<>();
-            suggestions.add("toggle");
-            suggestions.addAll(scoreboardManager.getAvailableScoreboards()); // Fetch registered scoreboard names
-            return suggestions;
+    
+            // Add "toggle" for players with the toggle permission or OP
+            if (player.hasPermission("core.board.toggle") || player.isOp()) {
+                suggestions.add("toggle");
+            }
+    
+            // Add "reload" for players with the reload permission or OP
+            if (player.hasPermission("core.board.reload") || player.isOp()) {
+                suggestions.add("reload");
+            }
+    
+            // Add "list" for everyone, as listing doesn't seem to require special permissions
+            suggestions.add("list");
+    
+            // Add scoreboard names for players with the switch permission or OP
+            if (player.hasPermission("core.board.switch") || player.isOp()) {
+                suggestions.addAll(scoreboardManager.getAvailableScoreboards());
+            }
+    
+            return filterSuggestions(suggestions, args[0]);
         }
-
+    
         return Collections.emptyList();
     }
+    
+    /**
+     * Filters suggestions based on the current input.
+     *
+     * @param suggestions the list of possible suggestions
+     * @param current     the current argument being typed
+     * @return the filtered list of suggestions
+     */
+    private List<String> filterSuggestions(List<String> suggestions, String current) {
+        if (current == null || current.isEmpty()) {
+            return suggestions;
+        }
+        String lowerCurrent = current.toLowerCase();
+        List<String> filtered = new ArrayList<>();
+        for (String suggestion : suggestions) {
+            if (suggestion.toLowerCase().startsWith(lowerCurrent)) {
+                filtered.add(suggestion);
+            }
+        }
+        return filtered;
+    }
+    
 }

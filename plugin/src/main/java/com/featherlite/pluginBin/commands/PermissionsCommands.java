@@ -116,40 +116,83 @@ public class PermissionsCommands implements TabCompleter {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (!(sender instanceof Player)) return Collections.emptyList();
-
+    
+        // First argument: main subcommands
         if (args.length == 1) {
-            return Arrays.asList("reload", "addgroup", "removegroup", "setperm", "my");
+            List<String> suggestions = new ArrayList<>();
+            if (sender.hasPermission("core.permissions") || sender.isOp()) {
+                suggestions.add("reload");
+                suggestions.add("addgroup");
+                suggestions.add("removegroup");
+                suggestions.add("setperm");
+            }
+            suggestions.add("my");
+            return filterSuggestions(suggestions, args[0]);
         }
-
+    
+        // Second argument: player names or subcommands for "my"
         if (args.length == 2) {
             switch (args[0].toLowerCase()) {
                 case "addgroup":
                 case "removegroup":
                 case "setperm":
-                    List<String> playerNames = new ArrayList<>();
-                    for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-                        playerNames.add(onlinePlayer.getName());
+                    if (sender.hasPermission("core.permissions") || sender.isOp()) {
+                        List<String> playerNames = new ArrayList<>();
+                        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                            playerNames.add(onlinePlayer.getName());
+                        }
+                        return filterSuggestions(playerNames, args[1]);
                     }
-                    return playerNames;
+                    break;
                 case "my":
-                    return Arrays.asList("permissions", "groups");
+                    return filterSuggestions(Arrays.asList("permissions", "groups"), args[1]);
             }
         }
-
+    
+        // Third argument: group names for "addgroup" and "removegroup" or permissions for "setperm"
         if (args.length == 3) {
             switch (args[0].toLowerCase()) {
                 case "addgroup":
                 case "removegroup":
-                    return new ArrayList<>(permissionManager.getAvailableGroups());
+                    if (sender.hasPermission("core.permissions") || sender.isOp()) {
+                        return filterSuggestions(new ArrayList<>(permissionManager.getAvailableGroups()), args[2]);
+                    }
+                    break;
                 case "setperm":
-                    return Arrays.asList("example.permission", "other.permission");
+                    if (sender.hasPermission("core.permissions") || sender.isOp()) {
+                        return filterSuggestions(Arrays.asList("example.permission", "other.permission"), args[2]);
+                    }
+                    break;
             }
         }
-
-        if (args.length == 4 && args[0].equalsIgnoreCase("setperm")) {
-            return Arrays.asList("true", "false");
+    
+        // Fourth argument: true/false for "setperm"
+        if (args.length == 4 && args[0].equalsIgnoreCase("setperm") && (sender.hasPermission("core.permissions") || sender.isOp())) {
+            return filterSuggestions(Arrays.asList("true", "false"), args[3]);
         }
-
+    
         return Collections.emptyList();
     }
+    
+    /**
+     * Filters suggestions based on the current input.
+     *
+     * @param suggestions the list of possible suggestions
+     * @param current     the current argument being typed
+     * @return the filtered list of suggestions
+     */
+    private List<String> filterSuggestions(List<String> suggestions, String current) {
+        if (current == null || current.isEmpty()) {
+            return suggestions;
+        }
+        String lowerCurrent = current.toLowerCase();
+        List<String> filtered = new ArrayList<>();
+        for (String suggestion : suggestions) {
+            if (suggestion.toLowerCase().startsWith(lowerCurrent)) {
+                filtered.add(suggestion);
+            }
+        }
+        return filtered;
+    }
+    
 }

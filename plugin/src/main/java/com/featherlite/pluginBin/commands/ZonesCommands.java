@@ -496,8 +496,13 @@ public class ZonesCommands implements TabCompleter {
 
 
 
-        @Override
+    @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+
+        if (!(sender.hasPermission("core.zones") || sender.isOp())) {
+            return Collections.emptyList();
+        }
+
         if (args.length == 1) {
             // Suggest primary subcommands
             return Arrays.asList("create", "delete", "list", "info", "reload", "pos1", "pos2", "rule");

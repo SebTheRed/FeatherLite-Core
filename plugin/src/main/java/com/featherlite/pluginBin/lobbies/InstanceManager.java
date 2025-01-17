@@ -237,6 +237,7 @@ public class InstanceManager {
 
     public void closeInstance(UUID instanceId) {
         GameInstance instance = activeInstances.remove(instanceId);
+
         if (instance == null) {
             plugin.getLogger().warning("Attempted to close an invalid or non-existent instance with ID: " + instanceId);
             return;
@@ -265,9 +266,7 @@ public class InstanceManager {
         }));
     
         // End the game if it's still in progress
-        if (instance.getState() == GameInstance.GameState.IN_PROGRESS) {
-            instance.endGame();
-        }
+        instance.endGame();
     
         // Unload and delete the instance-specific world
         String instanceWorldName = instance.getInstanceWorldName();

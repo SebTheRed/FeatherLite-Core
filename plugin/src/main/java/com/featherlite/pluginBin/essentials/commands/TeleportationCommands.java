@@ -309,24 +309,75 @@ public class TeleportationCommands implements TabCompleter {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (!(sender instanceof Player)) return Collections.emptyList();
-
+    
+        Player player = (Player) sender;
         List<String> suggestions = new ArrayList<>();
+    
         switch (alias.toLowerCase()) {
             case "tp":
             case "tpa":
             case "tphere":
             case "tpahere":
-                if (args.length == 1) {
-                    Bukkit.getOnlinePlayers().forEach(player -> suggestions.add(player.getName()));
+                if ((alias.equalsIgnoreCase("tp") && player.hasPermission("core.teleport.tp")) ||
+                    (alias.equalsIgnoreCase("tpa") && player.hasPermission("core.teleport.tpa")) ||
+                    (alias.equalsIgnoreCase("tphere") && player.hasPermission("core.teleport.tphere")) ||
+                    (alias.equalsIgnoreCase("tpahere") && player.hasPermission("core.teleport.tpa")) ||
+                    player.isOp()) {
+                    if (args.length == 1) {
+                        Bukkit.getOnlinePlayers().forEach(onlinePlayer -> suggestions.add(onlinePlayer.getName()));
+                    }
                 }
                 break;
+    
             case "tppos":
-                if (args.length <= 3) suggestions.add("<coordinate>");
-                if (args.length == 4) Bukkit.getWorlds().forEach(world -> suggestions.add(world.getName()));
+                if (player.hasPermission("core.teleport.tppos") || player.isOp()) {
+                    if (args.length <= 3) suggestions.add("<coordinate>");
+                    if (args.length == 4) Bukkit.getWorlds().forEach(world -> suggestions.add(world.getName()));
+                }
+                break;
+    
+            case "tpall":
+                if (player.hasPermission("core.teleport.tpall") || player.isOp()) {
+                    // No specific arguments for /tpall, no suggestions required.
+                }
+                break;
+    
+            case "back":
+                if (player.hasPermission("core.teleport.back") || player.isOp()) {
+                    // No specific arguments for /back, no suggestions required.
+                }
+                break;
+    
+            case "tpr":
+            case "rtp":
+                if (player.hasPermission("core.teleport.tpr") || player.isOp()) {
+                    // No specific arguments for /tpr or /rtp, no suggestions required.
+                }
+                break;
+    
+            case "spawn":
+                if (player.hasPermission("core.teleport.spawn") || player.isOp()) {
+                    // No specific arguments for /spawn, no suggestions required.
+                }
+                break;
+    
+            case "setspawn":
+                if (player.hasPermission("core.teleport.setspawn") || player.isOp()) {
+                    // No specific arguments for /setspawn, no suggestions required.
+                }
+                break;
+    
+            case "tpaccept":
+            case "tpadeny":
+            case "tpacancel":
+                if (player.hasPermission("core.teleport.tpa") || player.isOp()) {
+                    // No specific arguments for /tpaccept, /tpadeny, or /tpacancel, no suggestions required.
+                }
                 break;
         }
-
+    
         return suggestions;
     }
+    
 }
 

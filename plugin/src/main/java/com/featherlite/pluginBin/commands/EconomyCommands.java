@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class EconomyCommands implements TabCompleter {
     private final EconomyManager economyManager;
@@ -27,9 +28,11 @@ public class EconomyCommands implements TabCompleter {
             return handleBalCommand(sender);
             
         }
-        if (isPlayer && label.equalsIgnoreCase("baltop")) {
+        if (label.equalsIgnoreCase("baltop")) {
             return handleBaltopCommand(sender, args);
         }
+        
+        
         if (args.length < 1) {
             sender.sendMessage(ChatColor.RED + "Usage: /eco <bal | baltop | pay | give | take>");
             return true;
@@ -239,33 +242,39 @@ public class EconomyCommands implements TabCompleter {
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (args.length == 1) {
             List<String> suggestions = new ArrayList<>();
-            suggestions.add("bal");
-            suggestions.add("baltop");
-            suggestions.add("pay");
-            if (sender.hasPermission("economy.admin")) {
+            if (sender.hasPermission("core.eco.bal") || sender.isOp()) {
+                suggestions.add("bal");
+            }
+            if (sender.hasPermission("core.eco.baltop") || sender.isOp()) {
+                suggestions.add("baltop");
+            }
+            if (sender.hasPermission("core.eco.pay") || sender.isOp()) {
+                suggestions.add("pay");
+            }
+            if (sender.hasPermission("core.eco.admin") || sender.isOp()) {
                 suggestions.add("give");
                 suggestions.add("take");
             }
             return suggestions;
         }
 
-        if (args.length == 2 && (args[0].equalsIgnoreCase("pay") || args[0].equalsIgnoreCase("give") || args[0].equalsIgnoreCase("take"))) {
-            List<String> playerNames = new ArrayList<>();
-            for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-                playerNames.add(onlinePlayer.getName());
+        if (args.length == 2) {
+            if ((args[0].equalsIgnoreCase("pay") && sender.hasPermission("core.eco.pay")) ||
+                ((args[0].equalsIgnoreCase("give") || args[0].equalsIgnoreCase("take")) && sender.hasPermission("core.eco.admin"))) {
+                return Bukkit.getOnlinePlayers().stream()
+                    .map(Player::getName)
+                    .collect(Collectors.toList());
             }
-            return playerNames;
         }
 
         if (args.length == 3) {
-            List<String>suggestions = new ArrayList<>();
-            String amount = "<amount>";
-            // String currency = "<currency>";
-            suggestions.add(amount);
-            // suggestions.add(currency);
-            return suggestions;
+            if (args[0].equalsIgnoreCase("pay") && sender.hasPermission("core.eco.pay") ||
+                (args[0].equalsIgnoreCase("give") || args[0].equalsIgnoreCase("take")) && sender.hasPermission("core.eco.admin")) {
+                return List.of("<amount>");
+            }
         }
 
         return null;
     }
+
 }

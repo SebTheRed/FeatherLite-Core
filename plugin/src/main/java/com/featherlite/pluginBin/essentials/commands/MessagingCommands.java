@@ -146,17 +146,28 @@ public class MessagingCommands implements TabCompleter {
     }
 
 
-            @Override
+    @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (!(sender instanceof Player)) return Collections.emptyList();
-
+    
+        Player player = (Player) sender;
+    
+        // Check permissions before providing suggestions
+        if (alias.equalsIgnoreCase("broadcast") && !(player.hasPermission("core.messaging.broadcast") || player.isOp())) {
+            return Collections.emptyList(); // No suggestions if the player lacks permission
+        }
+    
+        if ((alias.equalsIgnoreCase("msg") || alias.equalsIgnoreCase("ignore")) && !(player.hasPermission("core.message") || player.isOp())) {
+            return Collections.emptyList(); // No suggestions for messaging-related commands if permission is missing
+        }
+    
         List<String> suggestions = new ArrayList<>();
         switch (alias.toLowerCase()) {
             case "msg":
             case "ignore":
                 if (args.length == 1) {
-                    for (Player player : Bukkit.getOnlinePlayers()) {
-                        suggestions.add(player.getName());
+                    for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                        suggestions.add(onlinePlayer.getName());
                     }
                 }
                 break;
@@ -172,5 +183,6 @@ public class MessagingCommands implements TabCompleter {
         }
         return suggestions;
     }
+    
 
 }

@@ -59,8 +59,8 @@ public class InventoryManager {
             inventoryMap.remove(uuid);
             deleteInventoryFile(uuid);
         } else {
-            player.sendMessage("§cFailed to restore your inventory. Please contact an admin!");
-            plugin.getLogger().warning("Could not restore inventory for player: " + player.getName());
+            // player.sendMessage("§cFailed to restore your inventory. Please contact an admin!");
+            plugin.getLogger().warning("Could not restore inventory for player: " + player.getName() + "It is likely they had an empty inventory going into the game.");
         }
     }
 

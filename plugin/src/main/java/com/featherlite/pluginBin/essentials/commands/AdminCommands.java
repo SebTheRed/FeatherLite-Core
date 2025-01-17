@@ -272,14 +272,14 @@ public class AdminCommands implements TabCompleter {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        if (!(sender instanceof Player)) return Collections.emptyList();
-
+        if (!(sender.hasPermission("core.admin") || sender.isOp())) {
+            return Collections.emptyList(); // No suggestions if sender lacks permissions
+        }
+    
         List<String> suggestions = new ArrayList<>();
         switch (alias.toLowerCase()) {
-            case "repair":
-                // No arguments for repair
-                break;
             case "enchant":
+                if (!(sender.hasPermission("core.enchant") || sender.isOp())) break;
                 if (args.length == 1) {
                     for (Enchantment enchant : Enchantment.values()) {
                         suggestions.add(enchant.getKey().getKey());
@@ -288,55 +288,95 @@ public class AdminCommands implements TabCompleter {
                     suggestions.add("<level>");
                 }
                 break;
+    
             case "exp":
+                if (!(sender.hasPermission("core.exp") || sender.isOp())) break;
                 if (args.length == 1) {
                     suggestions.add("give");
                     suggestions.add("set");
-                } else if (args.length > 1) {
+                } else if (args.length == 2) {
+                    for (Player player : Bukkit.getOnlinePlayers()) {
+                        suggestions.add(player.getName());
+                    }
+                } else if (args.length == 3) {
                     suggestions.add("<amount>");
                 }
                 break;
+    
             case "give":
-            case "kill":
-            case "sudo":
+                if (!(sender.hasPermission("core.give") || sender.isOp())) break;
                 if (args.length == 1) {
                     for (Player player : Bukkit.getOnlinePlayers()) {
                         suggestions.add(player.getName());
                     }
-                } else if (args.length == 2 && alias.equalsIgnoreCase("give")) {
+                } else if (args.length == 2) {
                     for (Material material : Material.values()) {
                         suggestions.add(material.name().toLowerCase());
                     }
+                } else if (args.length == 3) {
+                    suggestions.add("<amount>");
                 }
                 break;
+    
+            case "kill":
+                if (!(sender.hasPermission("core.kill") || sender.isOp())) break;
+                if (args.length == 1) {
+                    for (Player player : Bukkit.getOnlinePlayers()) {
+                        suggestions.add(player.getName());
+                    }
+                }
+                break;
+    
+            case "sudo":
+                if (!(sender.hasPermission("core.sudo") || sender.isOp())) break;
+                if (args.length == 1) {
+                    for (Player player : Bukkit.getOnlinePlayers()) {
+                        suggestions.add(player.getName());
+                    }
+                } else if (args.length >= 2) {
+                    suggestions.add("<command>");
+                }
+                break;
+    
             case "weather":
+                if (!(sender.hasPermission("core.weather") || sender.isOp())) break;
                 if (args.length == 1) {
                     suggestions.add("clear");
                     suggestions.add("rain");
                     suggestions.add("thunder");
-                }
-                break;
-            case "time":
-                if (args.length == 1) {
-                    // Suggest main actions
-                    suggestions.add("set");
-                    suggestions.add("add");
                 } else if (args.length == 2) {
-                    // Check if the first argument is "set" or "add"
-                    if (args[0].equalsIgnoreCase("set")) {
-                        suggestions.add("morning");
-                        suggestions.add("day");
-                        suggestions.add("noon");
-                        suggestions.add("night");
-                        suggestions.add("midnight");
-                        suggestions.add("<tick_time>"); // Placeholder for numeric ticks
-                    } else if (args[0].equalsIgnoreCase("add")) {
-                        suggestions.add("<tick_time>"); // Only numeric values are valid for "add"
+                    for (World world : Bukkit.getWorlds()) {
+                        suggestions.add(world.getName());
                     }
                 }
                 break;
+    
+            case "god":
+                if (!(sender.hasPermission("core.god") || sender.isOp())) break;
+                // No further arguments needed for /god
+                break;
+    
+            case "time":
+                if (!(sender.hasPermission("core.time") || sender.isOp())) break;
+                if (args.length == 1) {
+                    suggestions.add("set");
+                    suggestions.add("add");
+                } else if (args.length == 2) {
+                    if (args[0].equalsIgnoreCase("set")) {
+                        suggestions.addAll(List.of("morning", "day", "noon", "night", "midnight", "<tick_time>"));
+                    } else if (args[0].equalsIgnoreCase("add")) {
+                        suggestions.add("<tick_time>");
+                    }
+                } else if (args.length == 3) {
+                    for (World world : Bukkit.getWorlds()) {
+                        suggestions.add(world.getName());
+                    }
+                }
+                break;
+    
             case "killall":
             case "remove":
+                if (!(sender.hasPermission("core.killall") || sender.isOp())) break;
                 if (args.length == 1) {
                     suggestions.addAll(List.of("monsters", "displays", "entities", "boats", "minecarts", "players", "drops", "arrows", "mobs"));
                 } else if (args.length == 2) {
@@ -345,7 +385,29 @@ public class AdminCommands implements TabCompleter {
                 }
                 break;
         }
-        return suggestions;
+        return filterSuggestions(suggestions, args[args.length - 1]);
     }
+    
+    /**
+     * Filters suggestions based on the current input.
+     *
+     * @param suggestions the list of possible suggestions
+     * @param current     the current argument being typed
+     * @return the filtered list of suggestions
+     */
+    private List<String> filterSuggestions(List<String> suggestions, String current) {
+        if (current == null || current.isEmpty()) {
+            return suggestions;
+        }
+        String lowerCurrent = current.toLowerCase();
+        List<String> filtered = new ArrayList<>();
+        for (String suggestion : suggestions) {
+            if (suggestion.toLowerCase().startsWith(lowerCurrent)) {
+                filtered.add(suggestion);
+            }
+        }
+        return filtered;
+    }
+    
 
 }

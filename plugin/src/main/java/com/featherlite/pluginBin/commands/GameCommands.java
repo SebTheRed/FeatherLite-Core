@@ -40,11 +40,19 @@ public class GameCommands implements TabCompleter {
                 return true;
             }
         }
-    
-        if (args.length <= 0) {
-            sender.sendMessage("Usage: /game <ui|menu|join|leave|create|delete|close>");
+        // If no arguments are provided, default to opening the menu
+        if (args.length == 0) {
+            if (isPlayer) {
+                if (!(sender.hasPermission("core.games.menu") || sender.isOp())) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to open the games menu.");
+                    return true;
+                }
+                gamesUI.openMainMenu((Player) sender);
+            } else {
+                plugin.getLogger().warning("The /game menu command can only be used by players.");
+            }
+            return true;
         }
-
         switch (args[0].toLowerCase()) {
             case "ui":
             case "menu":
@@ -189,8 +197,8 @@ public class GameCommands implements TabCompleter {
     }
 
     private void handleCloseCommand(CommandSender sender, String[] args, boolean isPlayer) {
-        if (args.length < 3) {
-            sender.sendMessage("Usage: /game close <instanceID> <lobbyName>");
+        if (args.length < 2) {
+            sender.sendMessage("Usage: /game close <instanceID>");
             return;
         }
 
@@ -198,7 +206,7 @@ public class GameCommands implements TabCompleter {
             UUID instanceId = UUID.fromString(args[1]);
             GameInstance closingInstance = instanceManager.getInstance(instanceId);
             if (sender.getName().equalsIgnoreCase(closingInstance.getCreatedBy()) || !isPlayer || sender.hasPermission("core.games.closeothers")) {
-                String lobbyName = args[2] != null ? args[2] : "spawn";
+                String lobbyName = "spawn";
                 instanceManager.closeInstance(instanceId);
                 sender.sendMessage("Game instance: " + closingInstance.getInstanceId());
                 sender.sendMessage("Closed successfully and players teleported to " + lobbyName + "!");
@@ -246,32 +254,62 @@ public class GameCommands implements TabCompleter {
         return quoted.toString().trim();
     }
     
-
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         List<String> suggestions = new ArrayList<>();
     
         if (args.length == 1) {
-            // Suggest subcommands
-            suggestions.addAll(Arrays.asList("ui", "menu", "join", "leave", "create", "close"));
+            // Suggest subcommands based on permissions
+            if (sender.hasPermission("core.games.menu") || sender.isOp()) {
+                suggestions.add("menu");
+                suggestions.add("ui");
+            }
+            if (sender.hasPermission("core.games.play") || sender.isOp()) {
+                suggestions.add("join");
+                suggestions.add("leave");
+            }
+            if (sender.hasPermission("core.games.create") || sender.isOp()) {
+                suggestions.add("create");
+            }
+            if (sender.hasPermission("core.games.close") || sender.isOp()) {
+                suggestions.add("close");
+            }
         } else if (args.length == 2) {
             // For the "create" command, suggest available game names
-            if (args[0].equalsIgnoreCase("create")) {
+            if (args[0].equalsIgnoreCase("create") && (sender.hasPermission("core.games.create") || sender.isOp())) {
                 suggestions.addAll(
                     gamesManager.listRegisteredGames().stream()
                         .map(GameData::getGameName)
                         .map(name -> "\"" + name + "\"") // Ensure game names are quoted
                         .collect(Collectors.toList())
                 );
-            } else if (args[0].equalsIgnoreCase("join")  || args[0].equalsIgnoreCase("close")) {
-                // For other commands, suggest active instance IDs
+            } else if (args[0].equalsIgnoreCase("close") && (sender.hasPermission("core.games.close") || sender.isOp())) {
+                // Suggest only the UUIDs of instances created by the sender, unless they have the "closeothers" permission
+                if (sender instanceof Player) {
+                    Player player = (Player) sender;
+                    suggestions.addAll(
+                        instanceManager.getActiveInstances().values().stream()
+                            .filter(instance -> instance.getCreatedBy().equalsIgnoreCase(player.getName()) || player.hasPermission("core.games.closeothers") || player.isOp())
+                            .map(instance -> instance.getInstanceId().toString())
+                            .collect(Collectors.toList())
+                    );
+                } else {
+                    // For console, show all active instances
+                    suggestions.addAll(
+                        instanceManager.getActiveInstances().keySet().stream()
+                            .map(UUID::toString)
+                            .collect(Collectors.toList())
+                    );
+                }
+            } else if (args[0].equalsIgnoreCase("join") && (sender.hasPermission("core.games.play") || sender.isOp())) {
+                // For "join" command, suggest active instance IDs
                 suggestions.addAll(
                     instanceManager.getActiveInstances().keySet().stream()
                         .map(UUID::toString)
                         .collect(Collectors.toList())
                 );
             }
-        } else if (args.length == 3 && args[0].equalsIgnoreCase("create")) {
+        } else if (args.length == 3 && args[0].equalsIgnoreCase("create") && (sender.hasPermission("core.games.create") || sender.isOp())) {
             // For the second argument of "create", suggest available worlds for the selected game
             String gameName = extractQuotedArgument(args, 1);
             if (gameName != null) {
@@ -287,5 +325,7 @@ public class GameCommands implements TabCompleter {
             .filter(s -> s.toLowerCase().startsWith(args[args.length - 1].toLowerCase()))
             .collect(Collectors.toList());
     }
+    
+    
     
 }

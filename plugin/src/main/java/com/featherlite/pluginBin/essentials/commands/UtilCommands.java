@@ -285,69 +285,170 @@ public class UtilCommands implements TabCompleter {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-
+        if (!(sender instanceof Player)) {
+            return Collections.emptyList();
+        }
+    
+        Player player = (Player) sender;
         List<String> suggestions = new ArrayList<>();
+    
         switch (alias.toLowerCase()) {
             case "gamemode":
             case "gm":
-                if (args.length == 1) {
-                    suggestions.add("survival");
-                    suggestions.add("creative");
-                    suggestions.add("spectator");
-                }
-                break;
-
-            case "speed":
-            case "flyspeed":
-                if (args.length == 1) {
-                    suggestions.add("1");
-                    suggestions.add("2");
-                    suggestions.add("3");
-                }
-                break;
-            
-            case "near":
-                if (args.length == 1) {
-                    suggestions.add("<radius>");
-                }
-                break;
-            
-            case "nick":
-            case "nickname":
-                if (args.length == 1) {
-                    suggestions.add("<new nickname>");
-                }
-                break;
-            
-            case "realname":
-            case "seen":
-            case "getpos":
-                if (args.length == 1) {
-                    for (Player online : Bukkit.getOnlinePlayers()) {
-                        suggestions.add(online.getName());
+                if (player.hasPermission("core.gamemode") || player.isOp()) {
+                    if (args.length == 1) {
+                        suggestions.addAll(List.of("survival", "creative", "spectator"));
+                    }
+                    if (args.length == 2) {
+                        Bukkit.getOnlinePlayers().forEach(online -> suggestions.add(online.getName()));
                     }
                 }
                 break;
-            
+    
+            case "speed":
+            case "flyspeed":
+                if ((alias.equalsIgnoreCase("speed") && player.hasPermission("core.speed")) ||
+                    (alias.equalsIgnoreCase("flyspeed") && player.hasPermission("core.flyspeed")) || 
+                    player.isOp()) {
+                    if (args.length == 1) {
+                        suggestions.addAll(List.of("1", "2", "3", "4", "5", "6", "7", "8", "9", "10"));
+                    }
+                    if (args.length == 2) {
+                        Bukkit.getOnlinePlayers().forEach(online -> suggestions.add(online.getName()));
+                    }
+                }
+                break;
+    
+            case "near":
+                if (player.hasPermission("core.near") || player.isOp()) {
+                    if (args.length == 1) {
+                        suggestions.add("<radius>");
+                    }
+                }
+                break;
+    
+            case "nick":
+            case "nickname":
+                if (player.hasPermission("core.nick") || player.isOp()) {
+                    if (args.length == 1) {
+                        suggestions.add("<new nickname>");
+                    }
+                    if (args.length == 2) {
+                        Bukkit.getOnlinePlayers().forEach(online -> suggestions.add(online.getName()));
+                    }
+                }
+                break;
+    
+            case "realname":
+            case "seen":
+            case "getpos":
+                if ((alias.equalsIgnoreCase("realname") && player.hasPermission("core.realname")) ||
+                    (alias.equalsIgnoreCase("seen") && player.hasPermission("core.seen")) ||
+                    (alias.equalsIgnoreCase("getpos") && player.hasPermission("core.getpos")) ||
+                    player.isOp()) {
+                    if (args.length == 1) {
+                        Bukkit.getOnlinePlayers().forEach(online -> suggestions.add(online.getName()));
+                    }
+                }
+                break;
+    
             case "ptime":
-                if (args.length == 1) {
-                    suggestions.add("morning");
-                    suggestions.add("noon");
-                    suggestions.add("night");
-                    suggestions.add("<ticks>");
+                if (player.hasPermission("core.ptime") || player.isOp()) {
+                    if (args.length == 1) {
+                        suggestions.addAll(List.of("morning", "noon", "night", "<ticks>"));
+                    }
+                    if (args.length == 2) {
+                        Bukkit.getOnlinePlayers().forEach(online -> suggestions.add(online.getName()));
+                    }
                 }
                 break;
-            
+    
             case "pweather":
-                if (args.length == 1) {
-                    suggestions.add("clear");
-                    suggestions.add("storm");
-                    suggestions.add("thunder");
+                if (player.hasPermission("core.pweather") || player.isOp()) {
+                    if (args.length == 1) {
+                        suggestions.addAll(List.of("clear", "storm", "thunder"));
+                    }
+                    if (args.length == 2) {
+                        Bukkit.getOnlinePlayers().forEach(online -> suggestions.add(online.getName()));
+                    }
                 }
                 break;
-            
-            
+    
+            case "fly":
+                if (player.hasPermission("core.fly") || player.isOp()) {
+                    if (args.length == 1) {
+                        Bukkit.getOnlinePlayers().forEach(online -> suggestions.add(online.getName()));
+                    }
+                }
+                break;
+    
+            case "enderchest":
+            case "ec":
+                if (player.hasPermission("core.enderchest") || player.isOp()) {
+                    if (args.length == 1) {
+                        Bukkit.getOnlinePlayers().forEach(online -> suggestions.add(online.getName()));
+                    }
+                }
+                break;
+    
+            case "heal":
+            case "feed":
+            case "rest":
+            case "afk":
+            case "ping":
+                if ((alias.equalsIgnoreCase("heal") && player.hasPermission("core.heal")) ||
+                    (alias.equalsIgnoreCase("feed") && player.hasPermission("core.feed")) ||
+                    (alias.equalsIgnoreCase("rest") && player.hasPermission("core.rest")) ||
+                    (alias.equalsIgnoreCase("afk") && player.hasPermission("core.afk")) ||
+                    (alias.equalsIgnoreCase("ping") && player.hasPermission("core.ping")) ||
+                    player.isOp()) {
+                    if (args.length == 1) {
+                        Bukkit.getOnlinePlayers().forEach(online -> suggestions.add(online.getName()));
+                    }
+                }
+                break;
+    
+            case "trash":
+            case "top":
+            case "hat":
+                if ((alias.equalsIgnoreCase("trash") && player.hasPermission("core.trash")) ||
+                    (alias.equalsIgnoreCase("top") && player.hasPermission("core.top")) ||
+                    (alias.equalsIgnoreCase("hat") && player.hasPermission("core.hat")) ||
+                    player.isOp()) {
+                    // No specific arguments for these commands
+                }
+                break;
+    
+            case "list":
+                if (player.hasPermission("core.list") || player.isOp()) {
+                    // No specific arguments for /list
+                }
+                break;
+    
+            case "workbench":
+            case "wb":
+            case "craft":
+            case "anvil":
+            case "cartographytable":
+            case "grindstone":
+            case "loom":
+            case "smithingtable":
+            case "smithing":
+            case "stonecutter":
+                if ((alias.equalsIgnoreCase("workbench") && player.hasPermission("core.workbench")) ||
+                    (alias.equalsIgnoreCase("anvil") && player.hasPermission("core.anvil")) ||
+                    (alias.equalsIgnoreCase("cartographytable") && player.hasPermission("core.cartographytable")) ||
+                    (alias.equalsIgnoreCase("grindstone") && player.hasPermission("core.grindstone")) ||
+                    (alias.equalsIgnoreCase("loom") && player.hasPermission("core.loom")) ||
+                    (alias.equalsIgnoreCase("smithingtable") && player.hasPermission("core.smithing")) ||
+                    (alias.equalsIgnoreCase("stonecutter") && player.hasPermission("core.stonecutter")) ||
+                    player.isOp()) {
+                    // No specific arguments for these commands
+                }
+                break;
         }
+    
         return suggestions;
     }
+    
 }

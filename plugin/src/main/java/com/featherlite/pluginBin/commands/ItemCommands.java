@@ -110,26 +110,30 @@ public class ItemCommands implements TabCompleter {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         List<String> suggestions = new ArrayList<>();
-
+    
         if (!command.getName().equalsIgnoreCase("item")) {
             return suggestions;
         }
-
+    
         // Handle top-level arguments
         if (args.length == 1) {
-            suggestions.add("give");
-            suggestions.add("reload");
+            if (sender.hasPermission("core.items.give") || sender.isOp()) {
+                suggestions.add("give");
+            }
+            if (sender.hasPermission("core.items.reload") || sender.isOp()) {
+                suggestions.add("reload");
+            }
             return filterSuggestions(suggestions, args[0]);
         }
-
+    
         // Handle "give" subcommand
-        if (args[0].equalsIgnoreCase("give")) {
+        if (args[0].equalsIgnoreCase("give") && (sender.hasPermission("core.items.give") || sender.isOp())) {
             // Second argument: category
             if (args.length == 2) {
                 suggestions.addAll(itemManager.getCategories());
                 return filterSuggestions(suggestions, args[1]);
             }
-
+    
             // Third argument: item name within the selected category
             if (args.length == 3) {
                 String category = args[1];
@@ -138,7 +142,7 @@ public class ItemCommands implements TabCompleter {
                 }
                 return filterSuggestions(suggestions, args[2]);
             }
-
+    
             // Fourth argument: player name
             if (args.length == 4) {
                 for (Player player : Bukkit.getOnlinePlayers()) {
@@ -147,9 +151,10 @@ public class ItemCommands implements TabCompleter {
                 return filterSuggestions(suggestions, args[3]);
             }
         }
-
+    
         return suggestions;
     }
+    
 
     /**
      * Filters suggestions based on the current argument being typed.

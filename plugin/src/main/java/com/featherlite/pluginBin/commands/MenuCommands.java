@@ -60,8 +60,23 @@ public class MenuCommands implements TabCompleter {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (args.length == 1) {
-            return new ArrayList<>(menuManager.getMenus().keySet());
+            List<String> suggestions = new ArrayList<>();
+    
+            // Only suggest menus the sender has permission to access
+            for (String menuId : menuManager.getMenus().keySet()) {
+                String requiredPermission = "core.menu." + menuId.toLowerCase();
+                if (sender.hasPermission(requiredPermission) || sender.hasPermission("core.menu.all") || sender.isOp()) {
+                    suggestions.add(menuId);
+                }
+            }
+    
+            // Filter suggestions based on input
+            return suggestions.stream()
+                    .filter(menuId -> menuId.toLowerCase().startsWith(args[0].toLowerCase()))
+                    .toList();
         }
+    
         return new ArrayList<>();
     }
+    
 }

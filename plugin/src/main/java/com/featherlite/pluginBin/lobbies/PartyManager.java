@@ -41,6 +41,23 @@ public class PartyManager {
         return getParty(player) != null;
     }
 
+    public boolean isPlayerPartyLeader(Player player) {
+        Party party = getParty(player);
+        return party != null && party.isLeader(player);
+    }
+
+    // Fetch all party leaders' names
+    public List<String> getAllPartyLeaders() {
+        return activeParties.values().stream()
+                .map(party -> {
+                    Player leader = Bukkit.getPlayer(party.getLeader());
+                    return (leader != null) ? leader.getName() : null;
+                })
+                .filter(Objects::nonNull) // Exclude null values for offline or invalid players
+                .collect(Collectors.toList());
+    }
+
+
     // Command-related methods
     public void handleCreateParty(Player leader) {
         if (isInParty(leader)) {

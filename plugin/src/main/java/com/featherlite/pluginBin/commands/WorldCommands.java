@@ -273,67 +273,157 @@ public class WorldCommands implements TabCompleter {
             return Collections.emptyList();
         }
     
+        Player player = (Player) sender;
+    
         if (args.length == 1) {
-            // Suggest main subcommands
-            return Arrays.asList("create", "copy", "tp", "delete", "load", "unload", "import", "list", "setborder");
+            // Suggest main subcommands based on permissions
+            List<String> suggestions = new ArrayList<>();
+            if (player.hasPermission("core.world.create") || player.isOp()) suggestions.add("create");
+            if (player.hasPermission("core.world.copy") || player.isOp()) suggestions.add("copy");
+            if (player.hasPermission("core.world.tp") || player.isOp()) suggestions.add("tp");
+            if (player.hasPermission("core.world.delete") || player.isOp()) suggestions.add("delete");
+            if (player.hasPermission("core.world.load") || player.isOp()) suggestions.add("load");
+            if (player.hasPermission("core.world.unload") || player.isOp()) suggestions.add("unload");
+            if (player.hasPermission("core.world.list") || player.isOp()) suggestions.add("list");
+            if (player.hasPermission("core.world.setborder") || player.isOp()) suggestions.add("setborder");
+            if (player.hasPermission("core.world.create") || player.isOp()) suggestions.add("import");
+            return filterSuggestions(suggestions, args[0]);
         }
     
         if (args.length == 2) {
             switch (args[0].toLowerCase()) {
                 case "tp":
-                case "delete":
-                case "unload":
-                case "copy":
-                case "setborder":
-                    // Suggest loaded world names for these commands
-                    List<String> worldNames = new ArrayList<>();
-                    for (World world : Bukkit.getWorlds()) {
-                        worldNames.add(world.getName());
+                    if (player.hasPermission("core.world.tp") || player.isOp()) {
+                        // Suggest loaded world names for teleportation
+                        return filterSuggestions(getWorldNames(), args[1]);
                     }
-                    return worldNames;
+                    break;
+                case "delete":
+                    if (player.hasPermission("core.world.delete") || player.isOp()) {
+                        // Suggest loaded world names for deletion
+                        return filterSuggestions(getWorldNames(), args[1]);
+                    }
+                    break;
+                case "unload":
+                    if (player.hasPermission("core.world.unload") || player.isOp()) {
+                        // Suggest loaded world names for unloading
+                        return filterSuggestions(getWorldNames(), args[1]);
+                    }
+                    break;
+                case "copy":
+                    if (player.hasPermission("core.world.copy") || player.isOp()) {
+                        // Suggest loaded world names for copying
+                        return filterSuggestions(getWorldNames(), args[1]);
+                    }
+                    break;
+                case "setborder":
+                    if (player.hasPermission("core.world.setborder") || player.isOp()) {
+                        // Suggest loaded world names for setting borders
+                        return filterSuggestions(getWorldNames(), args[1]);
+                    }
+                    break;
                 case "load":
-                case "create":
                 case "import":
-                    return Arrays.asList("<world_name>");
+                    if (player.hasPermission("core.world.load") || player.isOp()) {
+                        // Placeholder for world name input
+                        return Collections.singletonList("<world_name>");
+                    }
+                    break;
+                case "create":
+                    if (player.hasPermission("core.world.create") || player.isOp()) {
+                        // Placeholder for world name input
+                        return Collections.singletonList("<world_name>");
+                    }
+                    break;
             }
         }
     
         if (args.length == 3) {
             switch (args[0].toLowerCase()) {
                 case "tp":
-                    // Suggest online player names for teleporting others
-                    List<String> playerNames = new ArrayList<>();
-                    for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-                        playerNames.add(onlinePlayer.getName());
+                    if (player.hasPermission("core.world.tpothers") || player.isOp()) {
+                        // Suggest online player names for teleporting others
+                        return filterSuggestions(getOnlinePlayerNames(), args[2]);
                     }
-                    return playerNames;
+                    break;
                 case "create":
-                    // Suggest environments for creating worlds
-                    return Arrays.asList("NORMAL", "NETHER", "THE_END");
+                    if (player.hasPermission("core.world.create") || player.isOp()) {
+                        // Suggest environments for creating worlds
+                        return filterSuggestions(Arrays.asList("NORMAL", "NETHER", "THE_END"), args[2]);
+                    }
+                    break;
             }
         }
     
         if (args.length == 4 && args[0].equalsIgnoreCase("create")) {
-            // Suggest world types for creating worlds
-            return Arrays.asList("NORMAL", "FLAT", "AMPLIFIED");
+            if (player.hasPermission("core.world.create") || player.isOp()) {
+                // Suggest world types for creating worlds
+                return filterSuggestions(Arrays.asList("NORMAL", "FLAT", "AMPLIFIED"), args[3]);
+            }
         }
     
         if (args[0].equalsIgnoreCase("setborder")) {
             switch (args.length) {
                 case 2:
-                    // Suggest loaded world names
-                    List<String> worldNames = new ArrayList<>();
-                    for (World world : Bukkit.getWorlds()) {
-                        worldNames.add(world.getName());
+                    if (player.hasPermission("core.world.setborder") || player.isOp()) {
+                        // Suggest loaded world names
+                        return filterSuggestions(getWorldNames(), args[1]);
                     }
-                    return worldNames;
+                    break;
                 case 3:
-                    // Suggest radius placeholder
-                    return Collections.singletonList("<radius>");
+                    if (player.hasPermission("core.world.setborder") || player.isOp()) {
+                        // Suggest radius placeholder
+                        return Collections.singletonList("<radius>");
+                    }
+                    break;
             }
         }
     
         return Collections.emptyList();
     }
+    
+    /**
+     * Retrieves the names of all loaded worlds.
+     */
+    private List<String> getWorldNames() {
+        List<String> worldNames = new ArrayList<>();
+        for (World world : Bukkit.getWorlds()) {
+            worldNames.add(world.getName());
+        }
+        return worldNames;
+    }
+    
+    /**
+     * Retrieves the names of all online players.
+     */
+    private List<String> getOnlinePlayerNames() {
+        List<String> playerNames = new ArrayList<>();
+        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            playerNames.add(onlinePlayer.getName());
+        }
+        return playerNames;
+    }
+    
+    /**
+     * Filters suggestions based on the current input.
+     *
+     * @param suggestions the list of possible suggestions
+     * @param current     the current argument being typed
+     * @return the filtered list of suggestions
+     */
+    private List<String> filterSuggestions(List<String> suggestions, String current) {
+        if (current == null || current.isEmpty()) {
+            return suggestions;
+        }
+        String lowerCurrent = current.toLowerCase();
+        List<String> filtered = new ArrayList<>();
+        for (String suggestion : suggestions) {
+            if (suggestion.toLowerCase().startsWith(lowerCurrent)) {
+                filtered.add(suggestion);
+            }
+        }
+        return filtered;
+    }
+    
     
 }
