@@ -96,3 +96,5 @@ map-rules:
   natural-hunger-drain: false
   blocked-commands:
     - "NONE"
+extended-rules:
+  featherlite-core-skill-xp-gain: false

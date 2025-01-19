@@ -59,6 +59,9 @@ public class Zone {
     private boolean itemPickup, itemDrop, expDrop, fallDamage, weatherLock, naturalHealthRegen, naturalHungerDrain;
     private Set<String> blockedCommands = new HashSet<>();
 
+    // Extended rules
+    private boolean isSkillXPGainInZone;
+
     public Zone(String name, File configFile) {
 
         this.configFile = configFile;
@@ -157,6 +160,9 @@ public class Zone {
         this.naturalHealthRegen = config.getBoolean("map-rules.natural-health-regen", true);
         this.naturalHungerDrain = config.getBoolean("map-rules.natural-hunger-drain", false);
         loadList(config, "map-rules.blocked-commands", blockedCommands);
+
+        // Extended rules
+        this.isSkillXPGainInZone = config.getBoolean("extended-rules.featherlite-core-skill-xp-gain", true);
     }
 
 
@@ -353,6 +359,10 @@ public class Zone {
     
     public String getGameZoneType() {
         return gameZoneType;
+    }
+
+    public boolean isSkillXPGainInZone() {
+        return isSkillXPGainInZone;
     }
     
     public boolean isGameOverrideSpawnPoint() {
