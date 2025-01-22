@@ -201,7 +201,7 @@ public class UtilManager {
 
     public boolean openEnderChest(Player player, CommandSender sender) {
         player.openInventory(player.getEnderChest());
-        sender.sendMessage(ChatColor.GREEN + "Opened " + player + "'s Enderchest." );
+        sender.sendMessage(ChatColor.GREEN + "Opened " + player.getName() + "'s Enderchest." );
         return true;
     }
 
@@ -313,16 +313,17 @@ public class UtilManager {
     
     
 
-    public boolean getPlayerPosition(CommandSender sender, String[] args, boolean isPlayer) {
-        Player target = args.length > 0 ? Bukkit.getPlayer(args[0]) : (isPlayer ? (Player) sender : null);
+    public boolean getPlayerPosition(CommandSender sender, Player target) {
         if (target == null) {
-            sender.sendMessage(ChatColor.RED + "Player not found. Or command typed from console.");
+            sender.sendMessage(ChatColor.RED + "Player not found or invalid usage of the command.");
             return true;
         }
+    
         Location loc = target.getLocation();
-        sender.sendMessage(ChatColor.GREEN + target.getName() + "'s position: X=" + loc.getBlockX() + ", Y=" + loc.getBlockY() + ", Z=" + loc.getBlockZ());
+        sender.sendMessage(ChatColor.GREEN + target.getName() + "'s position: X=" + loc.getBlockX() +", Y=" + loc.getBlockY() + ", Z=" + loc.getBlockZ());
         return true;
     }
+    
 
     public boolean pingPlayer(Player player, CommandSender sender) {
         if (player == null) {

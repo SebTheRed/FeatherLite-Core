@@ -73,8 +73,10 @@ public class EconomyManager {
 
         if (amount <= 0) return;
         FileConfiguration playerData = playerDataManager.getPlayerData(playerId);
-        double newBalance = getBalance(target, currency) + amount;
+        // double newBalance = getBalance(target, currency) + amount;
+        double newBalance = round(getBalance(target, currency) + amount);
         playerData.set("balances." + currency, newBalance);
+        // playerData.set("balances." + currency, newBalance);
         playerDataManager.savePlayerData(target, playerData);
     }
 
@@ -93,8 +95,10 @@ public class EconomyManager {
             return false;
         }
 
-        double newBalance = currentBalance - amount;
+        // double newBalance = currentBalance - amount;
+        double newBalance = round(getBalance(target, currency) + amount);
         playerData.set("balances." + currency, newBalance);
+        // playerData.set("balances." + currency, newBalance);
         playerDataManager.savePlayerData(target, playerData);
         return true;
     }
@@ -109,9 +113,16 @@ public class EconomyManager {
         
         if (amount < 0) return;
         FileConfiguration playerData = playerDataManager.getPlayerData(target);
-        playerData.set("balances." + currency, amount);
+        double newBalance = round(getBalance(target, currency) + amount);
+        playerData.set("balances." + currency, newBalance);
+        // playerData.set("balances." + currency, amount);
         playerDataManager.savePlayerData(target, playerData);
     }
+
+    private double round(double value) {
+        return Math.round(value * 100.0) / 100.0; // Rounds to 2 decimal places
+    }
+    
 
     // Get a leaderboard of top balances (baltop)
     public List<Map.Entry<OfflinePlayer, Double>> getTopBalances(String currency) {

@@ -85,14 +85,14 @@ public class TeleportationCommands implements TabCompleter {
                 }
                 return teleportationManager.acceptTeleport(executor);
 
-            case "tpadeny":
+            case "tpdeny":
                 if (isPlayer && !(sender.hasPermission("core.teleport.tpa") || sender.isOp())) {
                     sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
                     return true;
                 }
                 return teleportationManager.denyTeleport(executor);
 
-            case "tpacancel":
+            case "tpcancel":
                 if (isPlayer && !(sender.hasPermission("core.teleport.tpa") || sender.isOp())) {
                     sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
                     return true;
@@ -216,10 +216,6 @@ public class TeleportationCommands implements TabCompleter {
     }
 
     private boolean handleTpAll(Player executor) {
-        if (executor == null || !executor.hasPermission("core.teleport.tpall")) {
-            executor.sendMessage(ChatColor.RED + "You do not have permission to use this command.");
-            return true;
-        }
 
         for (Player target : Bukkit.getOnlinePlayers()) {
             if (!target.equals(executor)) {
@@ -295,10 +291,6 @@ public class TeleportationCommands implements TabCompleter {
     }
 
     private boolean handleSetSpawn(Player executor) {
-        if (executor == null || !(executor.hasPermission("core.teleport.setspawn") || executor.isOp())) {
-            executor.sendMessage(ChatColor.RED + "You do not have permission to set the spawn.");
-            return true;
-        }
 
         Location location = executor.getLocation();
         teleportationManager.setServerSpawn(executor, location);

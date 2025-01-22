@@ -183,7 +183,8 @@ public class UtilCommands implements TabCompleter {
                     sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
                     return true;
                 }
-                return utilManager.getPlayerPosition(target != null ? target : executor, args, isPlayer);
+                return utilManager.getPlayerPosition(sender, target);
+            
             case "ping":
                 if (isPlayer && !(sender.hasPermission("core.ping") || sender.isOp())) {
                     sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");

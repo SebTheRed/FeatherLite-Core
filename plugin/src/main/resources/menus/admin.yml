@@ -1,5 +1,5 @@
 menu:
-  id: Admin_Menu
+  id: admin_menu
   title: "&aAdmin Menu" # The title of menu. Never seen by the player.
   slots: 27 # Number of inventory slots (must be a multiple of 9)
   pages:

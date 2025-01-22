@@ -121,6 +121,10 @@ public class AdminCommands implements TabCompleter {
                 }
 
                 String weatherType = args[0].toLowerCase();
+                if ((weatherType != "clear") || (weatherType != "rain") || (weatherType != "thunder") || (weatherType != "storm")) {
+                    sender.sendMessage(ChatColor.RED + "Incorrect weather type. Usage: /weather <clear|rain|thunder> [world]");
+                    return true;
+                }
                 World targetWorld;
 
                 // Determine the target world
@@ -158,6 +162,9 @@ public class AdminCommands implements TabCompleter {
                 return true;
                 
             case "time":
+                if (!(sender.hasPermission("core.time") || sender.isOp())) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to execute this command.");
+                }
                 if (args.length < 2 || args.length > 3) {
                     sender.sendMessage(ChatColor.RED + "Usage: /time <set|add> <value> [world]");
                     return true;
@@ -223,7 +230,7 @@ public class AdminCommands implements TabCompleter {
                 String targetType = args[0];
                 String scope = args.length > 1 ? args[1] : "world";
             
-                adminManager.killAll(player, targetType, scope, isPlayer);
+                adminManager.killAll(sender, targetType, scope, isPlayer);
                 return true;
             default:
                 sender.sendMessage("Unknown admin command.");

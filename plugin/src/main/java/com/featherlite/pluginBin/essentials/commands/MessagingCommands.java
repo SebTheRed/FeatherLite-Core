@@ -153,13 +153,13 @@ public class MessagingCommands implements TabCompleter {
         Player player = (Player) sender;
     
         // Check permissions before providing suggestions
-        if (alias.equalsIgnoreCase("broadcast") && !(player.hasPermission("core.messaging.broadcast") || player.isOp())) {
-            return Collections.emptyList(); // No suggestions if the player lacks permission
-        }
+        // if (alias.equalsIgnoreCase("broadcast") && !(player.hasPermission("core.broadcast") || player.isOp())) {
+        //     return Collections.emptyList(); // No suggestions if the player lacks permission
+        // }
     
-        if ((alias.equalsIgnoreCase("msg") || alias.equalsIgnoreCase("ignore")) && !(player.hasPermission("core.message") || player.isOp())) {
-            return Collections.emptyList(); // No suggestions for messaging-related commands if permission is missing
-        }
+        // if ((alias.equalsIgnoreCase("msg") || alias.equalsIgnoreCase("ignore")) && !(player.hasPermission("core.message") || player.isOp())) {
+        //     return Collections.emptyList(); // No suggestions for messaging-related commands if permission is missing
+        // }
     
         List<String> suggestions = new ArrayList<>();
         switch (alias.toLowerCase()) {

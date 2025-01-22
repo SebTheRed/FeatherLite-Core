@@ -14,7 +14,7 @@ permission-groups:
     - core.list
     - core.ping
     - core.seen
-    - core.menu.help
+    - core.menu.help_menu
 
   member:
     - group.default
@@ -109,4 +109,5 @@ permission-groups:
     - core.stonecutter
     - core.ptime
     - core.pweather
+    - core.menu.admin_menu
 

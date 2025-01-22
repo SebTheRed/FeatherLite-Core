@@ -513,8 +513,8 @@ public class FeatherCore extends JavaPlugin {
                 case "tpa":
                 case "tpahere":
                 case "tpaccept":
-                case "tpadeny":
-                case "tpacancel":
+                case "tpdeny":
+                case "tpcancel":
                 case "back":
                 case "tpr":
                 case "spawn":

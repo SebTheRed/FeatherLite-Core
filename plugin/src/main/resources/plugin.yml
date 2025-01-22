@@ -81,12 +81,12 @@ commands:
   tpaccept:
     description: Accepts a teleporation request.
     usage: /tpaccept
-  tpadeny:
+  tpdeny:
     description: Denies a teleportation request.
-    usage: /tpadeny
-  tpacancel:
+    usage: /tpdeny
+  tpcancel:
     description: Cancels any outbound teleporation requests.
-    usage: /tpacancel
+    usage: /tpcancel
   back:
     description: Returns you to the last position you teleported to.
     usage: /back

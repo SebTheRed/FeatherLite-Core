@@ -78,6 +78,7 @@ public class AdminManager {
                 world.setThundering(false);
                 break;
             case "thunder":
+            case "storm":
                 world.setStorm(true);
                 world.setThundering(true);
                 break;
@@ -233,11 +234,11 @@ public class AdminManager {
                 }
                 break;
             default:
-                player.sendMessage(ChatColor.RED + "Invalid type. Use /killall <monsters|entities|boats|minecarts|players|drops|arrows|mobs> [world_name].");
+                sender.sendMessage(ChatColor.RED + "Invalid type. Use /killall <monsters|entities|boats|minecarts|players|drops|arrows|mobs> [world_name].");
                 break;
         }
     
-        player.sendMessage(ChatColor.GREEN + "Removed " + count + " " + targetType + ".");
+        sender.sendMessage(ChatColor.GREEN + "Removed " + count + " " + targetType + ".");
     }
     
     

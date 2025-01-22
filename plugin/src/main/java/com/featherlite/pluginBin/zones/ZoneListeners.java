@@ -65,8 +65,16 @@ public class ZoneListeners implements Listener {
     }
 
     private boolean canBypassZone(Player player) {
-        return player.hasPermission("core.zonebypass") || player.isOp();
+        boolean hasPermission = player.hasPermission("core.zonebypass");
+        boolean isOperator = player.isOp();
+    
+        // Log detailed information about permission check
+        if (isDebuggerOn) {Bukkit.getLogger().info(String.format("Checking zone bypass for player '%s': Permission=%s, Op=%s",player.getName(),hasPermission,isOperator));}
+    
+        boolean canBypass = hasPermission || isOperator;
+        return canBypass;
     }
+    
     
 
     @EventHandler

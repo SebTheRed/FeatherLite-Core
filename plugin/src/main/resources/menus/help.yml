@@ -1,6 +1,6 @@
 menu:
-  id: FeatherLite_Menu
-  title: "&aFeatherLite Menu" # The title of menu. Never seen by the player.
+  id: help_menu
+  title: "&aFeatherLite Help Menu" # The title of menu. Never seen by the player.
   slots: 27 # Number of inventory slots (must be a multiple of 9)
   pages:
     main:

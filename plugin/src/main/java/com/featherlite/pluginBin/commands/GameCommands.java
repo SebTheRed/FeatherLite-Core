@@ -275,47 +275,76 @@ public class GameCommands implements TabCompleter {
                 suggestions.add("close");
             }
         } else if (args.length == 2) {
-            // For the "create" command, suggest available game names
-            if (args[0].equalsIgnoreCase("create") && (sender.hasPermission("core.games.create") || sender.isOp())) {
-                suggestions.addAll(
-                    gamesManager.listRegisteredGames().stream()
-                        .map(GameData::getGameName)
-                        .map(name -> "\"" + name + "\"") // Ensure game names are quoted
-                        .collect(Collectors.toList())
-                );
-            } else if (args[0].equalsIgnoreCase("close") && (sender.hasPermission("core.games.close") || sender.isOp())) {
-                // Suggest only the UUIDs of instances created by the sender, unless they have the "closeothers" permission
-                if (sender instanceof Player) {
-                    Player player = (Player) sender;
-                    suggestions.addAll(
-                        instanceManager.getActiveInstances().values().stream()
-                            .filter(instance -> instance.getCreatedBy().equalsIgnoreCase(player.getName()) || player.hasPermission("core.games.closeothers") || player.isOp())
-                            .map(instance -> instance.getInstanceId().toString())
-                            .collect(Collectors.toList())
-                    );
-                } else {
-                    // For console, show all active instances
-                    suggestions.addAll(
-                        instanceManager.getActiveInstances().keySet().stream()
-                            .map(UUID::toString)
-                            .collect(Collectors.toList())
-                    );
-                }
-            } else if (args[0].equalsIgnoreCase("join") && (sender.hasPermission("core.games.play") || sender.isOp())) {
-                // For "join" command, suggest active instance IDs
-                suggestions.addAll(
-                    instanceManager.getActiveInstances().keySet().stream()
-                        .map(UUID::toString)
-                        .collect(Collectors.toList())
-                );
+            String subcommand = args[0].toLowerCase();
+    
+            switch (subcommand) {
+                case "create":
+                    if (sender.hasPermission("core.games.create") || sender.isOp()) {
+                        // Suggest available game names for "create"
+                        suggestions.addAll(
+                            gamesManager.listRegisteredGames().stream()
+                                .map(GameData::getGameName)
+                                .map(name -> "\"" + name + "\"") // Quote game names for clarity
+                                .collect(Collectors.toList())
+                        );
+                    }
+                    break;
+    
+                case "close":
+                    if (sender.hasPermission("core.games.close") || sender.isOp()) {
+                        if (sender instanceof Player) {
+                            Player player = (Player) sender;
+    
+                            // OPs and players with "core.games.closeothers" see all instances
+                            if (player.isOp() || player.hasPermission("core.games.closeothers")) {
+                                suggestions.addAll(
+                                    instanceManager.getActiveInstances().keySet().stream()
+                                        .map(UUID::toString)
+                                        .collect(Collectors.toList())
+                                );
+                            } else {
+                                // Regular players see only their own instances
+                                suggestions.addAll(
+                                    instanceManager.getActiveInstances().values().stream()
+                                        .filter(instance -> instance.getCreatedBy().equalsIgnoreCase(player.getName()))
+                                        .map(instance -> instance.getInstanceId().toString())
+                                        .collect(Collectors.toList())
+                                );
+                            }
+                        } else {
+                            // Console sees all active instances
+                            suggestions.addAll(
+                                instanceManager.getActiveInstances().keySet().stream()
+                                    .map(UUID::toString)
+                                    .collect(Collectors.toList())
+                            );
+                        }
+                    }
+                    break;
+    
+                case "join":
+                    if (sender.hasPermission("core.games.play") || sender.isOp()) {
+                        // Suggest active game instance IDs for "join"
+                        suggestions.addAll(
+                            instanceManager.getActiveInstances().keySet().stream()
+                                .map(UUID::toString)
+                                .collect(Collectors.toList())
+                        );
+                    }
+                    break;
+    
+                default:
+                    break;
             }
-        } else if (args.length == 3 && args[0].equalsIgnoreCase("create") && (sender.hasPermission("core.games.create") || sender.isOp())) {
-            // For the second argument of "create", suggest available worlds for the selected game
-            String gameName = extractQuotedArgument(args, 1);
-            if (gameName != null) {
-                GameData gameData = gamesManager.getGameData(gameName);
-                if (gameData != null) {
-                    suggestions.addAll(gameData.getWorldOptions());
+        } else if (args.length == 3 && args[0].equalsIgnoreCase("create")) {
+            if (sender.hasPermission("core.games.create") || sender.isOp()) {
+                // Suggest available worlds for the specified game in "create"
+                String gameName = extractQuotedArgument(args, 1);
+                if (gameName != null) {
+                    GameData gameData = gamesManager.getGameData(gameName);
+                    if (gameData != null) {
+                        suggestions.addAll(gameData.getWorldOptions());
+                    }
                 }
             }
         }
