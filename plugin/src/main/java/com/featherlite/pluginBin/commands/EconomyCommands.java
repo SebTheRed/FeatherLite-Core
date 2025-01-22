@@ -40,7 +40,7 @@ public class EconomyCommands implements TabCompleter {
 
         switch (args[0].toLowerCase()) {
             case "bal":
-                if (!isPlayer) {sender.sendMessage(ChatColor.RED + "Only players can enter the command /eco bal."); return true;}
+                if (!isPlayer && !(sender.hasPermission("core.eco.bal") || sender.isOp())) {sender.sendMessage(ChatColor.RED + "Only players can enter the command /eco bal."); return true;}
                 return handleBalCommand(sender);
             case "baltop":
                 if (isPlayer && !(sender.hasPermission("core.eco.baltop") || sender.isOp())) {

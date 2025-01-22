@@ -25,7 +25,39 @@
 
 
 
+    "testing results" :{
 
+        "games menu slotting ppl into wrong team? test": false,
+
+        "app": "broken, admin has no access",
+        "autofill on perms": "need to not show the juicy stuff to non-admins",
+        "menu permissions": false,
+        "test games with bedwars": false,
+        "core.zonebypass not working?": false,
+        "test restoreInv on admins": false,
+        "test eco commands from console": false,
+        "test world commands": false,
+        "adjust god sword": false,
+        "test tpall": false,
+        "change command from tpdeny and tpaccept": false,
+        "retest setspawn": false,
+        "broadcast showing unknown command": false,
+        "add permissions for time": false,
+        "handle incorrect weather options - rn they error": false,
+        "weather not autofilling for admins": false,
+        "eco should only take doubles": false,
+        "killall isn't autofilling for admins": false,
+        "killall from console breaks": false,
+        "exp not autofilling": false,
+        "speed autofill needs fixed": false,
+        "fixed ec message": false,
+        "fix realname autofill": false,
+        "fix getpos, no message": false,
+        "fix ptime autofill": false,
+        "cant /games close as OP?": false
+
+
+    },
 
 
 

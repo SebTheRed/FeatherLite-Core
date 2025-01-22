@@ -1,6 +1,6 @@
 permission-groups:
   default:
-    - core.party
+    - core.party.player
     - core.games.menu
     - core.games.play
     - core.board.switch

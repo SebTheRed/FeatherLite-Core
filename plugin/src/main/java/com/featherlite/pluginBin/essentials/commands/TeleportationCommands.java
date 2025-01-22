@@ -216,7 +216,7 @@ public class TeleportationCommands implements TabCompleter {
     }
 
     private boolean handleTpAll(Player executor) {
-        if (executor == null || !executor.hasPermission("feathercore.tpall")) {
+        if (executor == null || !executor.hasPermission("core.teleport.tpall")) {
             executor.sendMessage(ChatColor.RED + "You do not have permission to use this command.");
             return true;
         }
@@ -295,7 +295,7 @@ public class TeleportationCommands implements TabCompleter {
     }
 
     private boolean handleSetSpawn(Player executor) {
-        if (executor == null || !(executor.hasPermission("feathercore.setspawn") || executor.isOp())) {
+        if (executor == null || !(executor.hasPermission("core.teleport.setspawn") || executor.isOp())) {
             executor.sendMessage(ChatColor.RED + "You do not have permission to set the spawn.");
             return true;
         }
