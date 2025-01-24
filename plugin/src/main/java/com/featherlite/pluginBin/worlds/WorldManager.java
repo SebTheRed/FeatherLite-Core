@@ -9,6 +9,7 @@ import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World.Environment;
+import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -76,22 +77,54 @@ public class WorldManager {
         }
     }
 
-    // Save the loaded world to configuration file
+    // Save the loaded world to configuration file and load the world into memory
     public void persistWorld(String worldName) {
         List<String> worlds = config.getStringList("loadedWorlds");
+
+        // Add the world to the configuration if it doesn't exist
         if (!worlds.contains(worldName)) {
             worlds.add(worldName);
             config.set("loadedWorlds", worlds);
             saveConfig();
         }
+
+        // Check if the world is already loaded in memory
+        if (Bukkit.getWorld(worldName) == null) {
+            // Load the world from disk
+            File worldFolder = new File(Bukkit.getWorldContainer(), worldName);
+            if (worldFolder.exists()) {
+                Bukkit.createWorld(new WorldCreator(worldName));
+                Bukkit.getLogger().info("World '" + worldName + "' has been loaded and persisted.");
+            } else {
+                Bukkit.getLogger().warning("World '" + worldName + "' does not exist on disk. Cannot persist.");
+            }
+        }
     }
 
-    // Remove a world from persisted list when unloaded or deleted
+
+    // Remove a world from persisted list and unload it from the server
     public void removePersistedWorld(String worldName) {
         List<String> worlds = config.getStringList("loadedWorlds");
-        worlds.remove(worldName);
-        config.set("loadedWorlds", worlds);
-        saveConfig();
+
+        // Remove the world from the configuration
+        if (worlds.contains(worldName)) {
+            worlds.remove(worldName);
+            config.set("loadedWorlds", worlds);
+            saveConfig();
+        }
+
+        // Unload the world from memory if it is currently loaded
+        World world = Bukkit.getWorld(worldName);
+        if (world != null) {
+            boolean success = Bukkit.unloadWorld(world, true); // Save changes before unloading
+            if (success) {
+                Bukkit.getLogger().info("World '" + worldName + "' has been unloaded and removed from persistence.");
+            } else {
+                Bukkit.getLogger().warning("Failed to unload world '" + worldName + "'.");
+            }
+        } else {
+            Bukkit.getLogger().info("World '" + worldName + "' is not currently loaded.");
+        }
     }
 
     // Save configuration file

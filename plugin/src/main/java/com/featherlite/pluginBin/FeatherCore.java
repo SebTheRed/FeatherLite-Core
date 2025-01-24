@@ -277,10 +277,10 @@ public class FeatherCore extends JavaPlugin {
         getCommand("tpahere").setTabCompleter(teleportationCommands);
         getCommand("tpaccept").setExecutor(this);
         getCommand("tpaccept").setTabCompleter(teleportationCommands);
-        getCommand("tpadeny").setExecutor(this);
-        getCommand("tpadeny").setTabCompleter(teleportationCommands);
-        getCommand("tpacancel").setExecutor(this);
-        getCommand("tpacancel").setTabCompleter(teleportationCommands);
+        getCommand("tpdeny").setExecutor(this);
+        getCommand("tpdeny").setTabCompleter(teleportationCommands);
+        getCommand("tpcancel").setExecutor(this);
+        getCommand("tpcancel").setTabCompleter(teleportationCommands);
         getCommand("tpr").setExecutor(this);
         getCommand("tpr").setTabCompleter(teleportationCommands);
         getCommand("rtp").setExecutor(this);

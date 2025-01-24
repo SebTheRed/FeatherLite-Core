@@ -12,7 +12,10 @@
         "add multiple homes permission up to 50": "test",
         "test leaving game - ensuring it takes back to chosen /spawn": "test",
         "weave in debugger": "test",
-        "allow players to only be able to close their own games instances": "test"
+        "allow players to only be able to close their own games instances": "test",
+        "/weather not workign": false,
+        "world tp works with /back": false
+
     },
 
     "v1.2":{
