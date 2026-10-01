@@ -73,7 +73,6 @@ public class HomeCommands implements TabCompleter {
                     player.sendMessage(ChatColor.RED + "Home '" + args[0] + "' does not exist!");
                     return true;
                 }
-                teleportationManager.saveLastLocation(player);
                 player.teleport(home);
                 player.sendMessage(ChatColor.GREEN + "Teleported to home '" + args[0] + "'.");
                 return true;

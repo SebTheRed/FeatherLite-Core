@@ -3,9 +3,14 @@ package com.featherlite.pluginBin.essentials.teleportation;
 import com.featherlite.pluginBin.essentials.PlayerDataManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.ChatColor;
 
@@ -15,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class TeleportationManager {
+public class TeleportationManager implements Listener {
     private final PlayerDataManager playerDataManager;
     private final Map<UUID, TeleportRequest> teleportRequests = new HashMap<>(); // <Target, Request Details>
     private JavaPlugin plugin;
@@ -105,14 +110,12 @@ public class TeleportationManager {
 
         switch (request.getRequestType()) {
             case TPA:
-                saveLastLocation(requester); // Save the requester's location
                 requester.teleport(target.getLocation());
                 requester.sendMessage(ChatColor.GREEN + "You have been teleported to " + target.getName());
                 target.sendMessage(ChatColor.YELLOW + requester.getName() + " has teleported to you.");
                 break;
 
             case TPAHERE:
-                saveLastLocation(target); // Save the target's location
                 target.teleport(requester.getLocation());
                 target.sendMessage(ChatColor.GREEN + "You have been teleported to " + requester.getName());
                 requester.sendMessage(ChatColor.YELLOW + target.getName() + " has teleported to you.");
@@ -182,7 +185,22 @@ public class TeleportationManager {
 
 
     public void saveLastLocation(Player player) {
-        Location location = player.getLocation();
+        saveLastLocation(player, player.getLocation());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onPlayerTeleport(PlayerTeleportEvent event) {
+        if (event.isCancelled() || event.getTo() == null || event.getTo().getWorld() == null) {
+            return;
+        }
+        // Use the event's departure point; /back participates in the same swap.
+        saveLastLocation(event.getPlayer(), event.getFrom());
+    }
+
+    private void saveLastLocation(Player player, Location location) {
+        if (location.getWorld() == null) {
+            return;
+        }
     
         // Create a map of updates
         Map<String, Object> updates = new HashMap<>();
@@ -212,8 +230,17 @@ public class TeleportationManager {
             return false;
         }
 
-        Location lastLocation = new Location(Bukkit.getWorld(worldName), x, y, z, yaw, pitch);
-        player.teleport(lastLocation);
+        World world = Bukkit.getWorld(worldName);
+        if (world == null) {
+            player.sendMessage(ChatColor.RED + "Your last teleport world is not loaded.");
+            return false;
+        }
+
+        Location lastLocation = new Location(world, x, y, z, yaw, pitch);
+        if (!player.teleport(lastLocation)) {
+            player.sendMessage(ChatColor.RED + "Could not teleport to your last location.");
+            return false;
+        }
         player.sendMessage(ChatColor.GREEN + "Teleported to your last location.");
         return true;
     }
@@ -284,7 +311,6 @@ public class TeleportationManager {
             return false;
         }
     
-        saveLastLocation(requester); // Save the requester's previous location
         requester.teleport(target.getLocation());
         requester.sendMessage(ChatColor.GREEN + "You have been teleported to " + target.getName());
         target.sendMessage(ChatColor.YELLOW + requester.getName() + " has teleported to you.");
@@ -309,7 +335,6 @@ public class TeleportationManager {
             return false;
         }
     
-        saveLastLocation(target); // Save the target's previous location
         target.teleport(requester.getLocation());
         target.sendMessage(ChatColor.GREEN + "You have been teleported to " + requester.getName());
         requester.sendMessage(ChatColor.YELLOW + target.getName() + " has teleported to you.");
@@ -353,7 +378,6 @@ public class TeleportationManager {
             // Check if the block is safe
             if (isSafeLocation(randomLocation)) {
                 player.teleport(randomLocation);
-                saveLastLocation(player); // Save the teleport location
                 // player.sendMessage(ChatColor.GREEN + "You have been teleported to a random location!");
                 return true;
             }
@@ -371,7 +395,6 @@ public class TeleportationManager {
             return false;
         }
     
-        saveLastLocation(player);
         player.teleport(spawnLocation);
         player.sendMessage(ChatColor.GREEN + "You have been teleported to the server spawn.");
         return true;

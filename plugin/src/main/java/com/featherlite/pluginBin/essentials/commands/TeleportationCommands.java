@@ -158,7 +158,6 @@ public class TeleportationCommands implements TabCompleter {
                 return true;
             }
 
-            teleportationManager.saveLastLocation(executor);
             executor.teleport(location);
             executor.sendMessage(ChatColor.GREEN + "Teleported to coordinates.");
         } catch (NumberFormatException e) {
@@ -185,7 +184,6 @@ public class TeleportationCommands implements TabCompleter {
             return true;
         }
 
-        teleportationManager.saveLastLocation(executor);
         executor.teleport(target.getLocation());
         executor.sendMessage(ChatColor.GREEN + "Teleported to " + target.getName() + ".");
         return true;
@@ -208,7 +206,6 @@ public class TeleportationCommands implements TabCompleter {
             return true;
         }
 
-        teleportationManager.saveLastLocation(target);
         target.teleport(executor.getLocation());
         target.sendMessage(ChatColor.YELLOW + "You have been teleported to " + executor.getName() + ".");
         executor.sendMessage(ChatColor.GREEN + "Teleported " + target.getName() + " to you.");
@@ -219,7 +216,6 @@ public class TeleportationCommands implements TabCompleter {
 
         for (Player target : Bukkit.getOnlinePlayers()) {
             if (!target.equals(executor)) {
-                teleportationManager.saveLastLocation(target);
                 target.teleport(executor.getLocation());
                 target.sendMessage(ChatColor.YELLOW + "You have been teleported to " + executor.getName() + ".");
             }

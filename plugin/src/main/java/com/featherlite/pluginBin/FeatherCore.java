@@ -139,6 +139,7 @@ public class FeatherCore extends JavaPlugin {
         getLogger().info("FeatherCore debugger is: " + isDebuggerOn);
         playerDataManager = new PlayerDataManager(this, "player_data");
         teleportationManager = new TeleportationManager(playerDataManager, this);
+        getServer().getPluginManager().registerEvents(teleportationManager, this);
         homeManager = new HomeManager(playerDataManager);
 
         adminManager = new AdminManager();
