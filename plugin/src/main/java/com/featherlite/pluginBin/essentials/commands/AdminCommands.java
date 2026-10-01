@@ -5,6 +5,7 @@ import com.featherlite.pluginBin.essentials.admin.AdminManager;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -120,8 +121,9 @@ public class AdminCommands implements TabCompleter {
                     return true;
                 }
 
-                String weatherType = args[0].toLowerCase();
-                if ((weatherType != "clear") || (weatherType != "rain") || (weatherType != "thunder") || (weatherType != "storm")) {
+                String weatherType = args[0].toLowerCase(Locale.ROOT);
+                if (!weatherType.equals("clear") && !weatherType.equals("rain")
+                        && !weatherType.equals("thunder") && !weatherType.equals("storm")) {
                     sender.sendMessage(ChatColor.RED + "Incorrect weather type. Usage: /weather <clear|rain|thunder> [world]");
                     return true;
                 }
